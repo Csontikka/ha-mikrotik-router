@@ -2513,8 +2513,10 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
                 if uid not in self.ds["host"]:
                     self.ds["host"][uid] = {"source": "wireless"}
-                elif self.ds["host"][uid]["source"] != "wireless":
+                elif self.ds["host"][uid]["source"] == "capsman":
                     continue
+                else:
+                    self.ds["host"][uid]["source"] = "wireless"
 
                 wireless_detected[uid] = True
                 self.ds["host"][uid]["available"] = True
