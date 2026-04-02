@@ -6,7 +6,7 @@ import voluptuous as vol
 import logging
 from collections import deque
 
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, SupportsResponse
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry
 from homeassistant.config_entries import ConfigEntry
@@ -24,6 +24,15 @@ WOL_SCHEMA = vol.Schema(
     {
         vol.Required("mac"): cv.string,
         vol.Optional("interface"): cv.string,
+    }
+)
+
+API_TEST_SCHEMA = vol.Schema(
+    {
+        vol.Required("path"): cv.string,
+        vol.Optional("limit", default=10): vol.All(vol.Coerce(int), vol.Range(min=1, max=500)),
+        vol.Optional("host"): cv.string,
+        vol.Optional("coordinator_data", default=False): cv.boolean,
     }
 )
 
@@ -97,6 +106,60 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
             "send_magic_packet",
             async_send_magic_packet,
             schema=WOL_SCHEMA,
+        )
+
+    # Register api_test service once
+    if not hass.services.has_service(DOMAIN, "api_test"):
+
+        async def async_api_test(call):
+            """Test a raw Mikrotik API call and return the response."""
+            path = call.data["path"]
+            limit = call.data.get("limit", 10)
+            host_filter = call.data.get("host")
+            use_coordinator_data = call.data.get("coordinator_data", False)
+
+            results = {}
+            for entry_data in hass.data.get(DOMAIN, {}).values():
+                coordinator = entry_data.data_coordinator
+                router_host = coordinator.config_entry.data.get("host", "unknown")
+                if host_filter and router_host != host_filter:
+                    continue
+                try:
+                    if use_coordinator_data:
+                        # Return processed coordinator.data instead of raw API
+                        data = coordinator.data.get(path) if coordinator.data else None
+                        if data is None:
+                            results[router_host] = {"error": f"No coordinator data for path '{path}'"}
+                        elif isinstance(data, dict):
+                            items = list(data.items())[:limit]
+                            safe_items = {str(k): {str(ik): str(iv) for ik, iv in v.items()} if isinstance(v, dict) else str(v) for k, v in items}
+                            results[router_host] = {"total_keys": len(data), "items": safe_items}
+                        else:
+                            results[router_host] = {"value": str(data)}
+                    else:
+                        raw = await hass.async_add_executor_job(coordinator.api.query, path)
+                        if raw is None:
+                            results[router_host] = {"error": "No response or not connected"}
+                        else:
+                            items = raw[:limit]
+                            safe_items = []
+                            for item in items:
+                                if isinstance(item, dict):
+                                    safe_items.append({str(k): str(v) for k, v in item.items()})
+                                else:
+                                    safe_items.append(str(item))
+                            results[router_host] = {"total_returned": len(raw), "items": safe_items}
+                except Exception as exc:
+                    results[router_host] = {"error": str(exc)}
+
+            return {"result": results}
+
+        hass.services.async_register(
+            DOMAIN,
+            "api_test",
+            async_api_test,
+            schema=API_TEST_SCHEMA,
+            supports_response=SupportsResponse.ONLY,
         )
 
     config_entry.async_on_unload(config_entry.add_update_listener(async_reload_entry))

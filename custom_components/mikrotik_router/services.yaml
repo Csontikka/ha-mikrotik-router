@@ -20,3 +20,46 @@ send_magic_packet:
       example: "bridge"
       selector:
         text:
+
+api_test:
+  name: API Test
+  description: >
+    Query the RouterOS API directly or read processed coordinator data.
+    Returns response data for diagnostics and debugging.
+  fields:
+    path:
+      name: API Path
+      description: >
+        RouterOS API path to query (e.g. /interface, /ip/address, /system/resource).
+        When coordinator_data is true, this is the coordinator data key instead.
+      required: true
+      example: "/interface"
+      selector:
+        text:
+    limit:
+      name: Limit
+      description: Maximum number of items to return (1-500).
+      required: false
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 500
+    host:
+      name: Host Filter
+      description: >
+        Only query this specific router host.
+        If omitted, queries all configured routers.
+      required: false
+      example: "192.168.88.1"
+      selector:
+        text:
+    coordinator_data:
+      name: Coordinator Data
+      description: >
+        If true, reads processed coordinator data instead of making a raw API call.
+        Useful for inspecting the integration's internal state.
+      required: false
+      default: false
+      selector:
+        boolean:
