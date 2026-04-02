@@ -133,16 +133,12 @@ class MikrotikClientTrafficSensor(MikrotikSensor):
         """Return the name for this entity"""
         return f"{self.entity_description.name}"
 
-    # @property
-    # def available(self) -> bool:
-    #     """Return if controller and accounting feature in Mikrotik is available.
-    #     Additional check for lan-tx/rx sensors
-    #     """
-    #     if self.entity_description.data_attribute in ["lan-tx", "lan-rx"]:
-    #         return (
-    #             self.coordinator.connected()
-    #             and self._data["available"]
-    #             and self._data["local_accounting"]
-    #         )
-    #     else:
-    #         return self.coordinator.connected() and self._data["available"]
+    @property
+    def available(self) -> bool:
+        """Return if accounting/kid-control data is available for this client."""
+        if self.entity_description.data_attribute in ["lan-tx", "lan-rx"]:
+            return (
+                self._data.get("available", False)
+                and self._data.get("local_accounting", False)
+            )
+        return self._data.get("available", False)
