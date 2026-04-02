@@ -182,7 +182,7 @@ SENSOR_TYPES: tuple[BinarySensorEntityDescription, ...] = (
         func="MikrotikPPPSecretBinarySensor",
     ),
     MikrotikBinarySensorEntityDescription(
-        key="interface",
+        key="interface-connection",
         name="Connection",
         icon_enabled="mdi:lan-connect",
         icon_disabled="mdi:lan-pending",

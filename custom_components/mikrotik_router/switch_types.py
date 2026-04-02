@@ -217,7 +217,7 @@ DEVICE_ATTRIBUTES_CONTAINER = [
 
 SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
     MikrotikSwitchEntityDescription(
-        key="interface",
+        key="interface-port",
         name="Port",
         icon_enabled="mdi:lan-connect",
         icon_disabled="mdi:lan-pending",
