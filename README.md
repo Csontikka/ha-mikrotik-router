@@ -1,9 +1,9 @@
 # Mikrotik Router
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/Csontikka/homeassistant-mikrotik_router?style=plastic)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Csontikka/ha-mikrotik-router?style=plastic)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=plastic)](https://github.com/hacs/integration)
 ![Project Stage](https://img.shields.io/badge/project%20stage-Production%20Ready-green.svg?style=plastic)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_homeassistant-mikrotik_router&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_homeassistant-mikrotik_router)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_homeassistant-mikrotik_router&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_homeassistant-mikrotik_router)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_ha-mikrotik-router&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_ha-mikrotik-router)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_ha-mikrotik-router&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_ha-mikrotik-router)
 
 > **Fork** of [tomaae/homeassistant-mikrotik_router](https://github.com/tomaae/homeassistant-mikrotik_router) with additional features.
 
@@ -160,7 +160,7 @@ This integration is distributed using [HACS](https://hacs.xyz/) as a custom repo
 
 Add this repository to HACS:
 1. HACS → 3 dots menu → **Custom repositories**
-2. URL: `https://github.com/Csontikka/homeassistant-mikrotik_router`
+2. URL: `https://github.com/Csontikka/ha-mikrotik-router`
 3. Category: **Integration**
 4. Find and install "Mikrotik Router"
 
@@ -175,7 +175,7 @@ Minimum requirements:
 
 # Support & Feature Requests
 
-Have an idea for a new feature or found a bug? Don't hesitate to [open an issue](https://github.com/Csontikka/homeassistant-mikrotik_router/issues) — feedback and feature requests are always welcome!
+Have an idea for a new feature or found a bug? Don't hesitate to [open an issue](https://github.com/Csontikka/ha-mikrotik-router/issues) — feedback and feature requests are always welcome!
 
 ## Reporting a bug
 

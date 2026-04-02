@@ -11,18 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Zip mikrotik_router dir
         run: |
-          cd /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router
+          cd ${{ github.workspace }}/custom_components/mikrotik_router
           zip mikrotik_router.zip -r ./
-      - name: Upload zip to release
-        uses: svenstaro/upload-release-action@v1-release
 
+      - name: Upload zip to release
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/mikrotik_router.zip
+          file: ${{ github.workspace }}/custom_components/mikrotik_router/mikrotik_router.zip
           asset_name: mikrotik_router.zip
           tag: ${{ github.ref }}
           overwrite: true
@@ -32,12 +32,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.13
+          python-version: "3.13"
 
       - name: Install requirements
         run: |
@@ -45,4 +45,4 @@ jobs:
 
       - name: Update release notes
         run: |
-          python3 /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/.github/generate_releasenotes.py --token ${{ secrets.GITHUB_TOKEN }} --release yes --tag ${{ github.ref }}
+          python3 ${{ github.workspace }}/.github/generate_releasenotes.py --token ${{ secrets.GITHUB_TOKEN }} --release yes --tag ${{ github.ref }}
