@@ -5,8 +5,6 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_ha-mikrotik-router&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_ha-mikrotik-router)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_ha-mikrotik-router&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_ha-mikrotik-router)
 
-> **Fork** of [tomaae/homeassistant-mikrotik_router](https://github.com/tomaae/homeassistant-mikrotik_router) with additional features.
-
 ![Mikrotik Logo](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/header.png)
 
 Monitor and control your Mikrotik device from Home Assistant.
@@ -208,3 +206,8 @@ logger:
 ```
 
 This is **not required** for diagnostics — only needed if you want to watch logs live via the HA log viewer.
+
+
+# Credits
+
+Based on [tomaae/homeassistant-mikrotik_router](https://github.com/tomaae/homeassistant-mikrotik_router) by [@tomaae](https://github.com/tomaae), licensed under MIT.
