@@ -868,6 +868,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
             skip=[
                 {"name": "type", "value": "bridge"},
+                {"name": "type", "value": "loopback"},
                 {"name": "type", "value": "ppp-in"},
                 {"name": "type", "value": "pptp-in"},
                 {"name": "type", "value": "sstp-in"},
