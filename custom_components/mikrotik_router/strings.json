@@ -17,7 +17,7 @@
         }
       },
       "basic_options": {
-        "title": "Mikrotik Router setup (2/3)",
+        "title": "Mikrotik Router setup (2/4)",
         "description": "Configure integration",
         "data": {
           "scan_interval": "Scan interval (seconds)",
@@ -30,8 +30,18 @@
           "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
         }
       },
+      "sensor_mode": {
+        "title": "Mikrotik Router setup (3/4)",
+        "description": "Choose how to enable sensors and switches",
+        "data": {
+          "sensor_mode": "Sensor setup mode"
+        },
+        "data_description": {
+          "sensor_mode": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
+        }
+      },
       "sensor_select": {
-        "title": "Mikrotik Router setup (3/3)",
+        "title": "Mikrotik Router setup (4/4)",
         "description": "Enable sensors and switches",
         "data": {
           "sensor_client_captive": "Captive portal data",

@@ -100,6 +100,67 @@ def _ssl_mode_from_bools(ssl: bool, verify_ssl: bool) -> str:
     return "none"
 
 
+_SENSOR_PRESETS = {
+    "minimal": {
+        CONF_SENSOR_PORT_TRACKER: True,
+        CONF_SENSOR_PORT_TRAFFIC: False,
+        CONF_SENSOR_CLIENT_TRAFFIC: False,
+        CONF_SENSOR_CLIENT_CAPTIVE: False,
+        CONF_SENSOR_SIMPLE_QUEUES: False,
+        CONF_SENSOR_NAT: False,
+        CONF_SENSOR_MANGLE: False,
+        CONF_SENSOR_ROUTING_RULES: False,
+        CONF_SENSOR_FILTER: False,
+        CONF_SENSOR_WIREGUARD: False,
+        CONF_SENSOR_CONTAINERS: False,
+        CONF_SENSOR_PPP: False,
+        CONF_SENSOR_KIDCONTROL: False,
+        CONF_SENSOR_SCRIPTS: False,
+        CONF_SENSOR_ENVIRONMENT: False,
+        CONF_SENSOR_NETWATCH_TRACKER: False,
+        CONF_TRACK_HOSTS: False,
+    },
+    "recommended": {
+        CONF_SENSOR_PORT_TRACKER: True,
+        CONF_SENSOR_PORT_TRAFFIC: False,
+        CONF_SENSOR_CLIENT_TRAFFIC: False,
+        CONF_SENSOR_CLIENT_CAPTIVE: False,
+        CONF_SENSOR_SIMPLE_QUEUES: False,
+        CONF_SENSOR_NAT: True,
+        CONF_SENSOR_MANGLE: True,
+        CONF_SENSOR_ROUTING_RULES: False,
+        CONF_SENSOR_FILTER: True,
+        CONF_SENSOR_WIREGUARD: False,
+        CONF_SENSOR_CONTAINERS: False,
+        CONF_SENSOR_PPP: False,
+        CONF_SENSOR_KIDCONTROL: False,
+        CONF_SENSOR_SCRIPTS: True,
+        CONF_SENSOR_ENVIRONMENT: False,
+        CONF_SENSOR_NETWATCH_TRACKER: True,
+        CONF_TRACK_HOSTS: False,
+    },
+    "full": {
+        CONF_SENSOR_PORT_TRACKER: True,
+        CONF_SENSOR_PORT_TRAFFIC: True,
+        CONF_SENSOR_CLIENT_TRAFFIC: True,
+        CONF_SENSOR_CLIENT_CAPTIVE: True,
+        CONF_SENSOR_SIMPLE_QUEUES: True,
+        CONF_SENSOR_NAT: True,
+        CONF_SENSOR_MANGLE: True,
+        CONF_SENSOR_ROUTING_RULES: True,
+        CONF_SENSOR_FILTER: True,
+        CONF_SENSOR_WIREGUARD: True,
+        CONF_SENSOR_CONTAINERS: True,
+        CONF_SENSOR_PPP: True,
+        CONF_SENSOR_KIDCONTROL: True,
+        CONF_SENSOR_SCRIPTS: True,
+        CONF_SENSOR_ENVIRONMENT: True,
+        CONF_SENSOR_NETWATCH_TRACKER: True,
+        CONF_TRACK_HOSTS: True,
+    },
+}
+
+
 # ---------------------------
 #   MikrotikControllerConfigFlow
 # ---------------------------
@@ -176,7 +237,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
         """Handle basic options step during initial setup."""
         if user_input is not None:
             self._options.update(user_input)
-            return await self.async_step_sensor_select()
+            return await self.async_step_sensor_mode()
 
         return self.async_show_form(
             step_id="basic_options",
@@ -186,6 +247,42 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                     vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(int, vol.Range(min=10)),
                     vol.Optional(CONF_TRACK_HOSTS_TIMEOUT, default=DEFAULT_TRACK_HOST_TIMEOUT): int,
                     vol.Optional(CONF_ZONE, default=STATE_HOME): str,
+                }
+            ),
+        )
+
+    # ---------------------------
+    #   async_step_sensor_mode
+    # ---------------------------
+    async def async_step_sensor_mode(self, user_input=None):
+        """Handle sensor mode selection step during initial setup."""
+        if user_input is not None:
+            mode = user_input.get("sensor_mode", "recommended")
+            if mode == "custom":
+                return await self.async_step_sensor_select()
+            self._options.update(_SENSOR_PRESETS[mode])
+            return self.async_create_entry(
+                title=self._user_input[CONF_NAME],
+                data=self._user_input,
+                options=self._options,
+            )
+
+        return self.async_show_form(
+            step_id="sensor_mode",
+            last_step=False,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional("sensor_mode", default="recommended"): SelectSelector(
+                        SelectSelectorConfig(
+                            options=[
+                                SelectOptionDict(value="minimal", label="Minimal — port tracker only"),
+                                SelectOptionDict(value="recommended", label="Recommended — port tracker, NAT, mangle, filter, scripts, netwatch"),
+                                SelectOptionDict(value="full", label="Full — all sensors enabled (warning: can generate hundreds of entities on large networks)"),
+                                SelectOptionDict(value="custom", label="Custom — manually select sensors"),
+                            ],
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
                 }
             ),
         )
