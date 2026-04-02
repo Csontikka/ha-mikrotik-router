@@ -64,6 +64,18 @@ Send a Wake-on-LAN magic packet through the MikroTik router to wake up any devic
 - Parameters: `mac` (required), `interface` (optional)
 - Works across all configured MikroTik routers simultaneously
 
+## API Test Service
+Diagnostic service for querying the RouterOS API directly or inspecting processed coordinator data.
+
+- HA service: `mikrotik_router.api_test`
+- **Returns response data** (use in Developer Tools → Services with "Return response" enabled)
+- Parameters:
+  - `path` (required): RouterOS API path (e.g. `/interface`, `/ip/address`, `/system/resource`)
+  - `limit` (optional, default 10): Max items to return (1-500)
+  - `host` (optional): Filter to a specific router host
+  - `coordinator_data` (optional, default false): Read processed integration data instead of raw API
+- Queries all configured routers unless `host` is specified
+
 ## Reboot Button
 Each router device gets a **Reboot** button entity in Home Assistant.
 
@@ -138,11 +150,26 @@ Monitor and control Kid Control.
 
 ## Client Traffic
 
+6 sensors per tracked client (LAN TX/RX, WAN TX/RX, upload speed, download speed).
+
+**Without the required backend feature enabled, client traffic sensors will show as "unavailable" instead of 0.**
+
 ### Client Traffic for RouterOS v6
-Monitor per-IP throughput tracking based on Mikrotik Accounting.
+Requires **IP Accounting** enabled on the router:
+```
+/ip accounting set enabled=yes
+```
 
 ### Client Traffic for RouterOS v7+
-In RouterOS v7 Accounting feature is deprecated, use Kid Control Devices feature instead.
+IP Accounting is deprecated in RouterOS 7. Use **Kid Control** with device profiles instead:
+1. Enable Kid Control (`/ip/kid-control`)
+2. Create device profiles and assign devices to them
+
+Without Kid Control device profiles configured, client traffic sensors will show "unavailable".
+
+## Port Traffic
+
+4 sensors per interface: TX bytes, RX bytes, TX total, RX total. Enable via integration options.
 
 ## UPS sensor
 Monitor your UPS.
