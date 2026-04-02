@@ -2583,6 +2583,15 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         # if not self.host_tracking_initialized:
         #     await self.async_ping_tracked_hosts()
 
+        # Mark wired hosts available if present in ARP table
+        for uid, vals in self.ds["host"].items():
+            if vals.get("source") not in ["capsman", "wireless", "restored"]:
+                if (
+                    uid in self.ds["arp"]
+                    and self.ds["arp"][uid].get("address", "unknown") not in ["unknown", ""]
+                ):
+                    self.ds["host"][uid]["available"] = True
+
         # Process hosts
         self.ds["resource"]["clients_wired"] = 0
         self.ds["resource"]["clients_wireless"] = 0
