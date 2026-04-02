@@ -344,10 +344,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     @property
     def option_track_iface_clients(self):
-        """Config entry option to not track ARP."""
-        return self.config_entry.options.get(
-            CONF_TRACK_IFACE_CLIENTS, DEFAULT_TRACK_IFACE_CLIENTS
-        )
+        """Always show client MAC and IP on interface sensors."""
+        return True
 
     # ---------------------------
     #   option_track_network_hosts
@@ -635,6 +633,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     async def _async_update_data(self):
         """Update Mikrotik data"""
+        _cycle_start = datetime.now()
         _LOGGER.debug("Mikrotik %s starting data update cycle", self.host)
         delta = datetime.now().replace(microsecond=0) - self.last_hwinfo_update
         if self.api.has_reconnected() or delta.total_seconds() > 60 * 60 * 4:
@@ -770,6 +769,15 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if not self.api.connected():
             raise UpdateFailed("Mikrotik Disconnected")
 
+        _cycle_s = (datetime.now() - _cycle_start).total_seconds()
+        if _cycle_s > 5:
+            _LOGGER.warning(
+                "Mikrotik %s update cycle took %.1fs (interfaces=%d, hosts=%d) — consider increasing scan interval",
+                self.host,
+                _cycle_s,
+                len(self.ds.get("interface", {})),
+                len(self.ds.get("host", {})),
+            )
         _LOGGER.debug(
             "Mikrotik %s data update cycle complete (interfaces=%d, hosts=%d, routing_rules=%d)",
             self.host,
@@ -1141,29 +1149,28 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             only=[{"key": "action", "value": "dst-nat"}],
         )
 
-        # Remove duplicate NAT entries to prevent crash
-        nat_uniq = {}
-        nat_del = {}
+        # Handle duplicate NAT entries - suffix uniq-id with RouterOS ID to keep all rules
+        nat_seen = {}
         for uid in self.ds["nat"]:
             self.ds["nat"][uid]["comment"] = str(self.ds["nat"][uid]["comment"])
-
             tmp_name = self.ds["nat"][uid]["uniq-id"]
-            if tmp_name not in nat_uniq:
-                nat_uniq[tmp_name] = uid
+            if tmp_name not in nat_seen:
+                nat_seen[tmp_name] = [uid]
             else:
-                nat_del[uid] = 1
-                nat_del[nat_uniq[tmp_name]] = 1
+                nat_seen[tmp_name].append(uid)
 
-        for uid in nat_del:
-            if self.ds["nat"][uid]["uniq-id"] not in self.nat_removed:
-                self.nat_removed[self.ds["nat"][uid]["uniq-id"]] = 1
-                _LOGGER.warning(
-                    "Mikrotik %s duplicate NAT rule %s, entity will be unavailable.",
-                    self.host,
-                    self.ds["nat"][uid]["name"],
-                )
-
-            del self.ds["nat"][uid]
+        for tmp_name, uids in nat_seen.items():
+            if len(uids) > 1:
+                for uid in uids:
+                    router_id = self.ds["nat"][uid].get(".id", uid)
+                    self.ds["nat"][uid]["uniq-id"] = f"{tmp_name} ({router_id})"
+                if tmp_name not in self.nat_removed:
+                    self.nat_removed[tmp_name] = 1
+                    _LOGGER.info(
+                        "Mikrotik %s duplicate NAT rule '%s' — RouterOS ID suffix added. Add unique comments to the rules to remove this warning.",
+                        self.host,
+                        self.ds["nat"][uids[0]]["name"],
+                    )
 
     # ---------------------------
     #   get_mangle
@@ -1233,29 +1240,28 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
         )
 
-        # Remove duplicate Mangle entries to prevent crash
-        mangle_uniq = {}
-        mangle_del = {}
+        # Handle duplicate Mangle entries - suffix uniq-id with RouterOS ID to keep all rules
+        mangle_seen = {}
         for uid in self.ds["mangle"]:
             self.ds["mangle"][uid]["comment"] = str(self.ds["mangle"][uid]["comment"])
-
             tmp_name = self.ds["mangle"][uid]["uniq-id"]
-            if tmp_name not in mangle_uniq:
-                mangle_uniq[tmp_name] = uid
+            if tmp_name not in mangle_seen:
+                mangle_seen[tmp_name] = [uid]
             else:
-                mangle_del[uid] = 1
-                mangle_del[mangle_uniq[tmp_name]] = 1
+                mangle_seen[tmp_name].append(uid)
 
-        for uid in mangle_del:
-            if self.ds["mangle"][uid]["uniq-id"] not in self.mangle_removed:
-                self.mangle_removed[self.ds["mangle"][uid]["uniq-id"]] = 1
-                _LOGGER.warning(
-                    "Mikrotik %s duplicate Mangle rule %s, entity will be unavailable.",
-                    self.host,
-                    self.ds["mangle"][uid]["name"],
-                )
-
-            del self.ds["mangle"][uid]
+        for tmp_name, uids in mangle_seen.items():
+            if len(uids) > 1:
+                for uid in uids:
+                    router_id = self.ds["mangle"][uid].get(".id", uid)
+                    self.ds["mangle"][uid]["uniq-id"] = f"{tmp_name} ({router_id})"
+                if tmp_name not in self.mangle_removed:
+                    self.mangle_removed[tmp_name] = 1
+                    _LOGGER.info(
+                        "Mikrotik %s duplicate Mangle rule '%s' — RouterOS ID suffix added. Add unique comments to the rules to remove this warning.",
+                        self.host,
+                        self.ds["mangle"][uids[0]]["name"],
+                    )
 
     # ---------------------------
     #   get_routing_rules
@@ -1316,29 +1322,28 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
         )
 
-        # Remove duplicate Routing Rules entries to prevent crash
-        routing_rules_uniq = {}
-        routing_rules_del = {}
+        # Handle duplicate Routing Rules entries - suffix uniq-id with RouterOS ID to keep all rules
+        routing_rules_seen = {}
         for uid in self.ds["routing_rules"]:
             self.ds["routing_rules"][uid]["comment"] = str(self.ds["routing_rules"][uid]["comment"])
-
             tmp_name = self.ds["routing_rules"][uid]["uniq-id"]
-            if tmp_name not in routing_rules_uniq:
-                routing_rules_uniq[tmp_name] = uid
+            if tmp_name not in routing_rules_seen:
+                routing_rules_seen[tmp_name] = [uid]
             else:
-                routing_rules_del[uid] = 1
-                routing_rules_del[routing_rules_uniq[tmp_name]] = 1
+                routing_rules_seen[tmp_name].append(uid)
 
-        for uid in routing_rules_del:
-            if self.ds["routing_rules"][uid]["uniq-id"] not in self.routing_rules_removed:
-                self.routing_rules_removed[self.ds["routing_rules"][uid]["uniq-id"]] = 1
-                _LOGGER.warning(
-                    "Mikrotik %s duplicate Routing Rules rule %s, entity will be unavailable.",
-                    self.host,
-                    self.ds["routing_rules"][uid]["name"],
-                )
-
-            del self.ds["routing_rules"][uid]
+        for tmp_name, uids in routing_rules_seen.items():
+            if len(uids) > 1:
+                for uid in uids:
+                    router_id = self.ds["routing_rules"][uid].get(".id", uid)
+                    self.ds["routing_rules"][uid]["uniq-id"] = f"{tmp_name} ({router_id})"
+                if tmp_name not in self.routing_rules_removed:
+                    self.routing_rules_removed[tmp_name] = 1
+                    _LOGGER.info(
+                        "Mikrotik %s duplicate Routing Rule '%s' — RouterOS ID suffix added. Add unique comments to the rules to remove this warning.",
+                        self.host,
+                        self.ds["routing_rules"][uids[0]]["name"],
+                    )
 
     # ---------------------------
     #   get_wireguard_peers
@@ -1565,30 +1570,28 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
         )
 
-        # Remove duplicate filter entries to prevent crash
-        filter_uniq = {}
-        filter_del = {}
+        # Handle duplicate filter entries - suffix uniq-id with RouterOS ID to keep all rules
+        filter_seen = {}
         for uid in self.ds["filter"]:
             self.ds["filter"][uid]["comment"] = str(self.ds["filter"][uid]["comment"])
-
             tmp_name = self.ds["filter"][uid]["uniq-id"]
-            if tmp_name not in filter_uniq:
-                filter_uniq[tmp_name] = uid
+            if tmp_name not in filter_seen:
+                filter_seen[tmp_name] = [uid]
             else:
-                filter_del[uid] = 1
-                filter_del[filter_uniq[tmp_name]] = 1
+                filter_seen[tmp_name].append(uid)
 
-        for uid in filter_del:
-            if self.ds["filter"][uid]["uniq-id"] not in self.filter_removed:
-                self.filter_removed[self.ds["filter"][uid]["uniq-id"]] = 1
-                _LOGGER.warning(
-                    "Mikrotik %s duplicate Filter rule %s (ID %s), entity will be unavailable.",
-                    self.host,
-                    self.ds["filter"][uid]["name"],
-                    self.ds["filter"][uid][".id"],
-                )
-
-            del self.ds["filter"][uid]
+        for tmp_name, uids in filter_seen.items():
+            if len(uids) > 1:
+                for uid in uids:
+                    router_id = self.ds["filter"][uid].get(".id", uid)
+                    self.ds["filter"][uid]["uniq-id"] = f"{tmp_name} ({router_id})"
+                if tmp_name not in self.filter_removed:
+                    self.filter_removed[tmp_name] = 1
+                    _LOGGER.info(
+                        "Mikrotik %s duplicate Filter rule '%s' — RouterOS ID suffix added. Add unique comments to the rules to remove this warning.",
+                        self.host,
+                        self.ds["filter"][uids[0]]["name"],
+                    )
 
     # ---------------------------
     #   get_kidcontrol
@@ -2918,8 +2921,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if not kid_control_devices_data:
             if "kid-control-devices" not in self.notified_flags:
-                _LOGGER.error(
-                    "No kid control devices found on your Mikrotik device, make sure kid-control feature is configured"
+                _LOGGER.warning(
+                    "Mikrotik %s: No Kid Control devices found. Either configure Kid Control on your router, or disable 'Kid control' in the integration options.",
+                    self.host,
                 )
                 self.notified_flags.append("kid-control-devices")
             return
