@@ -34,7 +34,7 @@
         "title": "Mikrotik Router setup (3/4)",
         "description": "Choose how to enable sensors and switches",
         "data": {
-          "sensor_preset": "Sensor preset"
+          "sensor_preset": " "
         },
         "data_description": {
           "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."

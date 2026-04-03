@@ -157,6 +157,7 @@ This integration is distributed via [HACS](https://hacs.xyz/) as a custom reposi
 - Home Assistant 2024.3.0 or later
 - RouterOS 7+ (v6 is not officially supported — see [Feature Availability](#feature-availability))
 - API user with permissions: `read, write, api, reboot, policy, test, sensitive`
+  > All permissions are recommended. Without `write`, switches and Kid Control auto-setup won't work. Without `reboot`, the reboot button is unavailable.
 
 ## Configuration
 
