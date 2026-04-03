@@ -103,10 +103,55 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
 ![RouterOS Update](docs/assets/images/screenshots/update_routeros.png)
 
-### Services
+### Actions (Services)
 
-- **Wake-on-LAN** (`mikrotik_router.send_magic_packet`): send WoL magic packet through the router. Parameters: `mac` (required), `interface` (optional).
-- **API Test** (`mikrotik_router.api_test`): diagnostic service for raw RouterOS API queries or coordinator data inspection. Use in Developer Tools -> Services with "Return response" enabled. Parameters: `path` (required), `limit` (optional, default 10), `host` (optional), `coordinator_data` (optional).
+- **Wake-on-LAN** (`mikrotik_router.send_magic_packet`): send a WoL magic packet through the router to wake up a network device.
+
+  **Parameters:** `mac` (required), `interface` (required — the router interface to send the packet from, e.g. `bridge`).
+
+  ```yaml
+  action: mikrotik_router.send_magic_packet
+  data:
+    mac: "AA:BB:CC:DD:EE:FF"
+    interface: "bridge"
+  ```
+
+  **Example — automation:**
+
+  ```yaml
+  automation:
+    - alias: "Wake up server when I get home"
+      trigger:
+        - platform: zone
+          entity_id: person.me
+          zone: zone.home
+          event: enter
+      action:
+        - action: mikrotik_router.send_magic_packet
+          data:
+            mac: "AA:BB:CC:DD:EE:FF"
+            interface: "bridge"
+  ```
+
+- **API Test** (`mikrotik_router.api_test`): diagnostic action for raw RouterOS API queries or coordinator data inspection. Use in **Developer Tools -> Actions** with "Return response" enabled.
+
+  **Parameters:** `path` (required), `limit` (optional, default 10), `host` (optional), `coordinator_data` (optional).
+
+  ```yaml
+  # Query router interfaces
+  action: mikrotik_router.api_test
+  data:
+    path: "/interface"
+    limit: 20
+  ```
+
+  ```yaml
+  # Inspect coordinator's processed data
+  action: mikrotik_router.api_test
+  data:
+    path: "interface"
+    coordinator_data: true
+  ```
 
 ## Feature Availability
 

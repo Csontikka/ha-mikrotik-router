@@ -14,9 +14,9 @@ send_magic_packet:
     interface:
       name: Interface
       description: >
-        Router interface to send the magic packet from.
-        If omitted, MikroTik broadcasts from the default gateway interface.
-      required: false
+        Router interface to send the magic packet from (e.g. bridge).
+        Required by RouterOS — the packet is sent out through this interface.
+      required: true
       example: "bridge"
       selector:
         text:
