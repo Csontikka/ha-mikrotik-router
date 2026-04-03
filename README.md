@@ -98,8 +98,8 @@ Without the required backend, sensors show "unavailable" instead of 0.
 
 Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
-- RouterOS update entity with changelog
-- RouterBoard firmware update entity
+- **RouterOS update** — with changelog and optional automatic backup before install
+- **RouterBoard firmware update** — upgrades board firmware and reboots
 
 ![RouterOS Update](docs/assets/images/screenshots/update_routeros.png)
 
