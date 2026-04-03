@@ -14,13 +14,13 @@ Full-featured Home Assistant integration for MikroTik routers running **RouterOS
 
 CPU load, memory/HDD usage, uptime, temperatures (CPU, board, PHY, switch), voltage, power consumption, PSU metrics (current/voltage for PSU1/PSU2), fan speeds (fan1-fan4), UPS status, GPS coordinates. Each router also gets a reboot button entity.
 
-<!-- SCREENSHOT_PLACEHOLDER: System sensors overview — show CPU, memory, uptime, temperature entities for a router device -->
+> **[SCREENSHOT]** System sensors overview — CPU, memory, uptime, temperature entities for a router device
 
 ### Network Interfaces
 
 Per-interface monitoring: link status (binary sensor), enable/disable (switch), TX/RX traffic rates and totals (optional), IP address sensor per interface, SFP status and information, PoE status/control/consumption, connected device MAC/IP info per interface.
 
-<!-- SCREENSHOT_PLACEHOLDER: Interface entities — show port binary sensor, traffic sensors, IP address sensor, and port switch for one interface -->
+> **[SCREENSHOT]** Interface entities — port binary sensor, traffic sensors, IP address sensor, and port switch for one interface
 
 ### Firewall & Routing Rules
 
@@ -33,13 +33,13 @@ Monitor and control individual rules — each gets a switch entity:
 
 More information: [MikroTik Firewall documentation](https://help.mikrotik.com/docs/display/ROS/Firewall)
 
-<!-- SCREENSHOT_PLACEHOLDER: Firewall switches — show a few NAT/filter/mangle switch entities -->
+> **[SCREENSHOT]** Firewall switches — NAT/filter/mangle switch entities
 
 ### Device Tracking
 
 ARP-based network host presence tracking. Configurable timeout (default 180s). Shows MAC address, IP, and connected interface as attributes.
 
-<!-- SCREENSHOT_PLACEHOLDER: Device tracker entity — show a tracked device with its attributes -->
+> **[SCREENSHOT]** Device tracker entity — tracked device with its attributes
 
 ### WireGuard (RouterOS 7+)
 
@@ -53,7 +53,7 @@ Peer display name: `name` field, then `comment`, then first 8 chars of public ke
 
 Enable via integration options -> WireGuard peer sensors.
 
-<!-- SCREENSHOT_PLACEHOLDER: WireGuard peer device — show the peer device with its switch, binary sensor, and traffic sensors -->
+> **[SCREENSHOT]** WireGuard peer device — switch, binary sensor, and traffic sensors
 
 ### Containers (RouterOS 7+)
 
@@ -65,7 +65,7 @@ Each container gets its own device with:
 
 Enable via integration options -> Container sensors.
 
-<!-- SCREENSHOT_PLACEHOLDER: Container device — show container switch and status sensor -->
+> **[SCREENSHOT]** Container device — container switch and status sensor
 
 ### Client Traffic
 
@@ -79,7 +79,7 @@ Uses Kid Control backend. The integration auto-creates an `ha-monitoring` profil
 
 Without the required backend, sensors show "unavailable" instead of 0.
 
-<!-- SCREENSHOT_PLACEHOLDER: Client traffic sensors — show TX/RX sensors for a tracked client device -->
+> **[SCREENSHOT]** Client traffic sensors — TX/RX sensors for a tracked client device
 
 ### Additional Features
 
@@ -101,7 +101,7 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 - RouterOS update entity with changelog
 - RouterBoard firmware update entity
 
-<!-- SCREENSHOT_PLACEHOLDER: Update entities — show RouterOS and RouterBoard update entities -->
+> **[SCREENSHOT]** Update entities — RouterOS and RouterBoard update entities
 
 ### Services
 
