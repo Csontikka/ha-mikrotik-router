@@ -66,11 +66,11 @@ def _skip_sensor(config_entry, entity_description, data, uid) -> bool:
     ):
         return True
 
-    if (
-        entity_description.data_path == "client_traffic"
-        and entity_description.data_attribute not in data[uid].keys()
-    ):
-        return True
+    if entity_description.data_path == "client_traffic":
+        if not data[uid].get("available", False):
+            return True
+        if entity_description.data_attribute not in data[uid].keys():
+            return True
 
     # Binary sensors
     if (
@@ -168,7 +168,14 @@ async def async_add_entities(
         hass.data[DOMAIN][config_entry.entry_id].data_coordinator
     )
 
-    unsub = async_dispatcher_connect(hass, "update_sensors", async_update_controller)
+    # Remove orphaned entities that are no longer provided by this platform
+    entity_registry = er.async_get(hass)
+    for entry in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
+        if entry.domain == platform.domain and entry.entity_id not in platform.entities:
+            _LOGGER.debug("Removing orphaned entity %s", entry.entity_id)
+            entity_registry.async_remove(entry.entity_id)
+
+    unsub = async_dispatcher_connect(hass, f"update_sensors_{config_entry.entry_id}", async_update_controller)
     config_entry.async_on_unload(unsub)
 
 
