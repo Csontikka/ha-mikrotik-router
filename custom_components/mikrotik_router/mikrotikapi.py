@@ -51,7 +51,6 @@ class MikrotikAPI:
         self._connection_retry_sec = 58
         self.error = None
         self.connection_error_reported = False
-        self.client_traffic_last_run = None
         self.disable_health = False
 
         # Default ports
@@ -446,73 +445,3 @@ class MikrotikAPI:
         _LOGGER.debug("Ping host failure: %s", args["address"])
         return False
 
-    @staticmethod
-    def _current_milliseconds():
-        return int(round(time() * 1000))
-
-    def is_accounting_and_local_traffic_enabled(self) -> (bool, bool):
-        # Returns:
-        #   1st bool: Is accounting enabled
-        #   2nd bool: Is account-local-traffic enabled
-
-        if not self.connection_check():
-            return False, False
-
-        response = self.query("/ip/accounting")
-        if response is None:
-            return False, False
-
-        for item in response:
-            if "enabled" not in item:
-                continue
-            if not item["enabled"]:
-                return False, False
-
-        for item in response:
-            if "account-local-traffic" not in item:
-                continue
-            if not item["account-local-traffic"]:
-                return True, False
-
-        return True, True
-
-    # ---------------------------
-    #   take_client_traffic_snapshot
-    #   Returns float -> period in seconds between last and current run
-    # ---------------------------
-    def take_client_traffic_snapshot(self, use_accounting) -> float:
-        """Tako accounting snapshot and return time diff"""
-        if not self.connection_check():
-            return 0
-
-        if use_accounting:
-            accounting = self.query("/ip/accounting", return_list=False)
-
-            self.lock.acquire()
-            try:
-                # Prepare command
-                take = accounting("snapshot/take")
-            except Exception as e:
-                self.disconnect("accounting_snapshot", e)
-                self.lock.release()
-                return 0
-
-            try:
-                list(take)
-            except Exception as e:
-                self.disconnect("accounting_snapshot", e)
-                self.lock.release()
-                return 0
-
-            self.lock.release()
-
-        # First request will be discarded because we cannot know when the last data was retrieved
-        # prevents spikes in data
-        if not self.client_traffic_last_run:
-            self.client_traffic_last_run = self._current_milliseconds()
-            return 0
-
-        # Calculate time difference in seconds and return
-        time_diff = self._current_milliseconds() - self.client_traffic_last_run
-        self.client_traffic_last_run = self._current_milliseconds()
-        return time_diff / 1000

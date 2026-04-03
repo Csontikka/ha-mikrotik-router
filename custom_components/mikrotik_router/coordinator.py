@@ -544,18 +544,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
         )
 
-        if 0 < self.major_fw_version < 7:
-            if "ppp" in packages:
-                self.support_ppp = packages["ppp"]["enabled"]
-
-            if "wireless" in packages:
-                self.support_capsman = packages["wireless"]["enabled"]
-                self.support_wireless = packages["wireless"]["enabled"]
-            else:
-                self.support_capsman = False
-                self.support_wireless = False
-
-        elif 0 < self.major_fw_version >= 7:
+        if 0 < self.major_fw_version >= 7:
             self.support_ppp = True
             self.support_wireless = True
             if "wifiwave2" in packages and packages["wifiwave2"]["enabled"]:
@@ -749,11 +738,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if self.api.connected() and 0 < self.major_fw_version >= 7:
             await self.hass.async_add_executor_job(self.sync_kid_control_monitoring_profile)
 
-        if self.api.connected() and self.option_sensor_client_traffic:
-            if 0 < self.major_fw_version < 7:
-                await self.hass.async_add_executor_job(self.process_accounting)
-            elif 0 < self.major_fw_version >= 7:
-                await self.hass.async_add_executor_job(self.process_kid_control_devices)
+        if self.api.connected() and self.option_sensor_client_traffic and 0 < self.major_fw_version >= 7:
+            await self.hass.async_add_executor_job(self.process_kid_control_devices)
 
         if self.api.connected() and self.option_sensor_client_captive:
             await self.hass.async_add_executor_job(self.get_captive)
@@ -1767,22 +1753,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         ):
             return
 
-        if 0 < self.major_fw_version < 7:
-            self.ds["health"] = parse_api(
-                data=self.ds["health"],
-                source=self.api.query("/system/health"),
-                vals=[
-                    {"name": "temperature", "default": 0},
-                    {"name": "voltage", "default": 0},
-                    {"name": "cpu-temperature", "default": 0},
-                    {"name": "power-consumption", "default": 0},
-                    {"name": "board-temperature1", "default": 0},
-                    {"name": "phy-temperature", "default": 0},
-                    {"name": "fan1-speed", "default": 0},
-                    {"name": "fan2-speed", "default": 0},
-                ],
-            )
-        elif 0 < self.major_fw_version >= 7:
+        if 0 < self.major_fw_version >= 7:
             self.ds["health7"] = parse_api(
                 data=self.ds["health7"],
                 source=self.api.query("/system/health"),
@@ -2743,155 +2714,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     self.ds["resource"]["clients_wired"] += 1
 
     # ---------------------------
-    #   process_accounting
-    # ---------------------------
-    def process_accounting(self) -> None:
-        """Get Accounting data from Mikrotik"""
-        # Check if accounting and account-local-traffic is enabled
-        (
-            accounting_enabled,
-            local_traffic_enabled,
-        ) = self.api.is_accounting_and_local_traffic_enabled()
-
-        # Build missing hosts from main hosts dict
-        for uid, vals in self.ds["host"].items():
-            if uid not in self.ds["client_traffic"]:
-                self.ds["client_traffic"][uid] = {
-                    "address": vals["address"],
-                    "mac-address": vals["mac-address"],
-                    "host-name": vals["host-name"],
-                    "available": False,
-                    "local_accounting": False,
-                }
-
-        _LOGGER.debug(
-            f"Working with {len(self.ds['client_traffic'])} accounting devices"
-        )
-
-        # Build temp accounting values dict with ip address as key
-        tmp_accounting_values = {
-            vals["address"]: {
-                "wan-tx": 0,
-                "wan-rx": 0,
-                "lan-tx": 0,
-                "lan-rx": 0,
-            }
-            for uid, vals in self.ds["client_traffic"].items()
-        }
-
-        time_diff = self.api.take_client_traffic_snapshot(True)
-        if time_diff:
-            accounting_data = parse_api(
-                data={},
-                source=self.api.query("/ip/accounting/snapshot"),
-                key=".id",
-                vals=[
-                    {"name": ".id"},
-                    {"name": "src-address"},
-                    {"name": "dst-address"},
-                    {"name": "bytes", "default": 0},
-                ],
-            )
-
-            threshold = self.api.query("/ip/accounting")[0].get("threshold")
-            entry_count = len(accounting_data)
-
-            if entry_count == threshold:
-                _LOGGER.warning(
-                    f"Accounting entries count reached the threshold of {threshold}!"
-                    " Some entries were not saved by Mikrotik so accounting calculation won't be correct."
-                    " Consider shortening update interval or"
-                    " increasing the accounting threshold value in Mikrotik."
-                )
-            elif entry_count > threshold * 0.9:
-                _LOGGER.info(
-                    f"Accounting entries count ({entry_count} reached 90% of the threshold,"
-                    f" currently set to {threshold}! Consider shortening update interval or"
-                    " increasing the accounting threshold value in Mikrotik."
-                )
-
-            for item in accounting_data.values():
-                source_ip = str(item.get("src-address")).strip()
-                destination_ip = str(item.get("dst-address")).strip()
-                bits_count = int(str(item.get("bytes")).strip())
-
-                if self._address_part_of_local_network(
-                    source_ip
-                ) and self._address_part_of_local_network(destination_ip):
-                    # LAN TX/RX
-                    if source_ip in tmp_accounting_values:
-                        tmp_accounting_values[source_ip]["lan-tx"] += bits_count
-                    if destination_ip in tmp_accounting_values:
-                        tmp_accounting_values[destination_ip]["lan-rx"] += bits_count
-                elif self._address_part_of_local_network(
-                    source_ip
-                ) and not self._address_part_of_local_network(destination_ip):
-                    # WAN TX
-                    if source_ip in tmp_accounting_values:
-                        tmp_accounting_values[source_ip]["wan-tx"] += bits_count
-                elif (
-                    not self._address_part_of_local_network(source_ip)
-                    and self._address_part_of_local_network(destination_ip)
-                    and destination_ip in tmp_accounting_values
-                ):
-                    # WAN RX
-                    tmp_accounting_values[destination_ip]["wan-rx"] += bits_count
-
-        # Calculate real throughput and transform it to appropriate unit
-        # Also handle availability of accounting and local_accounting from Mikrotik
-        for addr, vals in tmp_accounting_values.items():
-            uid = self._get_accounting_uid_by_ip(addr)
-            if not uid:
-                _LOGGER.warning(
-                    f"Address {addr} not found in accounting data, skipping update"
-                )
-                continue
-
-            self.ds["client_traffic"][uid]["available"] = accounting_enabled
-            self.ds["client_traffic"][uid]["local_accounting"] = local_traffic_enabled
-
-            if not accounting_enabled:
-                # Skip calculation for WAN and LAN if accounting is disabled
-                continue
-
-            self.ds["client_traffic"][uid]["wan-tx"] = (
-                round(vals["wan-tx"] / time_diff) if vals["wan-tx"] else 0.0
-            )
-            self.ds["client_traffic"][uid]["wan-rx"] = (
-                round(vals["wan-rx"] / time_diff) if vals["wan-rx"] else 0.0
-            )
-
-            if not local_traffic_enabled:
-                # Skip calculation for LAN if LAN accounting is disabled
-                continue
-
-            self.ds["client_traffic"][uid]["lan-tx"] = (
-                round(vals["lan-tx"] / time_diff) if vals["lan-tx"] else 0.0
-            )
-            self.ds["client_traffic"][uid]["lan-rx"] = (
-                round(vals["lan-rx"] / time_diff) if vals["lan-rx"] else 0.0
-            )
-
-    # ---------------------------
-    #   _address_part_of_local_network
-    # ---------------------------
-    def _address_part_of_local_network(self, address) -> bool:
-        address = ip_address(address)
-        for vals in self.ds["dhcp-network"].values():
-            if address in vals["IPv4Network"]:
-                return True
-        return False
-
-    # ---------------------------
-    #   _get_accounting_uid_by_ip
-    # ---------------------------
-    def _get_accounting_uid_by_ip(self, requested_ip):
-        for mac, vals in self.ds["client_traffic"].items():
-            if vals.get("address") is requested_ip:
-                return mac
-        return None
-
-    # ---------------------------
     #   _get_iface_from_entry
     # ---------------------------
     def _get_iface_from_entry(self, entry):
@@ -2957,12 +2779,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     "address": vals["address"],
                     "mac-address": vals["mac-address"],
                     "host-name": vals["host-name"],
-                    "previous-bytes-up": 0.0,
-                    "previous-bytes-down": 0.0,
                     "tx": 0.0,
                     "rx": 0.0,
                     "available": False,
-                    "local_accounting": False,
                 }
 
         _LOGGER.debug(
@@ -2975,8 +2794,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
-                {"name": "bytes-down"},
-                {"name": "bytes-up"},
+                {"name": "rate-down", "default": 0},
+                {"name": "rate-up", "default": 0},
                 {
                     "name": "enabled",
                     "source": "disabled",
@@ -2985,8 +2804,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 },
             ],
         )
-
-        time_diff = self.api.take_client_traffic_snapshot(False)
 
         if not kid_control_devices_data:
             if "kid-control-devices" not in self.notified_flags:
@@ -3005,17 +2822,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 continue
 
             self.ds["client_traffic"][uid]["available"] = vals["enabled"]
-
-            current_tx = vals["bytes-up"]
-            previous_tx = self.ds["client_traffic"][uid]["previous-bytes-up"]
-            if time_diff:
-                delta_tx = max(0, current_tx - previous_tx)
-                self.ds["client_traffic"][uid]["tx"] = round(delta_tx / time_diff)
-            self.ds["client_traffic"][uid]["previous-bytes-up"] = current_tx
-
-            current_rx = vals["bytes-down"]
-            previous_rx = self.ds["client_traffic"][uid]["previous-bytes-down"]
-            if time_diff:
-                delta_rx = max(0, current_rx - previous_rx)
-                self.ds["client_traffic"][uid]["rx"] = round(delta_rx / time_diff)
-            self.ds["client_traffic"][uid]["previous-bytes-down"] = current_rx
+            # Dynamic kid-control entries (created by ha-monitoring profile) report
+            # rate-up/rate-down in bits/sec; convert to bytes/sec for the sensor unit
+            self.ds["client_traffic"][uid]["tx"] = round(vals["rate-up"] / 8)
+            self.ds["client_traffic"][uid]["rx"] = round(vals["rate-down"] / 8)
