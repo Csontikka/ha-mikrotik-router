@@ -317,6 +317,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.mangle_removed = {}
         self.routing_rules_removed = {}
         self.filter_removed = {}
+        self.queue_removed = {}
         self.host_hass_recovered = False
         self.host_tracking_initialized = False
 
@@ -745,6 +746,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if self.api.connected() and self.support_ppp and self.option_sensor_ppp:
             await self.hass.async_add_executor_job(self.get_ppp)
 
+        if self.api.connected() and 0 < self.major_fw_version >= 7:
+            await self.hass.async_add_executor_job(self.sync_kid_control_monitoring_profile)
+
         if self.api.connected() and self.option_sensor_client_traffic:
             if 0 < self.major_fw_version < 7:
                 await self.hass.async_add_executor_job(self.process_accounting)
@@ -785,7 +789,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             len(self.ds.get("host", {})),
             len(self.ds.get("routing_rules", {})),
         )
-        async_dispatcher_send(self.hass, "update_sensors", self)
+        async_dispatcher_send(self.hass, f"update_sensors_{self.config_entry.entry_id}", self)
         return self.ds
 
     # ---------------------------
@@ -2085,7 +2089,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.ds["queue"] = parse_api(
             data=self.ds["queue"],
             source=self.api.query("/queue/simple"),
-            key="name",
+            key=".id",
             vals=[
                 {"name": ".id"},
                 {"name": "name", "default": "unknown"},
@@ -2110,6 +2114,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         for uid, vals in self.ds["queue"].items():
             self.ds["queue"][uid]["comment"] = str(self.ds["queue"][uid]["comment"])
+            # Generate uniq-id from name for entity unique_id
+            if "uniq-id" not in self.ds["queue"][uid]:
+                self.ds["queue"][uid]["uniq-id"] = self.ds["queue"][uid]["name"]
 
             upload_max_limit_bps, download_max_limit_bps = [
                 int(x) for x in vals["max-limit"].split("/")
@@ -2154,6 +2161,28 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             upload_burst_time, download_burst_time = vals["burst-time"].split("/")
             self.ds["queue"][uid]["upload-burst-time"] = upload_burst_time
             self.ds["queue"][uid]["download-burst-time"] = download_burst_time
+
+        # Handle duplicate Queue entries - suffix uniq-id with RouterOS ID to keep all rules
+        queue_seen = {}
+        for uid in self.ds["queue"]:
+            tmp_name = self.ds["queue"][uid]["uniq-id"]
+            if tmp_name not in queue_seen:
+                queue_seen[tmp_name] = [uid]
+            else:
+                queue_seen[tmp_name].append(uid)
+
+        for tmp_name, uids in queue_seen.items():
+            if len(uids) > 1:
+                for uid in uids:
+                    router_id = self.ds["queue"][uid].get(".id", uid)
+                    self.ds["queue"][uid]["uniq-id"] = f"{tmp_name} ({router_id})"
+                if tmp_name not in self.queue_removed:
+                    self.queue_removed[tmp_name] = 1
+                    _LOGGER.info(
+                        "Mikrotik %s duplicate Queue rule '%s' — RouterOS ID suffix added. Add unique names to the rules to remove this warning.",
+                        self.host,
+                        tmp_name,
+                    )
 
     # ---------------------------
     #   get_arp
@@ -2874,6 +2903,46 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 break
 
         return uid
+
+    # ---------------------------
+    #   sync_kid_control_monitoring_profile
+    # ---------------------------
+    _HA_MONITORING_PROFILE = "ha-monitoring"
+
+    def sync_kid_control_monitoring_profile(self) -> None:
+        """Create or remove the ha-monitoring kid-control profile based on integration option."""
+        existing = self.api.query("/ip/kid-control") or []
+        has_profile = any(p.get("name") == self._HA_MONITORING_PROFILE for p in existing)
+
+        if self.option_sensor_client_traffic:
+            if not has_profile:
+                success = self.api.execute(
+                    "/ip/kid-control", "add", None, None,
+                    attributes={
+                        "name": self._HA_MONITORING_PROFILE,
+                        "mon": "0s-1d", "tue": "0s-1d", "wed": "0s-1d",
+                        "thu": "0s-1d", "fri": "0s-1d", "sat": "0s-1d", "sun": "0s-1d",
+                    },
+                )
+                if success:
+                    _LOGGER.info(
+                        "Mikrotik %s: Created kid-control profile '%s' for device traffic monitoring",
+                        self.host, self._HA_MONITORING_PROFILE,
+                    )
+                else:
+                    _LOGGER.warning(
+                        "Mikrotik %s: Could not create kid-control profile '%s'. "
+                        "Create it manually: /ip/kid-control/add name=%s mon=0s-1d tue=0s-1d wed=0s-1d thu=0s-1d fri=0s-1d sat=0s-1d sun=0s-1d",
+                        self.host, self._HA_MONITORING_PROFILE, self._HA_MONITORING_PROFILE,
+                    )
+        else:
+            if has_profile:
+                success = self.api.execute("/ip/kid-control", "remove", "name", self._HA_MONITORING_PROFILE)
+                if success:
+                    _LOGGER.info(
+                        "Mikrotik %s: Removed kid-control profile '%s'",
+                        self.host, self._HA_MONITORING_PROFILE,
+                    )
 
     # ---------------------------
     #   process_kid_control

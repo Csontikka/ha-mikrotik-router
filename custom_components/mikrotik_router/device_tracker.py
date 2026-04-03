@@ -99,7 +99,21 @@ async def async_add_entities(
         hass.data[DOMAIN][config_entry.entry_id].tracker_coordinator
     )
 
-    unsub = async_dispatcher_connect(hass, "update_sensors", async_update_controller)
+    # Remove orphaned entities that are no longer provided by this platform
+    entity_registry = er.async_get(hass)
+    for entry in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
+        if entry.domain == platform.domain and entry.entity_id not in platform.entities:
+            _LOGGER.debug("Removing orphaned entity %s", entry.entity_id)
+            entity_registry.async_remove(entry.entity_id)
+
+    @callback
+    async def async_update_controller_wrapper(coordinator):
+        """Dispatcher fires with MikrotikCoordinator, but device trackers need tracker_coordinator."""
+        await async_update_controller(
+            hass.data[DOMAIN][config_entry.entry_id].tracker_coordinator
+        )
+
+    unsub = async_dispatcher_connect(hass, f"update_sensors_{config_entry.entry_id}", async_update_controller_wrapper)
     config_entry.async_on_unload(unsub)
 
 
