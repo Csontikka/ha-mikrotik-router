@@ -135,10 +135,5 @@ class MikrotikClientTrafficSensor(MikrotikSensor):
 
     @property
     def available(self) -> bool:
-        """Return if accounting/kid-control data is available for this client."""
-        if self.entity_description.data_attribute in ["lan-tx", "lan-rx"]:
-            return (
-                self._data.get("available", False)
-                and self._data.get("local_accounting", False)
-            )
+        """Return if kid-control data is available for this client."""
         return self._data.get("available", False)
