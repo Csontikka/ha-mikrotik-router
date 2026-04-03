@@ -6,7 +6,7 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_ha-mikrotik-router&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_ha-mikrotik-router)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_ha-mikrotik-router&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_ha-mikrotik-router)
 
-Full-featured Home Assistant integration for MikroTik routers. Monitor system resources, control firewall rules, track network devices, manage WireGuard peers, containers, and more — all from your HA dashboard. Supports multiple routers simultaneously with both RouterOS 6 and 7.
+Full-featured Home Assistant integration for MikroTik routers running **RouterOS 7+**. Monitor system resources, control firewall rules, track network devices, manage WireGuard peers, containers, and more — all from your HA dashboard. Supports multiple routers simultaneously.
 
 ## Features
 
@@ -69,15 +69,9 @@ Enable via integration options -> Container sensors.
 
 ### Client Traffic
 
-Per-device bandwidth monitoring.
+Per-device bandwidth monitoring. 2 sensors per tracked device (total TX/RX).
 
-**RouterOS 6**: 6 sensors per device (LAN TX/RX, WAN TX/RX, total TX/RX). Requires IP Accounting:
-
-```
-/ip/accounting/set enabled=yes
-```
-
-**RouterOS 7+**: 2 sensors per device (total TX/RX). Uses Kid Control backend. Auto-creates `ha-monitoring` profile (unrestricted). If the API user lacks write permission, a warning is logged with the manual command:
+Uses Kid Control backend. The integration auto-creates an `ha-monitoring` profile (unrestricted) on the router when enabled. If the API user lacks write permission, a warning is logged with the manual command:
 
 ```
 /ip/kid-control/add name=ha-monitoring mon=0s-1d tue=0s-1d wed=0s-1d thu=0s-1d fri=0s-1d sat=0s-1d sun=0s-1d
@@ -116,34 +110,36 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
 ## Feature Availability
 
-| Feature | RouterOS 6 | RouterOS 7+ | Optional |
+| Feature | RouterOS 7+ | RouterOS 6* | Optional |
 |---------|:---:|:---:|:---:|
 | System monitoring (CPU, memory, temps, fans, PSU, uptime) | ✓ | ✓ | No |
 | Network interfaces (status, traffic, IP address) | ✓ | ✓ | Traffic: Yes |
 | Firewall rules (NAT, mangle, filter) | ✓ | ✓ | Yes |
 | Routing rules | ✓ | ✓ | Yes |
 | Device tracking (ARP) | ✓ | ✓ | Yes |
-| WireGuard peers | — | ✓ | Yes |
-| Containers | — | ✓ | Yes |
-| Client traffic | ✓ (IP Accounting) | ✓ (Kid Control) | Yes |
+| WireGuard peers | ✓ | — | Yes |
+| Containers | ✓ | — | Yes |
+| Client traffic (Kid Control) | ✓ | — | Yes |
 | Kid Control | ✓ | ✓ | Yes |
-| PPP users | — | ✓ | Yes |
+| PPP users | ✓ | — | Yes |
 | Simple queues | ✓ | ✓ | Yes |
 | Captive portal | ✓ | ✓ | Yes |
 | Scripts | ✓ | ✓ | Yes |
 | Netwatch | ✓ | ✓ | Yes |
 | Environment variables | ✓ | ✓ | Yes |
-| CAPsMAN (wireless controller) | ✓ | — | Auto |
-| WiFi (wifiwave2/wifi-qcom) | — | ✓ | Auto |
+| WiFi (wifiwave2/wifi-qcom) | ✓ | — | Auto |
+| CAPsMAN (wireless controller) | — | ✓ | Auto |
 | UPS monitoring | ✓ | ✓ | Package |
 | GPS coordinates | ✓ | ✓ | Package |
 | IP Cloud (public IP) | ✓ | ✓ | No |
-| Device mode & packages | — | ✓ | No |
+| Device mode & packages | ✓ | — | No |
 | Firmware updates | ✓ | ✓ | No |
 | Wake-on-LAN service | ✓ | ✓ | No |
 | API Test service | ✓ | ✓ | No |
 | Reboot button | ✓ | ✓ | No |
 | Multi-router support | ✓ | ✓ | No |
+
+> **\*RouterOS 6 is not officially supported.** Basic features may still work, but v6 is not tested or maintained. Upgrade to RouterOS 7 is strongly recommended.
 
 ## Installation
 
@@ -157,7 +153,7 @@ This integration is distributed via [HACS](https://hacs.xyz/) as a custom reposi
 ### Requirements
 
 - Home Assistant 2024.3.0 or later
-- RouterOS v7 recommended (v6 supported with limited features)
+- RouterOS 7+ (v6 is not officially supported — see [Feature Availability](#feature-availability))
 - API user with permissions: `read, write, api, reboot, policy, test, sensitive`
 
 ## Configuration
