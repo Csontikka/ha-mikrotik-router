@@ -1795,19 +1795,19 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         )
 
         tmp_uptime = 0
-        tmp = re.split(r"(\d+)s", self.ds["resource"]["uptime_str"])
+        tmp = re.split(r"(\d++)s", self.ds["resource"]["uptime_str"])
         if len(tmp) > 1:
             tmp_uptime += int(tmp[1])
-        tmp = re.split(r"(\d+)m", self.ds["resource"]["uptime_str"])
+        tmp = re.split(r"(\d++)m", self.ds["resource"]["uptime_str"])
         if len(tmp) > 1:
             tmp_uptime += int(tmp[1]) * 60
-        tmp = re.split(r"(\d+)h", self.ds["resource"]["uptime_str"])
+        tmp = re.split(r"(\d++)h", self.ds["resource"]["uptime_str"])
         if len(tmp) > 1:
             tmp_uptime += int(tmp[1]) * 3600
-        tmp = re.split(r"(\d+)d", self.ds["resource"]["uptime_str"])
+        tmp = re.split(r"(\d++)d", self.ds["resource"]["uptime_str"])
         if len(tmp) > 1:
             tmp_uptime += int(tmp[1]) * 86400
-        tmp = re.split(r"(\d+)w", self.ds["resource"]["uptime_str"])
+        tmp = re.split(r"(\d++)w", self.ds["resource"]["uptime_str"])
         if len(tmp) > 1:
             tmp_uptime += int(tmp[1]) * 604800
 
