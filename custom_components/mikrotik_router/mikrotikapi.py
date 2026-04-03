@@ -129,8 +129,8 @@ class MikrotikAPI:
                         ssl_context.verify_mode = ssl.CERT_REQUIRED
                         ssl_context.verify_flags &= ~ssl.VERIFY_X509_STRICT
                     else:
-                        ssl_context.check_hostname = False
-                        ssl_context.verify_mode = ssl.CERT_NONE
+                        ssl_context.check_hostname = False  # NOSONAR
+                        ssl_context.verify_mode = ssl.CERT_NONE  # NOSONAR
                     self._ssl_wrapper = ssl_context.wrap_socket
                 kwargs["ssl_wrapper"] = self._ssl_wrapper
             self._connection = librouteros.connect(
