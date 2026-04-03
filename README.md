@@ -150,22 +150,35 @@ Monitor and control Kid Control.
 
 ## Client Traffic
 
-6 sensors per tracked client (LAN TX/RX, WAN TX/RX, upload speed, download speed).
+Monitor per-device bandwidth usage. The number of sensors and the backend mechanism differ by RouterOS version.
 
 **Without the required backend feature enabled, client traffic sensors will show as "unavailable" instead of 0.**
 
 ### Client Traffic for RouterOS v6
+
+6 sensors per tracked device: LAN TX, LAN RX, WAN TX, WAN RX, total TX, total RX.
+
 Requires **IP Accounting** enabled on the router:
 ```
-/ip accounting set enabled=yes
+/ip/accounting/set enabled=yes
 ```
 
 ### Client Traffic for RouterOS v7+
-IP Accounting is deprecated in RouterOS 7. Use **Kid Control** with device profiles instead:
-1. Enable Kid Control (`/ip/kid-control`)
-2. Create device profiles and assign devices to them
 
-Without Kid Control device profiles configured, client traffic sensors will show "unavailable".
+2 sensors per tracked device: total TX, total RX.
+
+IP Accounting is deprecated in RouterOS 7. The integration uses **Kid Control** instead.
+
+**Auto-setup:** When `sensor_client_traffic` is enabled, the integration automatically creates a `ha-monitoring` Kid Control profile on the router (unrestricted, all-day access). This profile acts as a trigger — RouterOS 7 dynamically tracks all devices once any Kid Control profile exists. When the option is disabled, the `ha-monitoring` profile is removed automatically.
+
+No manual device profiles are needed. RouterOS 7 tracks all devices dynamically as long as at least one Kid Control profile exists.
+
+**If the API user lacks write permission**, the profile cannot be created automatically. A warning will be logged with the manual command to run on the router:
+```
+/ip/kid-control/add name=ha-monitoring mon=0s-1d tue=0s-1d wed=0s-1d thu=0s-1d fri=0s-1d sat=0s-1d sun=0s-1d
+```
+
+Sensors only appear for devices that are actively tracked by Kid Control.
 
 ## Port Traffic
 

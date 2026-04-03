@@ -64,7 +64,7 @@
         },
         "data_description": {
           "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
-          "sensor_client_traffic": "6 sensors per tracked client (LAN/WAN TX/RX). Requires: RouterOS 6 — IP Accounting enabled (/ip/accounting); RouterOS 7 — Kid Control enabled with device profiles. Without this, sensors show unavailable. Warning: creates 6 entities per tracked device.",
+          "sensor_client_traffic": "RouterOS 6: 6 sensors per device (LAN TX/RX, WAN TX/RX, total TX/RX) via IP Accounting — enable with /ip/accounting/set enabled=yes. RouterOS 7: 2 sensors per device (total TX/RX) via Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when this option is enabled, and removes it when disabled. Sensors only appear for devices actively tracked by Kid Control.",
           "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
           "sensor_environment": "Sensors for RouterOS environment variables.",
           "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
@@ -132,7 +132,7 @@
         },
         "data_description": {
           "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
-          "sensor_client_traffic": "6 sensors per tracked client (LAN/WAN TX/RX). Requires: RouterOS 6 — IP Accounting enabled (/ip/accounting); RouterOS 7 — Kid Control enabled with device profiles. Without this, sensors show unavailable. Warning: creates 6 entities per tracked device.",
+          "sensor_client_traffic": "RouterOS 6: 6 sensors per device (LAN TX/RX, WAN TX/RX, total TX/RX) via IP Accounting — enable with /ip/accounting/set enabled=yes. RouterOS 7: 2 sensors per device (total TX/RX) via Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when this option is enabled, and removes it when disabled. Sensors only appear for devices actively tracked by Kid Control.",
           "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
           "sensor_environment": "Sensors for RouterOS environment variables.",
           "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
