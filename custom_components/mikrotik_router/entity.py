@@ -297,7 +297,7 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
                 model=f"{self.coordinator.data['resource']['board-name']}",
                 manufacturer=f"{self.coordinator.data['resource']['platform']}",
                 sw_version=f"{self.coordinator.data['resource']['version']}",
-                configuration_url=f"http://{self.coordinator.config_entry.data[CONF_HOST]}",
+                configuration_url=f"http://{self.coordinator.config_entry.data[CONF_HOST]}",  # NOSONAR
             )
         elif "mac-address" in self.entity_description.data_reference:
             dev_group = self._data[self.entity_description.data_name]
