@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
       types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+
 jobs:
   check_conflicts:
     name: Check for PR merge conflicts
