@@ -6,12 +6,17 @@ import voluptuous as vol
 import logging
 from collections import deque
 
+import re
+
 from homeassistant.core import HomeAssistant, SupportsResponse
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry
 from homeassistant.config_entries import ConfigEntry
 
 from homeassistant.const import CONF_VERIFY_SSL
+
+_MAC_RE = re.compile(r"^([0-9A-Fa-f]{2}[:\-]){5}[0-9A-Fa-f]{2}$")
 
 from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD, CONF_PORT, CONF_SSL
 
@@ -75,6 +80,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     async def async_send_magic_packet(call) -> None:
         """Send a WoL magic packet via all connected MikroTik routers."""
         mac = call.data["mac"]
+        if not _MAC_RE.match(mac):
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="invalid_mac",
+                translation_placeholders={"mac": mac},
+            )
         interface = call.data.get("interface")
         for entry in hass.config_entries.async_entries(DOMAIN):
             if not hasattr(entry, "runtime_data"):

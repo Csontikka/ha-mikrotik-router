@@ -219,16 +219,32 @@ This integration is distributed via [HACS](https://hacs.xyz/) as a custom reposi
 
 1. Create a user on your MikroTik router with the required permissions (see above)
 2. In Home Assistant: **Settings -> Devices & Services -> Add Integration -> Mikrotik Router**
-3. Enter connection details (host, username, password)
+3. Fill in the connection details (see parameters below)
+4. Choose a sensor preset and finish setup
 
-### Connection Options
+### Installation Parameters
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| Port | 0 (auto) | API port (0 = auto-detect: 8728 or 8729 for SSL) |
-| SSL Mode | None | `none` (port 8728), `ssl` (8729, self-signed OK), `ssl_verify` (8729, CA required) |
-| Scan interval | 30s | Update frequency (minimum 10s) |
-| Host tracking timeout | 180s | Seconds before marking a host as away |
+These fields are shown during the initial setup wizard:
+
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| Name | Yes | `Mikrotik` | Display name for this integration instance |
+| Host | Yes | — | IP address or hostname of the MikroTik router |
+| Username | Yes | `admin` | RouterOS API username |
+| Password | Yes | — | RouterOS API password |
+| Port | No | `0` | API port (`0` = auto-detect: 8728 plain, 8729 SSL) |
+| SSL Mode | No | `none` | `none` — plain (port 8728); `ssl` — encrypted, self-signed OK (port 8729); `ssl_verify` — encrypted, CA-signed cert required |
+
+### Configuration Parameters
+
+These options can be changed after setup via **Settings -> Devices & Services -> Mikrotik Router -> Configure**:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Scan interval | `30` s | How often the router is polled (minimum 10 s). Lower values increase load on the router. |
+| Host tracking timeout | `180` s | Seconds after the last ARP/DHCP/wireless activity before a network device is marked as away. |
+| Zone | `home` | HA zone used for device tracker `home`/`not_home` state. |
+| Sensor toggles | see presets | Per-category switches for NAT, mangle, filter, scripts, WireGuard, containers, etc. |
 
 ### Sensor Presets
 

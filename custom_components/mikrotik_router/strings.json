@@ -176,5 +176,10 @@
         "ssl_verify": "SSL with verification — requires a valid CA-signed certificate"
       }
     }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
+    }
   }
 }
