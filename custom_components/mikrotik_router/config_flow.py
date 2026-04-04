@@ -81,15 +81,6 @@ from .mikrotikapi import MikrotikAPI
 _LOGGER = logging.getLogger(__name__)
 
 
-# ---------------------------
-#   configured_instances
-# ---------------------------
-@callback
-def configured_instances(hass):
-    """Return a set of configured instances."""
-    return set(
-        entry.data[CONF_NAME] for entry in hass.config_entries.async_entries(DOMAIN)
-    )
 
 
 def _ssl_mode_from_bools(ssl: bool, verify_ssl: bool) -> str:
@@ -189,10 +180,6 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
         """Handle a flow initialized by the user."""
         errors = {}
         if user_input is not None:
-            # Check if instance with this name already exists
-            if user_input[CONF_NAME] in configured_instances(self.hass):
-                errors["base"] = "name_exists"
-
             # Convert ssl_mode selector to ssl + verify_ssl booleans
             ssl_mode = user_input.pop("ssl_mode", "none")
             user_input[CONF_SSL] = ssl_mode in ("ssl", "ssl_verify")

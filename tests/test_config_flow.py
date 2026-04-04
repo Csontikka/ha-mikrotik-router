@@ -68,6 +68,42 @@ async def test_successful_setup_recommended(hass):
         assert result["data"][CONF_HOST] == "192.168.88.1"
 
 
+async def test_duplicate_entry_aborted(hass):
+    """Test config flow aborts when the same host is added a second time."""
+    with patch(
+        "custom_components.mikrotik_router.config_flow.MikrotikAPI"
+    ) as mock_api_cls:
+        mock_api = MagicMock()
+        mock_api.connect.return_value = True
+        mock_api.error = None
+        mock_api_cls.return_value = mock_api
+
+        # First entry — full flow
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": config_entries.SOURCE_USER}
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], USER_INPUT
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], BASIC_OPTIONS_INPUT
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {"sensor_preset": "recommended"}
+        )
+        assert result["type"] == FlowResultType.CREATE_ENTRY
+
+        # Second attempt with the same host — should abort
+        result2 = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": config_entries.SOURCE_USER}
+        )
+        result2 = await hass.config_entries.flow.async_configure(
+            result2["flow_id"], USER_INPUT
+        )
+        assert result2["type"] == FlowResultType.ABORT
+        assert result2["reason"] == "already_configured"
+
+
 async def test_connection_failure(hass):
     """Test config flow shows error when router is unreachable."""
     with patch(
