@@ -136,4 +136,4 @@ class MikrotikClientTrafficSensor(MikrotikSensor):
     @property
     def available(self) -> bool:
         """Return if kid-control data is available for this client."""
-        return self._data.get("available", False)
+        return super().available and self._data.get("available", False)
