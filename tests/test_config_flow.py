@@ -8,10 +8,24 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_PORT,
+    CONF_SSL,
+    CONF_VERIFY_SSL,
+    CONF_NAME,
 )
 from homeassistant.data_entry_flow import FlowResultType
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.mikrotik_router.const import DOMAIN
+
+ENTRY_DATA = {
+    CONF_HOST: "192.168.88.1",
+    CONF_USERNAME: "admin",
+    CONF_PASSWORD: "oldpass",
+    CONF_PORT: 0,
+    CONF_SSL: False,
+    CONF_VERIFY_SSL: False,
+    CONF_NAME: "Mikrotik",
+}
 
 USER_INPUT = {
     CONF_HOST: "192.168.88.1",
@@ -125,3 +139,71 @@ async def test_connection_failure(hass):
         assert result["type"] == FlowResultType.FORM
         assert result["step_id"] == "user"
         assert result["errors"][CONF_HOST] == "cannot_connect"
+
+
+async def test_reauth_flow_success(hass):
+    """Reauth flow updates credentials and aborts with reauth_successful."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data=ENTRY_DATA,
+        options={},
+        unique_id="192.168.88.1",
+    )
+    entry.add_to_hass(hass)
+
+    with patch(
+        "custom_components.mikrotik_router.config_flow.MikrotikAPI"
+    ) as mock_api_cls:
+        mock_api = MagicMock()
+        mock_api.connect.return_value = True
+        mock_api.error = None
+        mock_api_cls.return_value = mock_api
+
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_REAUTH, "entry_id": entry.entry_id},
+            data=entry.data,
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "reauth_confirm"
+
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {CONF_USERNAME: "newadmin", CONF_PASSWORD: "newpass"},
+        )
+        assert result["type"] == FlowResultType.ABORT
+        assert result["reason"] == "reauth_successful"
+        assert entry.data[CONF_USERNAME] == "newadmin"
+        assert entry.data[CONF_PASSWORD] == "newpass"
+
+
+async def test_reauth_flow_wrong_credentials(hass):
+    """Reauth flow stays on form when credentials are rejected by the router."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data=ENTRY_DATA,
+        options={},
+        unique_id="192.168.88.1",
+    )
+    entry.add_to_hass(hass)
+
+    with patch(
+        "custom_components.mikrotik_router.config_flow.MikrotikAPI"
+    ) as mock_api_cls:
+        mock_api = MagicMock()
+        mock_api.connect.return_value = False
+        mock_api.error = "wrong_login"
+        mock_api_cls.return_value = mock_api
+
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_REAUTH, "entry_id": entry.entry_id},
+            data=entry.data,
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {CONF_USERNAME: "admin", CONF_PASSWORD: "wrongpass"},
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "reauth_confirm"
+        assert result["errors"][CONF_PASSWORD] == "wrong_login"
