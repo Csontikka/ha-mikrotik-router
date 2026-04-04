@@ -42,6 +42,43 @@ _TYPE_IP = 5
 _TYPE_IDENTITY = 11
 _TYPE_BOARD = 12
 
+# SNMP
+_SNMP_PORT = 161
+_SNMP_TIMEOUT = 0.5
+
+# Minimal SNMP v2c GET request for OID 1.3.6.1.2.1.1.5.0 (sysName), community "public".
+# Pre-encoded BER/DER — no external dependency needed.
+#
+# Structure:
+#   SEQUENCE {
+#     INTEGER 1               -- version v2c
+#     OCTET STRING "public"   -- community
+#     GetRequest-PDU {
+#       INTEGER 1             -- request-id
+#       INTEGER 0             -- error-status
+#       INTEGER 0             -- error-index
+#       SEQUENCE {            -- VarBindList
+#         SEQUENCE {          -- VarBind
+#           OID 1.3.6.1.2.1.1.5.0
+#           NULL
+#         }
+#       }
+#     }
+#   }
+_SNMP_SYSNAME_GET = bytes.fromhex(
+    "3029"                  # SEQUENCE (41 bytes)
+    "020101"                # INTEGER: version=1 (v2c)
+    "04067075626c6963"      # OCTET STRING: "public"
+    "a01c"                  # GetRequest-PDU (28 bytes)
+    "020400000001"          # INTEGER: request-id=1
+    "020100"                # INTEGER: error-status=0
+    "020100"                # INTEGER: error-index=0
+    "300e"                  # SEQUENCE: VarBindList (14 bytes)
+    "300c"                  # SEQUENCE: VarBind (12 bytes)
+    "06082b0601020101" "0500"  # OID 1.3.6.1.2.1.1.5.0
+    "0500"                    # NULL value
+)
+
 
 @dataclass
 class MndpDevice:
@@ -133,6 +170,41 @@ def _parse_mndp(data: bytes) -> MndpDevice | None:
     return dev if dev.ip else None
 
 
+def _parse_snmp_sysname(data: bytes) -> str | None:
+    """Extract sysName string from an SNMP GetResponse packet."""
+    # Find the OID value bytes in the response, then read the next TLV as the value.
+    oid_tlv = b"\x06\x08\x2b\x06\x01\x02\x01\x01\x05\x00"
+    idx = data.find(oid_tlv)
+    if idx == -1:
+        return None
+    after = idx + len(oid_tlv)
+    if after + 2 > len(data):
+        return None
+    val_type = data[after]
+    val_len = data[after + 1]
+    if after + 2 + val_len > len(data):
+        return None
+    if val_type == 0x04:  # OCTET STRING
+        return data[after + 2 : after + 2 + val_len].decode("utf-8", errors="replace").strip()
+    return None
+
+
+async def _snmp_sysname(loop: asyncio.AbstractEventLoop, ip: str) -> str | None:
+    """Query SNMP sysName (1.3.6.1.2.1.1.5.0) with community 'public'."""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setblocking(False)
+        sock.sendto(_SNMP_SYSNAME_GET, (ip, _SNMP_PORT))
+        data = await asyncio.wait_for(
+            loop.sock_recv(sock, 1024), timeout=_SNMP_TIMEOUT
+        )
+        return _parse_snmp_sysname(data)
+    except (asyncio.TimeoutError, OSError):
+        return None
+    finally:
+        sock.close()
+
+
 async def _mndp_unicast(loop: asyncio.AbstractEventLoop, ip: str, timeout: float) -> MndpDevice | None:
     """Send a unicast MNDP probe to *ip* and wait for a response."""
     try:
@@ -185,15 +257,30 @@ async def async_scan_mndp(timeout: float = 2.0) -> list[MndpDevice]:
 
     if probe_list:
         probe_timeout = min(1.0, timeout * 0.6)
-        tasks = [_mndp_unicast(loop, ip, probe_timeout) for ip, _, _ in probe_list]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        for (ip, mac, is_known), result in zip(probe_list, results):
-            if isinstance(result, MndpDevice):
-                result.mac = result.mac or mac
-                found[result.ip or ip] = result
-            elif not isinstance(result, Exception) and is_known:
-                # No MNDP response but OUI confirmed it's a MikroTik
-                found[ip] = MndpDevice(ip=ip, mac=mac)
+        # Run MNDP and SNMP probes in parallel — zero extra latency
+        mndp_results, snmp_results = await asyncio.gather(
+            asyncio.gather(
+                *[_mndp_unicast(loop, ip, probe_timeout) for ip, _, _ in probe_list],
+                return_exceptions=True,
+            ),
+            asyncio.gather(
+                *[_snmp_sysname(loop, ip) for ip, _, _ in probe_list],
+                return_exceptions=True,
+            ),
+        )
+        for (ip, mac, is_known), mndp_result, snmp_result in zip(
+            probe_list, mndp_results, snmp_results
+        ):
+            snmp_name = snmp_result if isinstance(snmp_result, str) else None
+            if isinstance(mndp_result, MndpDevice):
+                # MNDP confirmed MikroTik — fill missing identity from SNMP
+                if not mndp_result.identity and snmp_name:
+                    mndp_result.identity = snmp_name
+                mndp_result.mac = mndp_result.mac or mac
+                found[mndp_result.ip or ip] = mndp_result
+            elif not isinstance(mndp_result, Exception) and is_known:
+                # OUI-confirmed MikroTik, MNDP silent — use SNMP name if available
+                found[ip] = MndpDevice(ip=ip, mac=mac, identity=snmp_name or "")
         _LOGGER.debug("MNDP: unicast probe results: %s", list(found.keys()))
 
     # --- Step 2: Broadcast fallback if ARP found nothing ---
