@@ -67,6 +67,87 @@ _integration_logger.setLevel(logging.DEBUG)
 
 
 # ---------------------------
+#   async_setup
+# ---------------------------
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Register global actions (services) once at integration load time."""
+
+    async def async_send_magic_packet(call) -> None:
+        """Send a WoL magic packet via all connected MikroTik routers."""
+        mac = call.data["mac"]
+        interface = call.data.get("interface")
+        for entry_data in hass.data.get(DOMAIN, {}).values():
+            success = await hass.async_add_executor_job(
+                entry_data.data_coordinator.api.wol, mac, interface
+            )
+            if not success:
+                _LOGGER.warning(
+                    "WoL: failed to send magic packet to %s via router %s",
+                    mac,
+                    entry_data.data_coordinator.config_entry.data.get("host", "unknown"),
+                )
+
+    hass.services.async_register(
+        DOMAIN,
+        "send_magic_packet",
+        async_send_magic_packet,
+        schema=WOL_SCHEMA,
+    )
+
+    async def async_api_test(call):
+        """Test a raw Mikrotik API call and return the response."""
+        path = call.data["path"]
+        limit = call.data.get("limit", 10)
+        host_filter = call.data.get("host")
+        use_coordinator_data = call.data.get("coordinator_data", False)
+
+        results = {}
+        for entry_data in hass.data.get(DOMAIN, {}).values():
+            coordinator = entry_data.data_coordinator
+            router_host = coordinator.config_entry.data.get("host", "unknown")
+            if host_filter and router_host != host_filter:
+                continue
+            try:
+                if use_coordinator_data:
+                    data = coordinator.data.get(path) if coordinator.data else None
+                    if data is None:
+                        results[router_host] = {"error": f"No coordinator data for path '{path}'"}
+                    elif isinstance(data, dict):
+                        items = list(data.items())[:limit]
+                        safe_items = {str(k): {str(ik): str(iv) for ik, iv in v.items()} if isinstance(v, dict) else str(v) for k, v in items}
+                        results[router_host] = {"total_keys": len(data), "items": safe_items}
+                    else:
+                        results[router_host] = {"value": str(data)}
+                else:
+                    raw = await hass.async_add_executor_job(coordinator.api.query, path)
+                    if raw is None:
+                        results[router_host] = {"error": "No response or not connected"}
+                    else:
+                        items = raw[:limit]
+                        safe_items = []
+                        for item in items:
+                            if isinstance(item, dict):
+                                safe_items.append({str(k): str(v) for k, v in item.items()})
+                            else:
+                                safe_items.append(str(item))
+                        results[router_host] = {"total_returned": len(raw), "items": safe_items}
+            except Exception as exc:
+                results[router_host] = {"error": str(exc)}
+
+        return {"result": results}
+
+    hass.services.async_register(
+        DOMAIN,
+        "api_test",
+        async_api_test,
+        schema=API_TEST_SCHEMA,
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    return True
+
+
+# ---------------------------
 #   async_setup_entry
 # ---------------------------
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
@@ -85,85 +166,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     )
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
-
-    # Register global WoL service once (shared across all config entries)
-    if not hass.services.has_service(DOMAIN, "send_magic_packet"):
-
-        async def async_send_magic_packet(call) -> None:
-            """Send a WoL magic packet via all connected MikroTik routers."""
-            mac = call.data["mac"]
-            interface = call.data.get("interface")
-            for entry_data in hass.data.get(DOMAIN, {}).values():
-                success = await hass.async_add_executor_job(
-                    entry_data.data_coordinator.api.wol, mac, interface
-                )
-                if not success:
-                    _LOGGER.warning(
-                        "WoL: failed to send magic packet to %s via router %s",
-                        mac,
-                        entry_data.data_coordinator.config_entry.data.get("host", "unknown"),
-                    )
-
-        hass.services.async_register(
-            DOMAIN,
-            "send_magic_packet",
-            async_send_magic_packet,
-            schema=WOL_SCHEMA,
-        )
-
-    # Register api_test service once
-    if not hass.services.has_service(DOMAIN, "api_test"):
-
-        async def async_api_test(call):
-            """Test a raw Mikrotik API call and return the response."""
-            path = call.data["path"]
-            limit = call.data.get("limit", 10)
-            host_filter = call.data.get("host")
-            use_coordinator_data = call.data.get("coordinator_data", False)
-
-            results = {}
-            for entry_data in hass.data.get(DOMAIN, {}).values():
-                coordinator = entry_data.data_coordinator
-                router_host = coordinator.config_entry.data.get("host", "unknown")
-                if host_filter and router_host != host_filter:
-                    continue
-                try:
-                    if use_coordinator_data:
-                        # Return processed coordinator.data instead of raw API
-                        data = coordinator.data.get(path) if coordinator.data else None
-                        if data is None:
-                            results[router_host] = {"error": f"No coordinator data for path '{path}'"}
-                        elif isinstance(data, dict):
-                            items = list(data.items())[:limit]
-                            safe_items = {str(k): {str(ik): str(iv) for ik, iv in v.items()} if isinstance(v, dict) else str(v) for k, v in items}
-                            results[router_host] = {"total_keys": len(data), "items": safe_items}
-                        else:
-                            results[router_host] = {"value": str(data)}
-                    else:
-                        raw = await hass.async_add_executor_job(coordinator.api.query, path)
-                        if raw is None:
-                            results[router_host] = {"error": "No response or not connected"}
-                        else:
-                            items = raw[:limit]
-                            safe_items = []
-                            for item in items:
-                                if isinstance(item, dict):
-                                    safe_items.append({str(k): str(v) for k, v in item.items()})
-                                else:
-                                    safe_items.append(str(item))
-                            results[router_host] = {"total_returned": len(raw), "items": safe_items}
-                except Exception as exc:
-                    results[router_host] = {"error": str(exc)}
-
-            return {"result": results}
-
-        hass.services.async_register(
-            DOMAIN,
-            "api_test",
-            async_api_test,
-            schema=API_TEST_SCHEMA,
-            supports_response=SupportsResponse.ONLY,
-        )
 
     config_entry.async_on_unload(config_entry.add_update_listener(async_reload_entry))
 

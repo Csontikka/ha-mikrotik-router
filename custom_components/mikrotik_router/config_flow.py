@@ -212,6 +212,8 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
 
             # Save instance
             if not errors:
+                await self.async_set_unique_id(user_input[CONF_HOST])
+                self._abort_if_unique_id_configured()
                 self._user_input = user_input
                 return await self.async_step_basic_options()
 
