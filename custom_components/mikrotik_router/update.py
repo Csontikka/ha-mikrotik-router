@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+PARALLEL_UPDATES = 0
+
 import asyncio
 from logging import getLogger
 from typing import Any

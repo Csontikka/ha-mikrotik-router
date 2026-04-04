@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+PARALLEL_UPDATES = 0
+
 from logging import getLogger
 from collections.abc import Mapping
 from datetime import timedelta

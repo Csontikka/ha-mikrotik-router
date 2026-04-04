@@ -33,8 +33,8 @@ rules:
   docs-installation-parameters: todo
   entity-unavailable: done
   integration-owner: done
-  log-when-unavailable: todo
-  parallel-updates: todo
+  log-when-unavailable: done
+  parallel-updates: done
   reauthentication-flow: done
   test-coverage: todo
 
