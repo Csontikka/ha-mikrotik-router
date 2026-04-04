@@ -1,0 +1,125 @@
+{
+  "entity": {
+    "sensor": {
+      "system_temperature": {
+        "default": "mdi:thermometer"
+      },
+      "system_voltage": {
+        "default": "mdi:lightning-bolt"
+      },
+      "system_cpu_temperature": {
+        "default": "mdi:thermometer"
+      },
+      "system_switch_temperature": {
+        "default": "mdi:thermometer"
+      },
+      "system_board_temperature1": {
+        "default": "mdi:thermometer"
+      },
+      "system_phy_temperature": {
+        "default": "mdi:thermometer"
+      },
+      "system_power_consumption": {
+        "default": "mdi:transmission-tower"
+      },
+      "system_poe_out_consumption": {
+        "default": "mdi:flash"
+      },
+      "system_fan1_speed": {
+        "default": "mdi:fan"
+      },
+      "system_fan2_speed": {
+        "default": "mdi:fan"
+      },
+      "system_fan3_speed": {
+        "default": "mdi:fan"
+      },
+      "system_fan4_speed": {
+        "default": "mdi:fan"
+      },
+      "system_psu1_current": {
+        "default": "mdi:lightning-bolt-circle"
+      },
+      "system_psu1_voltage": {
+        "default": "mdi:lightning-bolt"
+      },
+      "system_psu2_current": {
+        "default": "mdi:lightning-bolt-circle"
+      },
+      "system_psu2_voltage": {
+        "default": "mdi:lightning-bolt"
+      },
+      "system_cpu_load": {
+        "default": "mdi:speedometer"
+      },
+      "system_memory_usage": {
+        "default": "mdi:memory"
+      },
+      "system_hdd_usage": {
+        "default": "mdi:harddisk"
+      },
+      "system_clients_wired": {
+        "default": "mdi:lan"
+      },
+      "system_clients_wireless": {
+        "default": "mdi:wifi"
+      },
+      "system_captive_authorized": {
+        "default": "mdi:key-wireless"
+      },
+      "system_gps_latitude": {
+        "default": "mdi:latitude"
+      },
+      "system_gps_longitude": {
+        "default": "mdi:longitude"
+      },
+      "traffic_tx": {
+        "default": "mdi:upload-network-outline"
+      },
+      "traffic_rx": {
+        "default": "mdi:download-network-outline"
+      },
+      "tx_total": {
+        "default": "mdi:upload-network"
+      },
+      "rx_total": {
+        "default": "mdi:download-network"
+      },
+      "client_traffic_tx": {
+        "default": "mdi:upload-network"
+      },
+      "client_traffic_rx": {
+        "default": "mdi:download-network"
+      },
+      "ip_address": {
+        "default": "mdi:ip"
+      },
+      "cloud_public_address": {
+        "default": "mdi:ip-network-outline"
+      },
+      "wireguard_peer_rx": {
+        "default": "mdi:download-network-outline"
+      },
+      "wireguard_peer_tx": {
+        "default": "mdi:upload-network-outline"
+      },
+      "wireguard_peer_handshake": {
+        "default": "mdi:handshake-outline"
+      },
+      "system_device_mode": {
+        "default": "mdi:cog-outline"
+      },
+      "system_packages": {
+        "default": "mdi:package-variant"
+      },
+      "container_status": {
+        "default": "mdi:docker"
+      }
+    },
+    "button": {
+      "reboot": {
+        "default": "mdi:restart"
+      }
+    }
+  }
+}
