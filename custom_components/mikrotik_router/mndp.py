@@ -64,6 +64,22 @@ class MndpDevice:
         return " ".join(parts) if parts else self.ip
 
 
+def _get_default_gateway() -> str | None:
+    """Return the default gateway IP from /proc/net/route, or None."""
+    try:
+        with open("/proc/net/route") as f:
+            for line in f.readlines()[1:]:
+                parts = line.split()
+                if len(parts) < 3:
+                    continue
+                if parts[1] == "00000000" and parts[2] != "00000000":
+                    gw_bytes = bytes.fromhex(parts[2])
+                    return ".".join(str(b) for b in reversed(gw_bytes))
+    except OSError:
+        pass
+    return None
+
+
 def _read_arp_table() -> list[tuple[str, str]]:
     """Return (ip, mac) pairs from /proc/net/arp for MikroTik devices."""
     results: list[tuple[str, str]] = []
@@ -148,24 +164,35 @@ async def async_scan_mndp(timeout: float = 2.0) -> list[MndpDevice]:
     loop = asyncio.get_event_loop()
     found: dict[str, MndpDevice] = {}
 
-    # --- Step 1: ARP table scan ---
+    # --- Step 1: ARP table scan + default gateway ---
     arp_devices = _read_arp_table()
     _LOGGER.debug("MNDP: ARP table found %d MikroTik device(s)", len(arp_devices))
 
-    if arp_devices:
-        # Send unicast MNDP probes in parallel to all found IPs
+    arp_ips = {ip for ip, _ in arp_devices}
+
+    # Always probe the default gateway — if it's a MikroTik it will respond
+    # with MNDP identity data; if not, the probe just times out silently.
+    gateway_ip = _get_default_gateway()
+    if gateway_ip and gateway_ip not in arp_ips:
+        _LOGGER.debug("MNDP: probing default gateway %s", gateway_ip)
+
+    # Build probe list: (ip, mac, is_known_mikrotik)
+    probe_list: list[tuple[str, str, bool]] = [
+        (ip, mac, True) for ip, mac in arp_devices
+    ]
+    if gateway_ip and gateway_ip not in arp_ips:
+        probe_list.append((gateway_ip, "", False))
+
+    if probe_list:
         probe_timeout = min(1.0, timeout * 0.6)
-        tasks = [
-            _mndp_unicast(loop, ip, probe_timeout)
-            for ip, mac in arp_devices
-        ]
+        tasks = [_mndp_unicast(loop, ip, probe_timeout) for ip, _, _ in probe_list]
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        for (ip, mac), result in zip(arp_devices, results):
+        for (ip, mac, is_known), result in zip(probe_list, results):
             if isinstance(result, MndpDevice):
                 result.mac = result.mac or mac
                 found[result.ip or ip] = result
-            elif not isinstance(result, Exception):
-                # No MNDP response but we know it's a MikroTik from ARP
+            elif not isinstance(result, Exception) and is_known:
+                # No MNDP response but OUI confirmed it's a MikroTik
                 found[ip] = MndpDevice(ip=ip, mac=mac)
         _LOGGER.debug("MNDP: unicast probe results: %s", list(found.keys()))
 
