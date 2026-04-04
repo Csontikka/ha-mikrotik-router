@@ -71,6 +71,9 @@ _integration_logger.addHandler(_log_handler)
 _integration_logger.setLevel(logging.DEBUG)
 
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+
 # ---------------------------
 #   async_setup
 # ---------------------------

@@ -30,11 +30,18 @@
           "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
         }
       },
+      "pick_device": {
+        "title": "Mikrotik Router found",
+        "description": "Select the router to configure, or choose manual entry.",
+        "data": {
+          "device": "Discovered routers"
+        }
+      },
       "sensor_mode": {
         "title": "Mikrotik Router setup (3/4)",
         "description": "Choose how to enable sensors and switches",
         "data": {
-          "sensor_preset": " "
+          "sensor_preset": "Sensor preset"
         },
         "data_description": {
           "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
@@ -83,6 +90,15 @@
         }
       }
     },
+      "reauth_confirm": {
+        "title": "Re-authenticate Mikrotik Router",
+        "description": "Enter new credentials for {host}.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
     "error": {
       "name_exists": "Name already exists.",
       "cannot_connect": "Cannot connect to Mikrotik.",
@@ -90,6 +106,10 @@
       "connection_timeout": "Mikrotik connection timeout.",
       "wrong_login": "Invalid user name or password.",
       "ssl_verify_failure": "Certificate verify failed"
+    },
+    "abort": {
+      "already_configured": "Device is already configured.",
+      "reauth_successful": "Re-authentication was successful."
     }
   },
   "options": {
@@ -152,6 +172,11 @@
         "title": "Mikrotik Router options (2/2)",
         "description": "Enable sensors and switches"
       }
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
     }
   },
   "selector": {
