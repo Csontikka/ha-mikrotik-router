@@ -242,7 +242,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 for dev in self._discovered:
                     if dev.ip == host:
                         if dev.identity:
-                            prefill[CONF_NAME] = dev.identity
+                            prefill[CONF_NAME] = f"Mikrotik {dev.identity}"
                         break
             return self._show_config_form(user_input=prefill)
 
