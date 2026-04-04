@@ -438,17 +438,63 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
         )
 
+    async def async_step_reconfigure(self, user_input=None):
+        """Handle reconfiguration of an existing config entry."""
+        errors = {}
+        reconfigure_entry = self._get_reconfigure_entry()
+
+        if user_input is not None:
+            ssl_mode = user_input.pop("ssl_mode", "none")
+            user_input[CONF_SSL] = ssl_mode in ("ssl", "ssl_verify")
+            user_input[CONF_VERIFY_SSL] = ssl_mode == "ssl_verify"
+
+            api = MikrotikAPI(
+                host=user_input[CONF_HOST],
+                username=user_input[CONF_USERNAME],
+                password=user_input[CONF_PASSWORD],
+                port=user_input[CONF_PORT],
+                use_ssl=user_input[CONF_SSL],
+                ssl_verify=user_input[CONF_VERIFY_SSL],
+            )
+            if not api.connect():
+                errors[CONF_HOST] = api.error
+
+            if not errors:
+                return self.async_update_reload_and_abort(
+                    reconfigure_entry,
+                    title=user_input[CONF_NAME],
+                    data={**reconfigure_entry.data, **user_input},
+                    reason="reconfigure_successful",
+                )
+
+            return self._show_config_form(
+                user_input=user_input, errors=errors, step_id="reconfigure"
+            )
+
+        return self._show_config_form(
+            user_input={
+                CONF_NAME: reconfigure_entry.title,
+                CONF_HOST: reconfigure_entry.data.get(CONF_HOST, DEFAULT_HOST),
+                CONF_USERNAME: reconfigure_entry.data.get(CONF_USERNAME, DEFAULT_USERNAME),
+                CONF_PASSWORD: reconfigure_entry.data.get(CONF_PASSWORD, ""),
+                CONF_PORT: reconfigure_entry.data.get(CONF_PORT, DEFAULT_PORT),
+                CONF_SSL: reconfigure_entry.data.get(CONF_SSL, DEFAULT_SSL),
+                CONF_VERIFY_SSL: reconfigure_entry.data.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL),
+            },
+            step_id="reconfigure",
+        )
+
     # ---------------------------
     #   _show_config_form
     # ---------------------------
-    def _show_config_form(self, user_input, errors=None):
+    def _show_config_form(self, user_input, errors=None, step_id="user"):
         """Show the configuration form to edit data."""
         ssl_mode = _ssl_mode_from_bools(
             user_input.get(CONF_SSL, DEFAULT_SSL),
             user_input.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL),
         )
         return self.async_show_form(
-            step_id="user",
+            step_id=step_id,
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_NAME, default=user_input[CONF_NAME]): str,

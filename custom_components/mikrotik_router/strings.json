@@ -103,6 +103,21 @@
           "username": "Username",
           "password": "Password"
         }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Mikrotik Router",
+        "description": "Update connection settings for this integration.",
+        "data": {
+          "name": "Name of the integration",
+          "host": "Host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password",
+          "ssl_mode": "Connection security"
+        },
+        "data_description": {
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
+        }
       }
     },
     "error": {
@@ -116,7 +131,8 @@
     },
     "abort": {
       "already_configured": "Device is already configured.",
-      "reauth_successful": "Re-authentication was successful."
+      "reauth_successful": "Re-authentication was successful.",
+      "reconfigure_successful": "Reconfiguration was successful."
     }
   },
   "options": {
