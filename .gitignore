@@ -18,4 +18,3 @@ qa_screenshots/
 # OS
 .DS_Store
 Thumbs.db
-custom_components/mikrotik_router/quality_scale.yaml
