@@ -123,13 +123,14 @@ async def async_add_entities(
         if coordinator.data is None:
             return
 
-        async def async_check_exist(obj, coordinator, uid: None) -> None:
+        async def async_check_exist(obj, coordinator, uid: str | None = None) -> None:
             """Check entity exists."""
             entity_registry = er.async_get(hass)
+            entry_id = config_entry.entry_id
             if uid:
-                unique_id = f"{obj._inst.lower()}-{obj.entity_description.key}-{slugify(str(obj._data[obj.entity_description.data_reference]).lower())}"
+                unique_id = f"{entry_id}-{obj.entity_description.key}-{slugify(str(obj._data[obj.entity_description.data_reference]).lower())}"
             else:
-                unique_id = f"{obj._inst.lower()}-{obj.entity_description.key}"
+                unique_id = f"{entry_id}-{obj.entity_description.key}"
 
             entity_id = entity_registry.async_get_entity_id(
                 platform.domain, DOMAIN, unique_id
