@@ -206,6 +206,16 @@
       }
     }
   },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Authentication failed for {host}",
+      "description": "The username or password for the MikroTik router at {host} is incorrect. Go to **Settings → Integrations → MikroTik Router → Reauthenticate** to update your credentials."
+    },
+    "ssl_error": {
+      "title": "SSL connection error for {host}",
+      "description": "Could not establish a secure SSL connection to the MikroTik router at {host}. Go to **Settings → Integrations → MikroTik Router → Reconfigure** to change the SSL settings or disable SSL."
+    }
+  },
   "exceptions": {
     "invalid_mac": {
       "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
