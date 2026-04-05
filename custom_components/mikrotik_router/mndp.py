@@ -91,14 +91,9 @@ class MndpDevice:
 
     def label(self) -> str:
         """Human-readable label for UI display."""
-        parts: list[str] = []
         if self.identity:
-            parts.append(self.identity)
-        if self.ip:
-            parts.append(f"({self.ip})")
-        if self.board:
-            parts.append(f"— {self.board}")
-        return " ".join(parts) if parts else self.ip
+            return f"{self.ip} ({self.identity})"
+        return self.ip
 
 
 def _get_default_gateway() -> str | None:
@@ -225,30 +220,122 @@ async def _mndp_unicast(loop: asyncio.AbstractEventLoop, ip: str, timeout: float
         sock.close()
 
 
-async def async_scan_mndp(timeout: float = 2.0) -> list[MndpDevice]:
+async def _listen_mndp_broadcast(
+    loop: asyncio.AbstractEventLoop,
+    found: dict[str, MndpDevice],
+    timeout: float,
+) -> None:
+    """Listen for periodic MNDP broadcast announcements from routers."""
+    broadcast_addrs: list[str] = ["255.255.255.255"]
+    try:
+        _tmp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        _tmp.connect(("8.8.8.8", 80))
+        local_ip = _tmp.getsockname()[0]
+        _tmp.close()
+        parts = local_ip.split(".")
+        if len(parts) == 4 and local_ip != "127.0.0.1":
+            directed = f"{parts[0]}.{parts[1]}.{parts[2]}.255"
+            if directed not in broadcast_addrs:
+                broadcast_addrs.append(directed)
+    except OSError:
+        pass
+
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.setblocking(False)
+        sock.bind(("", MNDP_PORT))
+        for bcast in broadcast_addrs:
+            sock.sendto(_MNDP_PROBE, (bcast, MNDP_PORT))
+    except OSError as err:
+        _LOGGER.debug("MNDP broadcast failed: %s", err)
+        return
+
+    deadline = loop.time() + timeout
+    try:
+        while True:
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                break
+            try:
+                data = await asyncio.wait_for(
+                    loop.sock_recv(sock, 4096), timeout=remaining
+                )
+                if data == _MNDP_PROBE:
+                    continue  # ignore loopback of our own probe
+                dev = _parse_mndp(data)
+                if dev and dev.ip not in found:
+                    found[dev.ip] = dev
+            except asyncio.TimeoutError:
+                break
+            except OSError:
+                break
+    finally:
+        sock.close()
+
+
+async def _populate_arp_table() -> None:
+    """Send pings across the local subnet to populate the ARP table."""
+    try:
+        _tmp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        _tmp.connect(("8.8.8.8", 80))
+        local_ip = _tmp.getsockname()[0]
+        _tmp.close()
+    except OSError:
+        return
+
+    parts = local_ip.split(".")
+    if len(parts) != 4 or local_ip == "127.0.0.1":
+        return
+
+    # Build subnet scan — send UDP to common IPs to trigger ARP resolution
+    base = f"{parts[0]}.{parts[1]}.{parts[2]}"
+    targets = [f"{base}.{i}" for i in range(1, 255) if str(i) != parts[3]]
+    _LOGGER.debug("MNDP: scanning %s.0/24 to populate ARP table", base)
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setblocking(False)
+    for target in targets:
+        try:
+            sock.sendto(b"\x00", (target, 9))
+        except OSError:
+            pass
+    sock.close()
+
+    # Give ARP time to resolve
+    await asyncio.sleep(1.0)
+
+
+async def async_scan_mndp(timeout: float = 5.0) -> list[MndpDevice]:
     """Discover MikroTik routers on the local network.
 
-    Strategy:
-    1. Read /proc/net/arp to find MikroTik devices by OUI (fast, no network I/O)
-    2. For each found IP, send a unicast MNDP probe to get identity/board info
-    3. Fallback: broadcast MNDP probe (works when ARP table is empty)
+    Strategy (all run in parallel):
+    1. Broadcast ping to populate ARP table with local devices
+    2. Read /proc/net/arp to find MikroTik devices by OUI + unicast MNDP/SNMP probes
+    3. Listen for periodic MNDP broadcast announcements from all routers on the network
     """
     loop = asyncio.get_event_loop()
     found: dict[str, MndpDevice] = {}
 
-    # --- Step 1: ARP table scan + default gateway ---
+    # --- Populate ARP table first ---
+    await _populate_arp_table()
+
+    # --- Start broadcast listener (runs for full timeout) ---
+    broadcast_task = asyncio.ensure_future(
+        _listen_mndp_broadcast(loop, found, timeout)
+    )
+
+    # --- ARP table scan + unicast probes (runs in parallel with broadcast) ---
     arp_devices = _read_arp_table()
     _LOGGER.debug("MNDP: ARP table found %d MikroTik device(s)", len(arp_devices))
 
     arp_ips = {ip for ip, _ in arp_devices}
 
-    # Always probe the default gateway — if it's a MikroTik it will respond
-    # with MNDP identity data; if not, the probe just times out silently.
     gateway_ip = _get_default_gateway()
     if gateway_ip and gateway_ip not in arp_ips:
         _LOGGER.debug("MNDP: probing default gateway %s", gateway_ip)
 
-    # Build probe list: (ip, mac, is_known_mikrotik)
     probe_list: list[tuple[str, str, bool]] = [
         (ip, mac, True) for ip, mac in arp_devices
     ]
@@ -256,8 +343,7 @@ async def async_scan_mndp(timeout: float = 2.0) -> list[MndpDevice]:
         probe_list.append((gateway_ip, "", False))
 
     if probe_list:
-        probe_timeout = min(1.0, timeout * 0.6)
-        # Run MNDP and SNMP probes in parallel — zero extra latency
+        probe_timeout = min(1.0, timeout * 0.4)
         mndp_results, snmp_results = await asyncio.gather(
             asyncio.gather(
                 *[_mndp_unicast(loop, ip, probe_timeout) for ip, _, _ in probe_list],
@@ -273,65 +359,16 @@ async def async_scan_mndp(timeout: float = 2.0) -> list[MndpDevice]:
         ):
             snmp_name = snmp_result if isinstance(snmp_result, str) else None
             if isinstance(mndp_result, MndpDevice):
-                # MNDP confirmed MikroTik — fill missing identity from SNMP
                 if not mndp_result.identity and snmp_name:
                     mndp_result.identity = snmp_name
                 mndp_result.mac = mndp_result.mac or mac
                 found[mndp_result.ip or ip] = mndp_result
             elif not isinstance(mndp_result, Exception) and is_known:
-                # OUI-confirmed MikroTik, MNDP silent — use SNMP name if available
                 found[ip] = MndpDevice(ip=ip, mac=mac, identity=snmp_name or "")
         _LOGGER.debug("MNDP: unicast probe results: %s", list(found.keys()))
 
-    # --- Step 2: Broadcast fallback if ARP found nothing ---
-    if not found:
-        broadcast_addrs: list[str] = ["255.255.255.255"]
-        try:
-            _tmp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            _tmp.connect(("8.8.8.8", 80))
-            local_ip = _tmp.getsockname()[0]
-            _tmp.close()
-            parts = local_ip.split(".")
-            if len(parts) == 4 and local_ip != "127.0.0.1":
-                directed = f"{parts[0]}.{parts[1]}.{parts[2]}.255"
-                if directed not in broadcast_addrs:
-                    broadcast_addrs.append(directed)
-        except OSError:
-            pass
-
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.setblocking(False)
-            sock.bind(("", MNDP_PORT))
-            for bcast in broadcast_addrs:
-                sock.sendto(_MNDP_PROBE, (bcast, MNDP_PORT))
-        except OSError as err:
-            _LOGGER.debug("MNDP broadcast failed: %s", err)
-            return []
-
-        deadline = loop.time() + timeout
-        try:
-            while True:
-                remaining = deadline - loop.time()
-                if remaining <= 0:
-                    break
-                try:
-                    data = await asyncio.wait_for(
-                        loop.sock_recv(sock, 4096), timeout=remaining
-                    )
-                    if data == _MNDP_PROBE:
-                        continue  # ignore loopback of our own probe
-                    dev = _parse_mndp(data)
-                    if dev and dev.ip not in found:
-                        found[dev.ip] = dev
-                except asyncio.TimeoutError:
-                    break
-                except OSError:
-                    break
-        finally:
-            sock.close()
+    # --- Wait for broadcast listener to finish ---
+    await broadcast_task
 
     _LOGGER.debug("MNDP scan complete: found %d device(s)", len(found))
     return list(found.values())
