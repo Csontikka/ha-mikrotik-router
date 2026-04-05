@@ -164,16 +164,16 @@ async def async_add_entities(
                         obj = func(coordinator, entity_description, uid)
                         await async_check_exist(obj, coordinator, uid)
 
+        # Remove orphaned entities that are no longer provided by this platform
+        entity_registry = er.async_get(hass)
+        for entry in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
+            if entry.domain == platform.domain and entry.entity_id not in platform.entities:
+                _LOGGER.debug("Removing orphaned entity %s", entry.entity_id)
+                entity_registry.async_remove(entry.entity_id)
+
     await async_update_controller(
         config_entry.runtime_data.data_coordinator
     )
-
-    # Remove orphaned entities that are no longer provided by this platform
-    entity_registry = er.async_get(hass)
-    for entry in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
-        if entry.domain == platform.domain and entry.entity_id not in platform.entities:
-            _LOGGER.debug("Removing orphaned entity %s", entry.entity_id)
-            entity_registry.async_remove(entry.entity_id)
 
     unsub = async_dispatcher_connect(hass, f"update_sensors_{config_entry.entry_id}", async_update_controller)
     config_entry.async_on_unload(unsub)
@@ -214,11 +214,15 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
 
     @callback
     def _handle_coordinator_update(self) -> None:
-        self._data = self.coordinator.data[self.entity_description.data_path]
+        path_data = self.coordinator.data.get(self.entity_description.data_path)
+        if path_data is None:
+            return
         if self._uid:
-            self._data = self.coordinator.data[self.entity_description.data_path][
-                self._uid
-            ]
+            if self._uid not in path_data:
+                return
+            self._data = path_data[self._uid]
+        else:
+            self._data = path_data
         self._attr_name = self.custom_name
         super()._handle_coordinator_update()
 

@@ -316,6 +316,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if _LOGGER.getEffectiveLevel() == 10:
             self.debug = True
 
+        self._stale_counters: dict[str, dict] = {}
+
         self.nat_removed = {}
         self.mangle_removed = {}
         self.routing_rules_removed = {}
@@ -342,6 +344,12 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         self.last_hwinfo_update = datetime(1970, 1, 1)
         self.rebootcheck = 0
+
+    def _get_stale_counters(self, key: str) -> dict:
+        """Get or create stale counter dict for a data path."""
+        if key not in self._stale_counters:
+            self._stale_counters[key] = {}
+        return self._stale_counters[key]
 
     # ---------------------------
     #   option_track_iface_clients
@@ -880,6 +888,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "type", "value": "pppoe-in"},
                 {"name": "type", "value": "ovpn-in"},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("interface"),
         )
 
         if self.option_sensor_port_traffic:
@@ -1142,6 +1152,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 ],
             ],
             only=[{"key": "action", "value": "dst-nat"}],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("nat"),
         )
 
         # Handle duplicate NAT entries - suffix uniq-id with RouterOS ID to keep all rules
@@ -1233,6 +1245,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "dynamic", "value": True},
                 {"name": "action", "value": "jump"},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("mangle"),
         )
 
         # Handle duplicate Mangle entries - suffix uniq-id with RouterOS ID to keep all rules
@@ -1315,6 +1329,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "dynamic", "value": True},
                 {"name": "action", "value": "jump"},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("routing_rules"),
         )
 
         # Handle duplicate Routing Rules entries - suffix uniq-id with RouterOS ID to keep all rules
@@ -1367,6 +1383,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     "reverse": True,
                 },
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("wireguard_peers"),
         )
 
         for uid in self.ds["wireguard_peers"]:
@@ -1469,6 +1487,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "memory-current", "default": ""},
                 {"name": "cpu-usage", "default": ""},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("containers"),
         )
 
         for uid in self.ds["containers"]:
@@ -1563,6 +1583,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "dynamic", "value": True},
                 {"name": "action", "value": "jump"},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("filter"),
         )
 
         # Handle duplicate filter entries - suffix uniq-id with RouterOS ID to keep all rules
@@ -1617,6 +1639,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     "reverse": True,
                 },
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("kid-control"),
         )
 
         for uid in self.ds["kid-control"]:
@@ -1651,6 +1675,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "encoding", "default": ""},
                 {"name": "connected", "default": False},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("ppp_secret"),
         )
 
         self.ds["ppp_active"] = parse_api(
@@ -1712,6 +1738,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     "reverse": True,
                 },
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("netwatch"),
         )
 
     # ---------------------------
@@ -2010,6 +2038,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "last-started", "default": "unknown"},
                 {"name": "run-count", "default": "unknown"},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("script"),
         )
 
     # ---------------------------
@@ -2025,6 +2055,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "name"},
                 {"name": "value"},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("environment"),
         )
 
     # ---------------------------
@@ -2079,6 +2111,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     "reverse": True,
                 },
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("queue"),
         )
 
         for uid, vals in self.ds["queue"].items():
@@ -2307,6 +2341,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "port-mac-address", "default": ""},
                 {"name": "ip", "default": ""},
             ],
+            prune_stale=True,
+            stale_counters=self._get_stale_counters("ip_address"),
         )
         for uid in self.ds["ip_address"]:
             iface_name = self.ds["ip_address"][uid]["interface"]

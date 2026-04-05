@@ -94,6 +94,8 @@ def parse_api(
     ensure_vals=None,
     only=None,
     skip=None,
+    prune_stale=False,
+    stale_counters=None,
 ) -> dict:
     """Get data from API."""
     if data is None:
@@ -111,6 +113,7 @@ def parse_api(
     if debug:
         _LOGGER.debug("Processing source %s", async_redact_data(source, TO_REDACT))
 
+    seen_uids = set()
     keymap = generate_keymap(data, key_search)
     for entry in source:
         if only and not matches_only(entry, only):
@@ -124,6 +127,8 @@ def parse_api(
             uid = get_uid(entry, key, key_secondary, key_search, keymap)
             if not uid:
                 continue
+
+            seen_uids.add(uid)
 
             if uid not in data:
                 data[uid] = {}
@@ -139,6 +144,16 @@ def parse_api(
 
         if val_proc:
             data = fill_vals_proc(data, uid, val_proc)
+
+    if prune_stale and stale_counters is not None and (key or key_search):
+        for uid in list(data.keys()):
+            if uid not in seen_uids:
+                stale_counters[uid] = stale_counters.get(uid, 0) + 1
+                if stale_counters[uid] >= 3:
+                    del data[uid]
+                    del stale_counters[uid]
+            else:
+                stale_counters.pop(uid, None)
 
     return data
 
