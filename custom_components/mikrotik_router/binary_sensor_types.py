@@ -11,7 +11,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_SENSOR_PPP
 
 DEVICE_ATTRIBUTES_PPP_SECRET = [
     "connected",
@@ -137,6 +137,7 @@ class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
     data_reference: str | None = None
     data_attributes_list: List = field(default_factory=lambda: [])
     func: str = "MikrotikBinarySensor"
+    enable_on_option: str | None = None
 
 
 DEVICE_ATTRIBUTES_WIREGUARD_PEER = [
@@ -184,6 +185,7 @@ SENSOR_TYPES: tuple[BinarySensorEntityDescription, ...] = (
         data_reference="name",
         data_attributes_list=DEVICE_ATTRIBUTES_PPP_SECRET,
         func="MikrotikPPPSecretBinarySensor",
+        enable_on_option=CONF_SENSOR_PPP,
     ),
     MikrotikBinarySensorEntityDescription(
         key="interface-connection",

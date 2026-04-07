@@ -11,7 +11,18 @@ from homeassistant.components.switch import (
     SwitchEntityDescription,
 )
 
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    CONF_SENSOR_NAT,
+    CONF_SENSOR_MANGLE,
+    CONF_SENSOR_ROUTING_RULES,
+    CONF_SENSOR_FILTER,
+    CONF_SENSOR_PPP,
+    CONF_SENSOR_SIMPLE_QUEUES,
+    CONF_SENSOR_KIDCONTROL,
+    CONF_SENSOR_CONTAINERS,
+    CONF_SENSOR_WIREGUARD,
+)
 
 DEVICE_ATTRIBUTES_IFACE = [
     "running",
@@ -192,6 +203,7 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
     data_reference: str | None = None
     data_attributes_list: List = field(default_factory=lambda: [])
     func: str = "MikrotikSwitch"
+    enable_on_option: str | None = None
 
 
 DEVICE_ATTRIBUTES_WIREGUARD_PEER = [
@@ -253,6 +265,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_NAT,
         func="MikrotikNATSwitch",
+        enable_on_option=CONF_SENSOR_NAT,
     ),
     MikrotikSwitchEntityDescription(
         key="mangle",
@@ -272,6 +285,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_MANGLE,
         func="MikrotikMangleSwitch",
+        enable_on_option=CONF_SENSOR_MANGLE,
     ),
     MikrotikSwitchEntityDescription(
         key="routing_rules",
@@ -291,6 +305,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_ROUTING_RULES,
         func="MikrotikRoutingRulesSwitch",
+        enable_on_option=CONF_SENSOR_ROUTING_RULES,
     ),
     MikrotikSwitchEntityDescription(
         key="filter",
@@ -310,6 +325,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_FILTER,
         func="MikrotikFilterSwitch",
+        enable_on_option=CONF_SENSOR_FILTER,
     ),
     MikrotikSwitchEntityDescription(
         key="ppp_secret",
@@ -328,6 +344,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_uid="name",
         data_reference="name",
         data_attributes_list=DEVICE_ATTRIBUTES_PPP_SECRET,
+        enable_on_option=CONF_SENSOR_PPP,
     ),
     MikrotikSwitchEntityDescription(
         key="queue",
@@ -346,6 +363,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_QUEUE,
         func="MikrotikQueueSwitch",
+        enable_on_option=CONF_SENSOR_SIMPLE_QUEUES,
     ),
     MikrotikSwitchEntityDescription(
         key="kidcontrol_enable",
@@ -363,6 +381,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_uid="name",
         data_reference="name",
         data_attributes_list=DEVICE_ATTRIBUTES_KIDCONTROL,
+        enable_on_option=CONF_SENSOR_KIDCONTROL,
     ),
     MikrotikSwitchEntityDescription(
         key="kidcontrol_paused",
@@ -383,6 +402,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="name",
         data_attributes_list=DEVICE_ATTRIBUTES_KIDCONTROL,
         func="MikrotikKidcontrolPauseSwitch",
+        enable_on_option=CONF_SENSOR_KIDCONTROL,
     ),
     MikrotikSwitchEntityDescription(
         key="wireguard_peer",
@@ -421,6 +441,7 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference=".id",
         data_attributes_list=DEVICE_ATTRIBUTES_CONTAINER,
         func="MikrotikContainerSwitch",
+        enable_on_option=CONF_SENSOR_CONTAINERS,
     ),
 )
 

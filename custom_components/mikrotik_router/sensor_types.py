@@ -23,7 +23,14 @@ from homeassistant.const import (
     UnitOfPower,
 )
 
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    CONF_SENSOR_PORT_TRAFFIC,
+    CONF_SENSOR_CLIENT_TRAFFIC,
+    CONF_SENSOR_WIREGUARD,
+    CONF_SENSOR_CONTAINERS,
+    CONF_SENSOR_ENVIRONMENT,
+)
 
 DEVICE_ATTRIBUTES_IFACE = [
     "running",
@@ -188,6 +195,7 @@ class MikrotikSensorEntityDescription(SensorEntityDescription):
     data_reference: str | None = None
     data_attributes_list: List = field(default_factory=lambda: [])
     func: str = "MikrotikSensor"
+    enable_on_option: str | None = None
 
 
 SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
@@ -623,6 +631,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="default-name",
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikInterfaceTrafficSensor",
+        enable_on_option=CONF_SENSOR_PORT_TRAFFIC,
     ),
     MikrotikSensorEntityDescription(
         key="traffic_rx",
@@ -645,6 +654,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="default-name",
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikInterfaceTrafficSensor",
+        enable_on_option=CONF_SENSOR_PORT_TRAFFIC,
     ),
     MikrotikSensorEntityDescription(
         key="tx-total",
@@ -667,6 +677,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="default-name",
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikInterfaceTrafficSensor",
+        enable_on_option=CONF_SENSOR_PORT_TRAFFIC,
     ),
     MikrotikSensorEntityDescription(
         key="rx-total",
@@ -689,6 +700,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="default-name",
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikInterfaceTrafficSensor",
+        enable_on_option=CONF_SENSOR_PORT_TRAFFIC,
     ),
     MikrotikSensorEntityDescription(
         key="client_traffic_tx",
@@ -711,6 +723,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="mac-address",
         data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
         func="MikrotikClientTrafficSensor",
+        enable_on_option=CONF_SENSOR_CLIENT_TRAFFIC,
     ),
     MikrotikSensorEntityDescription(
         key="client_traffic_rx",
@@ -733,6 +746,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="mac-address",
         data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
         func="MikrotikClientTrafficSensor",
+        enable_on_option=CONF_SENSOR_CLIENT_TRAFFIC,
     ),
     MikrotikSensorEntityDescription(
         key="environment",
@@ -751,6 +765,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_name="name",
         data_uid="name",
         data_reference="name",
+        enable_on_option=CONF_SENSOR_ENVIRONMENT,
     ),
     MikrotikSensorEntityDescription(
         key="ip_address",
@@ -800,6 +815,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
         func="MikrotikSensor",
+        enable_on_option=CONF_SENSOR_WIREGUARD,
     ),
     MikrotikSensorEntityDescription(
         key="wireguard_peer_tx",
@@ -821,6 +837,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
         func="MikrotikSensor",
+        enable_on_option=CONF_SENSOR_WIREGUARD,
     ),
     MikrotikSensorEntityDescription(
         key="wireguard_peer_handshake",
@@ -842,6 +859,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
         func="MikrotikSensor",
+        enable_on_option=CONF_SENSOR_WIREGUARD,
     ),
     MikrotikSensorEntityDescription(
         key="system_device_mode",
@@ -894,6 +912,7 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_reference=".id",
         data_attributes_list=DEVICE_ATTRIBUTES_CONTAINER_SENSOR,
         func="MikrotikSensor",
+        enable_on_option=CONF_SENSOR_CONTAINERS,
     ),
 )
 

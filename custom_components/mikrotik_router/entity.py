@@ -141,6 +141,15 @@ async def async_add_entities(
             ):
                 _LOGGER.debug("Add entity %s", entity_id)
                 await platform.async_add_entities([obj])
+            elif (
+                entity is not None
+                and entity.disabled_by == er.RegistryEntryDisabler.INTEGRATION
+            ):
+                enable_on = getattr(obj.entity_description, "enable_on_option", None)
+                if enable_on and config_entry.options.get(enable_on, False):
+                    _LOGGER.debug("Re-enabling entity %s", entity_id)
+                    entity_registry.async_update_entity(entity_id, disabled_by=None)
+                    await platform.async_add_entities([obj])
 
         for entity_description in descriptions:
             data = coordinator.data.get(entity_description.data_path)
@@ -267,6 +276,16 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
             return f"{entry_id}-{self.entity_description.key}-{slugify(str(self._data[self.entity_description.data_reference]).lower())}"
         else:
             return f"{entry_id}-{self.entity_description.key}"
+
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        """Return if entity should be enabled by default."""
+        if self.entity_description.entity_registry_enabled_default:
+            return True
+        enable_on = getattr(self.entity_description, "enable_on_option", None)
+        if enable_on:
+            return bool(self._config_entry.options.get(enable_on, False))
+        return False
 
     # @property
     # def available(self) -> bool:

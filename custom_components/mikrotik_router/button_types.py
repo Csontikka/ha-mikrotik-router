@@ -10,7 +10,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.helpers.entity import EntityCategory
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_SENSOR_SCRIPTS
 
 DEVICE_ATTRIBUTES_SCRIPT = [
     "last-started",
@@ -33,6 +33,7 @@ class MikrotikButtonEntityDescription(SensorEntityDescription):
     data_reference: str | None = None
     data_attributes_list: List = field(default_factory=lambda: [])
     func: str = "MikrotikButton"
+    enable_on_option: str | None = None
 
 
 SENSOR_TYPES: tuple[MikrotikButtonEntityDescription, ...] = (
@@ -63,6 +64,7 @@ SENSOR_TYPES: tuple[MikrotikButtonEntityDescription, ...] = (
         data_reference="name",
         data_attributes_list=DEVICE_ATTRIBUTES_SCRIPT,
         func="MikrotikScriptButton",
+        enable_on_option=CONF_SENSOR_SCRIPTS,
     ),
 )
 
