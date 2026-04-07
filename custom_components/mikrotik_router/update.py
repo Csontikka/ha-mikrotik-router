@@ -21,6 +21,10 @@ from packaging.version import Version
 
 from .coordinator import MikrotikCoordinator
 from .entity import MikrotikEntity, async_add_entities
+from .update_types import (
+    SENSOR_SERVICES,  # noqa: F401 — accessed via platform.platform.SENSOR_SERVICES
+    SENSOR_TYPES,  # noqa: F401 — accessed via platform.platform.SENSOR_TYPES
+)
 
 _LOGGER = getLogger(__name__)
 DEVICE_UPDATE = "device_update"

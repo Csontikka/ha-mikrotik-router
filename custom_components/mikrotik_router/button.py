@@ -11,6 +11,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from .button_types import (
+    SENSOR_SERVICES,  # noqa: F401 — accessed via platform.platform.SENSOR_SERVICES
+    SENSOR_TYPES,  # noqa: F401 — accessed via platform.platform.SENSOR_TYPES
+)
 from .entity import MikrotikEntity, async_add_entities
 
 _LOGGER = getLogger(__name__)

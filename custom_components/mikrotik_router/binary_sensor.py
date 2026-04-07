@@ -17,6 +17,8 @@ from .binary_sensor_types import (
     DEVICE_ATTRIBUTES_IFACE_ETHER,
     DEVICE_ATTRIBUTES_IFACE_SFP,
     DEVICE_ATTRIBUTES_IFACE_WIRELESS,
+    SENSOR_SERVICES,  # noqa: F401 — accessed via platform.platform.SENSOR_SERVICES
+    SENSOR_TYPES,  # noqa: F401 — accessed via platform.platform.SENSOR_TYPES
 )
 from .const import (
     CONF_SENSOR_PORT_TRACKER,
