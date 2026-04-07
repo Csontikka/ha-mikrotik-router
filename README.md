@@ -146,7 +146,7 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
 - **API Test** (`mikrotik_router.api_test`): diagnostic action for raw RouterOS API queries or coordinator data inspection. Use in **Developer Tools -> Actions** with "Return response" enabled.
 
-  **Parameters:** `path` (required), `limit` (optional, default 10), `host` (optional), `coordinator_data` (optional).
+  **Parameters:** `path` (required), `limit` (optional, default 10), `host` (optional), `coordinator_data`* (optional).
 
   ```yaml
   # Query router interfaces
@@ -163,6 +163,8 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
     path: "interface"
     coordinator_data: true
   ```
+
+  > **\*coordinator_data:** When set to `true`, the `path` parameter is treated as a coordinator data key (e.g. `interface`, `dhcp`, `arp`) instead of a RouterOS API path. This returns the integration's internally cached and processed data from the last update cycle — useful for debugging what the integration currently "sees" without making an additional API call to the router.
 
 ## Feature Availability
 
