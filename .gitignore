@@ -3,6 +3,8 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.coverage
+coverage.xml
 
 # Development tools
 .claude/
