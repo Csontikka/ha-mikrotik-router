@@ -59,10 +59,11 @@ async def async_add_entities(
         async def async_check_exist(obj, coordinator, uid: None) -> None:
             """Check entity exists."""
             entity_registry = er.async_get(hass)
+            entry_id = config_entry.entry_id
             if uid:
-                unique_id = f"{obj._inst.lower()}-{obj.entity_description.key}-{slugify(str(obj._data[obj.entity_description.data_reference]).lower())}"
+                unique_id = f"{entry_id}-{obj.entity_description.key}-{slugify(str(obj._data[obj.entity_description.data_reference]).lower())}"
             else:
-                unique_id = f"{obj._inst.lower()}-{obj.entity_description.key}"
+                unique_id = f"{entry_id}-{obj.entity_description.key}"
 
             entity_id = entity_registry.async_get_entity_id(
                 platform.domain, DOMAIN, unique_id
@@ -101,12 +102,16 @@ async def async_add_entities(
         config_entry.runtime_data.tracker_coordinator
     )
 
-    # Remove orphaned entities that are no longer provided by this platform
-    entity_registry = er.async_get(hass)
-    for entry in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
-        if entry.domain == platform.domain and entry.entity_id not in platform.entities:
-            _LOGGER.debug("Removing orphaned entity %s", entry.entity_id)
-            entity_registry.async_remove(entry.entity_id)
+    # Remove orphaned entities that are no longer provided by this platform.
+    # Only run if tracker data is available; skip on first startup before any data arrives.
+    if config_entry.runtime_data.tracker_coordinator.data is not None:
+        entity_registry = er.async_get(hass)
+        for entry in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
+            if entry.domain == platform.domain and entry.entity_id not in platform.entities:
+                if entry.disabled:
+                    continue
+                _LOGGER.debug("Removing orphaned entity %s", entry.entity_id)
+                entity_registry.async_remove(entry.entity_id)
 
     @callback
     async def async_update_controller_wrapper(coordinator):
