@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from logging import getLogger
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME, CONF_HOST
+from homeassistant.const import ATTR_ATTRIBUTION, CONF_HOST, CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import (
     device_registry as dr,
+)
+from homeassistant.helpers import (
     entity_platform as ep,
+)
+from homeassistant.helpers import (
     entity_registry as er,
 )
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -20,16 +24,16 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 
 from .const import (
-    DOMAIN,
     ATTRIBUTION,
-    CONF_SENSOR_PORT_TRAFFIC,
-    DEFAULT_SENSOR_PORT_TRAFFIC,
-    CONF_TRACK_HOSTS,
-    DEFAULT_TRACK_HOSTS,
-    CONF_SENSOR_PORT_TRACKER,
-    DEFAULT_SENSOR_PORT_TRACKER,
     CONF_SENSOR_NETWATCH_TRACKER,
+    CONF_SENSOR_PORT_TRACKER,
+    CONF_SENSOR_PORT_TRAFFIC,
+    CONF_TRACK_HOSTS,
     DEFAULT_SENSOR_NETWATCH_TRACKER,
+    DEFAULT_SENSOR_PORT_TRACKER,
+    DEFAULT_SENSOR_PORT_TRAFFIC,
+    DEFAULT_TRACK_HOSTS,
+    DOMAIN,
 )
 from .coordinator import MikrotikCoordinator, MikrotikTrackerCoordinator
 from .helper import format_attribute
@@ -70,7 +74,7 @@ def _skip_sensor(config_entry, entity_description, data, uid) -> bool:
     if entity_description.data_path == "client_traffic":
         if not data[uid].get("available", False):
             return True
-        if entity_description.data_attribute not in data[uid].keys():
+        if entity_description.data_attribute not in data[uid]:
             return True
 
     # Binary sensors
@@ -94,14 +98,11 @@ def _skip_sensor(config_entry, entity_description, data, uid) -> bool:
         return True
 
     # Device Tracker
-    if (
-        # Skip if host tracking is disabled
+    # Skip if host tracking is disabled
+    return (
         entity_description.func == "MikrotikHostDeviceTracker"
         and not config_entry.options.get(CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS)
-    ):
-        return True
-
-    return False
+    )
 
 
 # ---------------------------

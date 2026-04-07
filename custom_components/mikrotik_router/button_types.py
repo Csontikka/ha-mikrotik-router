@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
 
 from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 from homeassistant.helpers.entity import EntityCategory
 
-from .const import DOMAIN, CONF_SENSOR_SCRIPTS
+from .const import CONF_SENSOR_SCRIPTS, DOMAIN
 
 DEVICE_ATTRIBUTES_SCRIPT = [
     "last-started",
@@ -31,7 +30,7 @@ class MikrotikButtonEntityDescription(SensorEntityDescription):
     data_name_comment: bool = False
     data_uid: str | None = None
     data_reference: str | None = None
-    data_attributes_list: List = field(default_factory=lambda: [])
+    data_attributes_list: list = field(default_factory=lambda: [])
     func: str = "MikrotikButton"
     enable_on_option: str | None = None
 

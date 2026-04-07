@@ -1,12 +1,10 @@
 """API parser for JSON APIs."""
 
 from datetime import datetime
-from logging import getLogger, DEBUG
-
-from pytz import utc
-from typing import Optional
+from logging import DEBUG, getLogger
 
 from homeassistant.components.diagnostics import async_redact_data
+from pytz import utc
 
 from .const import TO_REDACT
 
@@ -161,7 +159,7 @@ def parse_api(
 # ---------------------------
 #   get_uid
 # ---------------------------
-def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional[str]:
+def get_uid(entry, key, key_secondary, key_search, keymap) -> str | None:
     """Get UID for data list."""
     uid = None
     if not key_search:
@@ -190,7 +188,7 @@ def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional[str]:
 # ---------------------------
 #   generate_keymap
 # ---------------------------
-def generate_keymap(data, key_search) -> Optional[dict]:
+def generate_keymap(data, key_search) -> dict | None:
     """Generate keymap."""
     return (
         {data[uid][key_search]: uid for uid in data if key_search in data[uid]}
@@ -354,7 +352,7 @@ def fill_vals_proc(data, uid, vals_proc) -> dict:
 
             if _action == "combine":
                 if "key" in val:
-                    tmp = _data[val["key"]] if val["key"] in _data else "unknown"
+                    tmp = _data.get(val["key"], "unknown")
                     _value = f"{_value}{tmp}" if _value else tmp
 
                 if "text" in val:

@@ -1,12 +1,15 @@
 """Diagnostics support for Mikrotik Router."""
 
 from __future__ import annotations
+
 from typing import Any
+
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from .const import DOMAIN, TO_REDACT
+
 from . import _LOG_BUFFER
+from .const import TO_REDACT
 
 
 async def async_get_config_entry_diagnostics(

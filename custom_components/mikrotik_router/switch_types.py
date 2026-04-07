@@ -3,25 +3,24 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
-from homeassistant.helpers.entity import EntityCategory
+
 from homeassistant.components.switch import (
     SwitchDeviceClass,
     SwitchEntityDescription,
 )
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
+from homeassistant.helpers.entity import EntityCategory
 
 from .const import (
-    DOMAIN,
-    CONF_SENSOR_NAT,
-    CONF_SENSOR_MANGLE,
-    CONF_SENSOR_ROUTING_RULES,
-    CONF_SENSOR_FILTER,
-    CONF_SENSOR_PPP,
-    CONF_SENSOR_SIMPLE_QUEUES,
-    CONF_SENSOR_KIDCONTROL,
     CONF_SENSOR_CONTAINERS,
-    CONF_SENSOR_WIREGUARD,
+    CONF_SENSOR_FILTER,
+    CONF_SENSOR_KIDCONTROL,
+    CONF_SENSOR_MANGLE,
+    CONF_SENSOR_NAT,
+    CONF_SENSOR_PPP,
+    CONF_SENSOR_ROUTING_RULES,
+    CONF_SENSOR_SIMPLE_QUEUES,
+    DOMAIN,
 )
 
 DEVICE_ATTRIBUTES_IFACE = [
@@ -201,7 +200,7 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
     data_name_comment: bool = False
     data_uid: str | None = None
     data_reference: str | None = None
-    data_attributes_list: List = field(default_factory=lambda: [])
+    data_attributes_list: list = field(default_factory=lambda: [])
     func: str = "MikrotikSwitch"
     enable_on_option: str | None = None
 

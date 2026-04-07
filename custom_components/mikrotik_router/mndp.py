@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import ipaddress
 import logging
 import socket
@@ -154,10 +155,8 @@ def _parse_mndp(data: bytes) -> MndpDevice | None:
         if tlv_type == _TYPE_MAC and tlv_len == 6:
             dev.mac = ":".join(f"{b:02X}" for b in value)
         elif tlv_type == _TYPE_IP and tlv_len == 4:
-            try:
+            with contextlib.suppress(ValueError):
                 dev.ip = str(ipaddress.IPv4Address(value))
-            except ValueError:
-                pass
         elif tlv_type == _TYPE_IDENTITY:
             dev.identity = value.decode("utf-8", errors="replace")
         elif tlv_type == _TYPE_BOARD:
@@ -194,7 +193,7 @@ async def _snmp_sysname(loop: asyncio.AbstractEventLoop, ip: str) -> str | None:
             loop.sock_recv(sock, 1024), timeout=_SNMP_TIMEOUT
         )
         return _parse_snmp_sysname(data)
-    except (asyncio.TimeoutError, OSError):
+    except (TimeoutError, OSError):
         return None
     finally:
         sock.close()
@@ -214,7 +213,7 @@ async def _mndp_unicast(loop: asyncio.AbstractEventLoop, ip: str, timeout: float
     try:
         data = await asyncio.wait_for(loop.sock_recv(sock, 4096), timeout=timeout)
         return _parse_mndp(data)
-    except (asyncio.TimeoutError, OSError):
+    except (TimeoutError, OSError):
         return None
     finally:
         sock.close()
@@ -267,7 +266,7 @@ async def _listen_mndp_broadcast(
                 dev = _parse_mndp(data)
                 if dev and dev.ip not in found:
                     found[dev.ip] = dev
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 break
             except OSError:
                 break
@@ -297,10 +296,8 @@ async def _populate_arp_table() -> None:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setblocking(False)
     for target in targets:
-        try:
+        with contextlib.suppress(OSError):
             sock.sendto(b"\x00", (target, 9))
-        except OSError:
-            pass
     sock.close()
 
     # Give ARP time to resolve
@@ -355,7 +352,7 @@ async def async_scan_mndp(timeout: float = 5.0) -> list[MndpDevice]:
             ),
         )
         for (ip, mac, is_known), mndp_result, snmp_result in zip(
-            probe_list, mndp_results, snmp_results
+            probe_list, mndp_results, snmp_results, strict=False
         ):
             snmp_name = snmp_result if isinstance(snmp_result, str) else None
             if isinstance(mndp_result, MndpDevice):

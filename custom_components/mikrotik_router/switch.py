@@ -4,9 +4,9 @@ from __future__ import annotations
 
 PARALLEL_UPDATES = 0
 
-from logging import getLogger
 from collections.abc import Mapping
-from typing import Any, Optional
+from logging import getLogger
+from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
@@ -17,8 +17,6 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from .entity import MikrotikEntity, async_add_entities
 from .helper import format_attribute
 from .switch_types import (
-    SENSOR_TYPES,
-    SENSOR_SERVICES,
     DEVICE_ATTRIBUTES_IFACE_ETHER,
     DEVICE_ATTRIBUTES_IFACE_SFP,
     DEVICE_ATTRIBUTES_IFACE_WIRELESS,
@@ -146,7 +144,7 @@ class MikrotikPortSwitch(MikrotikSwitch):
 
         return icon
 
-    async def async_turn_on(self) -> Optional[str]:
+    async def async_turn_on(self) -> str | None:
         """Turn on the switch."""
         if "write" not in self.coordinator.data["access"]:
             return
@@ -168,7 +166,7 @@ class MikrotikPortSwitch(MikrotikSwitch):
 
         await self.coordinator.async_refresh()
 
-    async def async_turn_off(self) -> Optional[str]:
+    async def async_turn_off(self) -> str | None:
         """Turn off the switch."""
         if "write" not in self.coordinator.data["access"]:
             return

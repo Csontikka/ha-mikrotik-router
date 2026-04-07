@@ -4,24 +4,22 @@ from __future__ import annotations
 
 PARALLEL_UPDATES = 0
 
-from logging import getLogger
 from collections.abc import Mapping
 from datetime import date, datetime
 from decimal import Decimal
+from logging import getLogger
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
 
 from .coordinator import MikrotikCoordinator
 from .entity import MikrotikEntity, async_add_entities
 from .helper import format_attribute
 from .sensor_types import (
-    SENSOR_TYPES,
-    SENSOR_SERVICES,
     DEVICE_ATTRIBUTES_IFACE_ETHER,
     DEVICE_ATTRIBUTES_IFACE_SFP,
     DEVICE_ATTRIBUTES_IFACE_WIRELESS,

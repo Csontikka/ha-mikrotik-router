@@ -2,26 +2,24 @@
 
 from __future__ import annotations
 
-import voluptuous as vol
 import logging
+import re
 from collections import deque
 
-import re
-
+import voluptuous as vol
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_VERIFY_SSL
 from homeassistant.core import HomeAssistant, SupportsResponse
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry
-from homeassistant.config_entries import ConfigEntry
-
-from homeassistant.const import CONF_VERIFY_SSL
 
 _MAC_RE = re.compile(r"^([0-9A-Fa-f]{2}[:\-]){5}[0-9A-Fa-f]{2}$")
 
-from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD, CONF_PORT, CONF_SSL
+from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_SSL, CONF_USERNAME
 
-from .const import PLATFORMS, DOMAIN, DEFAULT_VERIFY_SSL
-from .coordinator import MikrotikData, MikrotikCoordinator, MikrotikTrackerCoordinator
+from .const import DEFAULT_VERIFY_SSL, DOMAIN, PLATFORMS
+from .coordinator import MikrotikCoordinator, MikrotikData, MikrotikTrackerCoordinator
 from .mikrotikapi import MikrotikAPI
 
 SCRIPT_SCHEMA = vol.Schema(

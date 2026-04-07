@@ -23,6 +23,7 @@ select = [
     "RUF",    # ruff-specific
 ]
 ignore = [
+    "E402",   # module level import not at top of file (HA pattern: PARALLEL_UPDATES before imports)
     "E501",   # line too long (handled by line-length)
     "B008",   # do not perform function calls in argument defaults
     "SIM108", # use ternary operator

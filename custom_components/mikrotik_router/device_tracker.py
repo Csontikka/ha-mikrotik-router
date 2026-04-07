@@ -4,17 +4,20 @@ from __future__ import annotations
 
 PARALLEL_UPDATES = 0
 
-from logging import getLogger
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import timedelta
-from typing import Any, Callable
+from logging import getLogger
+from typing import Any
 
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
+from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
 from homeassistant.const import STATE_NOT_HOME
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import (
     entity_platform as ep,
+)
+from homeassistant.helpers import (
     entity_registry as er,
 )
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -22,19 +25,16 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 from homeassistant.util.dt import utcnow
 
-from homeassistant.components.device_tracker.const import SourceType
-
-from .device_tracker_types import SENSOR_TYPES, SENSOR_SERVICES
-from .coordinator import MikrotikCoordinator
-from .entity import _skip_sensor, MikrotikEntity
-from .helper import format_attribute
 from .const import (
-    DOMAIN,
     CONF_TRACK_HOSTS,
-    DEFAULT_TRACK_HOSTS,
     CONF_TRACK_HOSTS_TIMEOUT,
     DEFAULT_TRACK_HOST_TIMEOUT,
+    DEFAULT_TRACK_HOSTS,
+    DOMAIN,
 )
+from .coordinator import MikrotikCoordinator
+from .entity import MikrotikEntity, _skip_sensor
+from .helper import format_attribute
 
 _LOGGER = getLogger(__name__)
 
@@ -159,7 +159,7 @@ class MikrotikDeviceTracker(MikrotikEntity, ScannerEntity):
     @property
     def ip_address(self) -> str:
         """Return the primary ip address of the device."""
-        return self._data["address"] if "address" in self._data else None
+        return self._data.get("address", None)
 
     @property
     def mac_address(self) -> str:

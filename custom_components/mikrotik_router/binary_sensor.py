@@ -4,8 +4,8 @@ from __future__ import annotations
 
 PARALLEL_UPDATES = 0
 
-from logging import getLogger
 from collections.abc import Mapping
+from logging import getLogger
 from typing import Any
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
@@ -14,23 +14,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .binary_sensor_types import (
-    SENSOR_TYPES,
-    SENSOR_SERVICES,
     DEVICE_ATTRIBUTES_IFACE_ETHER,
     DEVICE_ATTRIBUTES_IFACE_SFP,
     DEVICE_ATTRIBUTES_IFACE_WIRELESS,
-    DEVICE_ATTRIBUTES_NETWATCH,
-    DEVICE_ATTRIBUTES_WIREGUARD_PEER,
 )
 from .const import (
-    CONF_SENSOR_PPP,
-    DEFAULT_SENSOR_PPP,
     CONF_SENSOR_PORT_TRACKER,
+    CONF_SENSOR_PPP,
     DEFAULT_SENSOR_PORT_TRACKER,
-    CONF_SENSOR_NETWATCH_TRACKER,
-    DEFAULT_SENSOR_NETWATCH_TRACKER,
-    CONF_SENSOR_WIREGUARD,
-    DEFAULT_SENSOR_WIREGUARD,
+    DEFAULT_SENSOR_PPP,
 )
 from .entity import MikrotikEntity, async_add_entities
 from .helper import format_attribute

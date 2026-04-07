@@ -3,33 +3,32 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
 
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.components.sensor import (
     SensorDeviceClass,
-    SensorStateClass,
     SensorEntityDescription,
+    SensorStateClass,
 )
 from homeassistant.const import (
     PERCENTAGE,
     REVOLUTIONS_PER_MINUTE,
-    UnitOfTemperature,
     UnitOfDataRate,
-    UnitOfInformation,
-    UnitOfElectricPotential,
     UnitOfElectricCurrent,
+    UnitOfElectricPotential,
+    UnitOfInformation,
     UnitOfPower,
+    UnitOfTemperature,
 )
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
+from homeassistant.helpers.entity import EntityCategory
 
 from .const import (
-    DOMAIN,
-    CONF_SENSOR_PORT_TRAFFIC,
     CONF_SENSOR_CLIENT_TRAFFIC,
-    CONF_SENSOR_WIREGUARD,
     CONF_SENSOR_CONTAINERS,
     CONF_SENSOR_ENVIRONMENT,
+    CONF_SENSOR_PORT_TRAFFIC,
+    CONF_SENSOR_WIREGUARD,
+    DOMAIN,
 )
 
 DEVICE_ATTRIBUTES_IFACE = [
@@ -193,7 +192,7 @@ class MikrotikSensorEntityDescription(SensorEntityDescription):
     data_name_comment: bool = False
     data_uid: str | None = None
     data_reference: str | None = None
-    data_attributes_list: List = field(default_factory=lambda: [])
+    data_attributes_list: list = field(default_factory=lambda: [])
     func: str = "MikrotikSensor"
     enable_on_option: str | None = None
 

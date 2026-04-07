@@ -8,24 +8,19 @@ import asyncio
 from logging import getLogger
 from typing import Any
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
 from homeassistant.components.update import (
-    UpdateEntity,
     UpdateDeviceClass,
+    UpdateEntity,
     UpdateEntityFeature,
 )
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from packaging.version import Version
 
 from .coordinator import MikrotikCoordinator
 from .entity import MikrotikEntity, async_add_entities
-from .update_types import (
-    SENSOR_TYPES,
-    SENSOR_SERVICES,
-)
-from packaging.version import Version
 
 _LOGGER = getLogger(__name__)
 DEVICE_UPDATE = "device_update"

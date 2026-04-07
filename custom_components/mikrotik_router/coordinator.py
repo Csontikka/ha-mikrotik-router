@@ -5,15 +5,15 @@ from __future__ import annotations
 import ipaddress
 import logging
 import re
-import pytz
-
-from datetime import datetime, timedelta
 from dataclasses import dataclass
-from ipaddress import ip_address, IPv4Network
-from mac_vendor_lookup import AsyncMacLookup
+from datetime import datetime, timedelta
+from ipaddress import IPv4Network
 
+import pytz
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from mac_vendor_lookup import AsyncMacLookup
+
 try:
     from homeassistant.components.repairs import (
         IssueSeverity,
@@ -31,64 +31,60 @@ except ImportError:
         async_create_issue = None
         async_delete_issue = None
         IssueSeverity = None
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PASSWORD,
+    CONF_PORT,
+    CONF_SSL,
+    CONF_USERNAME,
+    CONF_VERIFY_SSL,
+    CONF_ZONE,
+    STATE_HOME,
+)
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import utcnow
 
-
-from homeassistant.const import (
-    CONF_NAME,
-    CONF_HOST,
-    CONF_PORT,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_SSL,
-    CONF_VERIFY_SSL,
-    CONF_ZONE,
-    STATE_HOME,
-)
-
-from .const import (
-    DOMAIN,
-    CONF_TRACK_IFACE_CLIENTS,
-    DEFAULT_TRACK_IFACE_CLIENTS,
-    CONF_TRACK_HOSTS,
-    DEFAULT_TRACK_HOSTS,
-    CONF_SCAN_INTERVAL,
-    DEFAULT_SCAN_INTERVAL,
-    CONF_SENSOR_PORT_TRAFFIC,
-    DEFAULT_SENSOR_PORT_TRAFFIC,
-    CONF_SENSOR_CLIENT_TRAFFIC,
-    DEFAULT_SENSOR_CLIENT_TRAFFIC,
-    CONF_SENSOR_CLIENT_CAPTIVE,
-    DEFAULT_SENSOR_CLIENT_CAPTIVE,
-    CONF_SENSOR_SIMPLE_QUEUES,
-    DEFAULT_SENSOR_SIMPLE_QUEUES,
-    CONF_SENSOR_NAT,
-    DEFAULT_SENSOR_NAT,
-    CONF_SENSOR_MANGLE,
-    DEFAULT_SENSOR_MANGLE,
-    CONF_SENSOR_ROUTING_RULES,
-    DEFAULT_SENSOR_ROUTING_RULES,
-    CONF_SENSOR_WIREGUARD,
-    DEFAULT_SENSOR_WIREGUARD,
-    CONF_SENSOR_CONTAINERS,
-    DEFAULT_SENSOR_CONTAINERS,
-    CONF_SENSOR_FILTER,
-    DEFAULT_SENSOR_FILTER,
-    CONF_SENSOR_KIDCONTROL,
-    DEFAULT_SENSOR_KIDCONTROL,
-    CONF_SENSOR_PPP,
-    DEFAULT_SENSOR_PPP,
-    CONF_SENSOR_SCRIPTS,
-    DEFAULT_SENSOR_SCRIPTS,
-    CONF_SENSOR_ENVIRONMENT,
-    DEFAULT_SENSOR_ENVIRONMENT,
-    CONF_SENSOR_NETWATCH_TRACKER,
-    DEFAULT_SENSOR_NETWATCH_TRACKER,
-)
 from .apiparser import parse_api
+from .const import (
+    CONF_SCAN_INTERVAL,
+    CONF_SENSOR_CLIENT_CAPTIVE,
+    CONF_SENSOR_CLIENT_TRAFFIC,
+    CONF_SENSOR_CONTAINERS,
+    CONF_SENSOR_ENVIRONMENT,
+    CONF_SENSOR_FILTER,
+    CONF_SENSOR_KIDCONTROL,
+    CONF_SENSOR_MANGLE,
+    CONF_SENSOR_NAT,
+    CONF_SENSOR_NETWATCH_TRACKER,
+    CONF_SENSOR_PORT_TRAFFIC,
+    CONF_SENSOR_PPP,
+    CONF_SENSOR_ROUTING_RULES,
+    CONF_SENSOR_SCRIPTS,
+    CONF_SENSOR_SIMPLE_QUEUES,
+    CONF_SENSOR_WIREGUARD,
+    CONF_TRACK_HOSTS,
+    DEFAULT_SCAN_INTERVAL,
+    DEFAULT_SENSOR_CLIENT_CAPTIVE,
+    DEFAULT_SENSOR_CLIENT_TRAFFIC,
+    DEFAULT_SENSOR_CONTAINERS,
+    DEFAULT_SENSOR_ENVIRONMENT,
+    DEFAULT_SENSOR_FILTER,
+    DEFAULT_SENSOR_KIDCONTROL,
+    DEFAULT_SENSOR_MANGLE,
+    DEFAULT_SENSOR_NAT,
+    DEFAULT_SENSOR_NETWATCH_TRACKER,
+    DEFAULT_SENSOR_PORT_TRAFFIC,
+    DEFAULT_SENSOR_PPP,
+    DEFAULT_SENSOR_ROUTING_RULES,
+    DEFAULT_SENSOR_SCRIPTS,
+    DEFAULT_SENSOR_SIMPLE_QUEUES,
+    DEFAULT_SENSOR_WIREGUARD,
+    DEFAULT_TRACK_HOSTS,
+    DOMAIN,
+)
 from .mikrotikapi import MikrotikAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -207,6 +203,7 @@ class MikrotikTrackerCoordinator(DataUpdateCoordinator[None]):
                         "available",
                     ],
                     ["unknown", "unknown", "unknown", "unknown", False, False],
+                    strict=False,
                 ):
                     if key not in self.coordinator.ds["host"][uid]:
                         self.coordinator.ds["host"][uid][key] = default
@@ -579,19 +576,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 self.support_capsman = False
                 self._wifimodule = "wifiwave2"
 
-            elif "wifi" in packages and packages["wifi"]["enabled"]:
-                self.support_capsman = False
-                self._wifimodule = "wifi"
-
-            elif "wifi-qcom" in packages and packages["wifi-qcom"]["enabled"]:
-                self.support_capsman = False
-                self._wifimodule = "wifi"
-
-            elif "wifi-qcom-ac" in packages and packages["wifi-qcom-ac"]["enabled"]:
-                self.support_capsman = False
-                self._wifimodule = "wifi"
-
-            elif (
+            elif ("wifi" in packages and packages["wifi"]["enabled"]) or ("wifi-qcom" in packages and packages["wifi-qcom"]["enabled"]) or ("wifi-qcom-ac" in packages and packages["wifi-qcom-ac"]["enabled"]) or (
                 self.major_fw_version == 7 and self.minor_fw_version >= 13
             ) or self.major_fw_version > 7:
                 self.support_capsman = False
@@ -614,9 +599,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             self.support_gps = True
 
         # WireGuard is built-in from RouterOS v7
-        if self.major_fw_version >= 7:
-            self.support_wireguard = True
-        elif "wireguard" in packages and packages["wireguard"]["enabled"]:
+        if self.major_fw_version >= 7 or ("wireguard" in packages and packages["wireguard"]["enabled"]):
             self.support_wireguard = True
 
         # Container support available from RouterOS v7
@@ -1113,7 +1096,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             only=[{"key": "local", "value": False}],
         )
 
-        for uid, vals in self.ds["bridge_host"].items():
+        for _uid, vals in self.ds["bridge_host"].items():
             self.ds["bridge"][vals["bridge"]] = True
 
     # ---------------------------
@@ -1130,7 +1113,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         for uid, vals in self.ds["interface"].items():
             self.ds["interface"][uid]["client-ip-address"] = ""
             self.ds["interface"][uid]["client-mac-address"] = ""
-            for arp_uid, arp_vals in self.ds["arp"].items():
+            for _arp_uid, arp_vals in self.ds["arp"].items():
                 if arp_vals["interface"] != vals["name"] and not (
                     vals["name"] in self.ds["bonding_slaves"]
                     and self.ds["bonding_slaves"][vals["name"]]["master"]
@@ -1523,7 +1506,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         result = {"count": len(active)}
         for pkg in known:
-            result[pkg] = active[pkg] if pkg in active else False
+            result[pkg] = active.get(pkg, False)
 
         self.ds["system_packages"] = result
 
@@ -2294,7 +2277,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             vals=[{"name": "name"}, {"name": "address"}, {"name": "comment"}],
         )
 
-        for uid, vals in self.ds["dns"].items():
+        for uid, _vals in self.ds["dns"].items():
             self.ds["dns"][uid]["comment"] = str(self.ds["dns"][uid]["comment"])
 
     # ---------------------------
@@ -2667,7 +2650,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     self.ds["host"][uid_lower]["mac-address"] = uid_lower
                     self.ds["host"][uid_lower]["host-name"] = self.ds["host_hass"][uid]
 
-        for uid, vals in self.ds["host"].items():
+        for uid, _vals in self.ds["host"].items():
             # Add missing default values
             for key, default in zip(
                 [
@@ -2680,6 +2663,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     "available",
                 ],
                 ["unknown", "unknown", "unknown", "unknown", "detect", False, False],
+                strict=False,
             ):
                 if key not in self.ds["host"][uid]:
                     self.ds["host"][uid][key] = default
@@ -2689,13 +2673,12 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         # Mark wired hosts available if present in ARP table
         for uid, vals in self.ds["host"].items():
-            if vals.get("source") not in ["capsman", "wireless", "restored"]:
-                if (
-                    uid in self.ds["arp"]
-                    and self.ds["arp"][uid].get("address", "unknown") not in ["unknown", ""]
-                ):
-                    self.ds["host"][uid]["available"] = True
-                    self.ds["host"][uid]["last-seen"] = utcnow()
+            if vals.get("source") not in ["capsman", "wireless", "restored"] and (
+                uid in self.ds["arp"]
+                and self.ds["arp"][uid].get("address", "unknown") not in ["unknown", ""]
+            ):
+                self.ds["host"][uid]["available"] = True
+                self.ds["host"][uid]["last-seen"] = utcnow()
 
         # Process hosts
         self.ds["resource"]["clients_wired"] = 0
@@ -2749,7 +2732,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             if vals["host-name"] == "unknown":
                 # Resolve hostname from static DNS
                 if vals["address"] != "unknown":
-                    for dns_uid, dns_vals in self.ds["dns"].items():
+                    for _dns_uid, dns_vals in self.ds["dns"].items():
                         if dns_vals["address"] == vals["address"]:
                             if dns_vals["comment"].split("#", 1)[0] != "":
                                 self.ds["host"][uid]["host-name"] = dns_vals[
