@@ -139,14 +139,14 @@
     "step": {
       "basic_options": {
         "data": {
-          "scan_interval": "Scan interval (requires HA restart)",
+          "scan_interval": "Scan interval",
           "track_iface_clients": "Show client MAC and IP on interfaces",
           "unit_of_measurement": "Unit of measurement",
           "track_network_hosts_timeout": "Track network devices timeout (seconds)",
           "zone": "Zone for device tracker"
         },
         "data_description": {
-          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load. Requires HA restart.",
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
           "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
           "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
         },
