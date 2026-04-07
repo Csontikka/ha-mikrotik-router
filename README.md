@@ -103,8 +103,9 @@ Without the required backend, sensors show "unavailable" instead of 0.
 - **Environment Variables** — read RouterOS script environment variable values
 - **IP Cloud** — public IP address sensor via MikroTik cloud service
 - **Device Mode & Packages** — diagnostic sensors showing enabled features and installed packages
-  ![Packages Details](docs/assets/images/screenshots/packages_attributes.png)
 - **CAPsMAN** (v6) / **WiFi** (v7) — wireless client detection (auto-detected)
+
+![Packages Details](docs/assets/images/screenshots/packages_attributes.png)
 
 ### Firmware Updates
 
