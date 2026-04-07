@@ -1,20 +1,122 @@
 {
   "config": {
     "step": {
+      "discovery": {
+        "title": "إضافة جهاز MikroTik Router",
+        "description": "ابحث عن أجهزة MikroTik في شبكتك المحلية أو أدخل العنوان يدويًا.",
+        "data": {
+          "scan": "البحث عن أجهزة MikroTik في الشبكة"
+        }
+      },
+      "pick_device": {
+        "title": "أجهزة MikroTik التي تم العثور عليها",
+        "description": "اختر جهاز توجيه للتهيئة أو اختر الإدخال اليدوي.",
+        "data": {
+          "router": "اختر جهاز التوجيه"
+        }
+      },
       "user": {
         "title": "ضبط جهاز Mikrotik Router",
-        "description": "إعداد دمج موجِّه (Mikrotik).",
+        "description": "إعداد دمج موجِّه (Mikrotik).",
         "data": {
           "name": "اسم الدّمج",
           "host": "المُضيف",
           "port": "منفذ",
           "username": "اسم المستخدم",
           "password": "كلمة المرور",
-          "ssl": "استعمل طبقة الوصلات الآمنة (SSL)",
-          "verify_ssl": "Verify SSL"
+          "ssl_mode": "أمان الاتصال"
         },
         "data_description": {
-          "verify_ssl": "Enable certificate and hostname validation. Only enable if your MikroTik has a valid SSL certificate with a matching hostname. Leave disabled for self-signed certificates (default)."
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "إعداد Mikrotik Router (2/4)",
+        "description": "تهيئة التكامل",
+        "data": {
+          "scan_interval": "الفاصل الزمني للمسح (بالثواني)",
+          "track_network_hosts_timeout": "مهلة تتبّع أجهزة الشبكة (بالثواني)",
+          "zone": "منطقة لتعقُّب الجهاز"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "إعداد Mikrotik Router (3/4)",
+        "description": "اختر طريقة تفعيل المستشعرات",
+        "data": {
+          "sensor_preset": "إعداد مسبق للمستشعرات"
+        },
+        "data_description": {
+          "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
+        }
+      },
+      "sensor_select": {
+        "title": "إعداد Mikrotik Router (4/4)",
+        "description": "تمكين أجهزة الاستشعار والمفاتيح",
+        "data": {
+          "sensor_client_captive": "بيانات البوابة المقيدة",
+          "sensor_client_traffic": "مُستشعرات حركة المرور على شبكات العميل",
+          "sensor_containers": "مستشعرات الحاويات",
+          "sensor_environment": "مُستشعرات متغير البيئة",
+          "sensor_filter": "مفاتيح الترشيح",
+          "sensor_kidcontrol": "مراقبة الأطفال",
+          "sensor_mangle": "مفاتيح Mangle",
+          "sensor_nat": "مُبدِّلات NAT",
+          "sensor_netwatch_tracker": "مستشعرات Netwatch",
+          "sensor_port_tracker": "مُستشعرات تعقُب منفذ الشبكة",
+          "sensor_port_traffic": "مُستشعرات حركة المرور عبر منفذ الشبكة",
+          "sensor_ppp": "مستخدمي PPP",
+          "sensor_routing_rules": "مبدّلات Routing Rules",
+          "sensor_scripts": "مُبدِّلات النصوص البرمجية",
+          "sensor_simple_queues": "مُبدِّل الاِصْطِفاف البسيط",
+          "track_network_hosts": "تتبّع أجهزة الشبكة",
+          "sensor_wireguard": "مستشعرات WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "إعادة مصادقة Mikrotik Router",
+        "description": "أدخل بيانات الاعتماد الجديدة لـ {host}.",
+        "data": {
+          "username": "اسم المستخدم",
+          "password": "كلمة المرور"
+        }
+      },
+      "reconfigure": {
+        "title": "إعادة تهيئة Mikrotik Router",
+        "description": "تحديث إعدادات الاتصال لهذا التكامل.",
+        "data": {
+          "name": "اسم الدّمج",
+          "host": "المُضيف",
+          "port": "منفذ",
+          "username": "اسم المستخدم",
+          "password": "كلمة المرور",
+          "ssl_mode": "أمان الاتصال"
+        },
+        "data_description": {
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
         }
       }
     },
@@ -24,45 +126,167 @@
       "ssl_handshake_failure": "فشل تأكيد الاتصال (SSL)",
       "connection_timeout": "مهلة اتصال (Mikrotik).",
       "wrong_login": "خطأ في اسم المستخدم أو كلمة مرور.",
-      "ssl_verify_failure": "Certificate verify failed"
+      "ssl_verify_failure": "فشل التحقق من الشهادة",
+      "no_devices_found": "لم يتم العثور على أجهزة MikroTik في هذه الشبكة. أدخل عنوان جهاز التوجيه يدويًا."
+    },
+    "abort": {
+      "already_configured": "الجهاز مُهيأ بالفعل.",
+      "reauth_successful": "تمت إعادة المصادقة بنجاح.",
+      "reconfigure_successful": "تمت إعادة التهيئة بنجاح."
     }
   },
   "options": {
     "step": {
       "basic_options": {
         "data": {
-          "scan_interval": "الفاصل الزمني للمسح الضوئي (يتطلب إعادة تشغيل HA)",
-          "track_iface_clients": "إظهار  عنوان التحكّم في الوسائط (MAC)  و بروتوكول الإنترنت (IP) للعميل على الواجهات",
+          "scan_interval": "الفاصل الزمني للمسح",
+          "track_iface_clients": "إظهار عنوان MAC و IP للعميل على الواجهات",
           "unit_of_measurement": "وحدة قياس",
           "track_network_hosts_timeout": "مهلة تتبّع أجهزة الشبكة (بالثواني)",
-          "zone": "منطقة لتعقُّب الجهاز"
+          "zone": "منطقة لتعقُّب الجهاز"
         },
-        "title": "خيارات جهاز Mikrotik Router (1/2)",
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        },
+        "title": "خيارات جهاز Mikrotik Router (1/3)",
         "description": "تهيئة التكامل"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "إعداد مسبق للمستشعرات"
+        },
+        "data_description": {
+          "sensor_preset": "Select a preset to quickly configure which sensors and switches are enabled, or choose Custom to configure individually."
+        },
+        "title": "خيارات جهاز Mikrotik Router (2/3)",
+        "description": "اختر إعداد مسبق للمستشعرات"
       },
       "sensor_select": {
         "data": {
-          "sensor_client_captive": "Captive portal data",
+          "sensor_client_captive": "بيانات البوابة المقيدة",
           "sensor_client_traffic": "مُستشعرات حركة المرور على شبكات العميل",
-          "sensor_containers": "Container sensors",
+          "sensor_containers": "مستشعرات الحاويات",
           "sensor_environment": "مُستشعرات متغير البيئة",
           "sensor_filter": "مفاتيح الترشيح",
           "sensor_kidcontrol": "مراقبة الأطفال",
-          "sensor_mangle": "مفاتيح المِكواة الأُسطوانية",
-          "sensor_nat": "مُبدِّلات ترجمة عنوان الشبكة",
-          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_mangle": "مفاتيح Mangle",
+          "sensor_nat": "مُبدِّلات NAT",
+          "sensor_netwatch_tracker": "مستشعرات Netwatch",
           "sensor_port_tracker": "مُستشعرات تعقُب منفذ الشبكة",
           "sensor_port_traffic": "مُستشعرات حركة المرور عبر منفذ الشبكة",
           "sensor_ppp": "مستخدمي PPP",
-          "sensor_routing_rules": "Routing Rules switches",
-          "sensor_scripts": "مُبدِّلات النصوص",
-          "sensor_simple_queues": "مُبدِّل الاِصْطِفاف البسيط",
+          "sensor_routing_rules": "مبدّلات Routing Rules",
+          "sensor_scripts": "مُبدِّلات النصوص البرمجية",
+          "sensor_simple_queues": "مُبدِّل الاِصْطِفاف البسيط",
           "track_network_hosts": "تتبّع أجهزة الشبكة",
-          "sensor_wireguard": "WireGuard peer sensors"
+          "sensor_wireguard": "مستشعرات WireGuard peer"
         },
-        "title": "خيارات جهاز Mikrotik Router (2/2)",
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        },
+        "title": "خيارات جهاز Mikrotik Router (3/3)",
         "description": "تمكين أجهزة الاستشعار والمفاتيح"
       }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "فشلت المصادقة لـ {host}",
+      "description": "اسم المستخدم أو كلمة المرور لجهاز MikroTik على {host} غير صحيحة. انتقل إلى **الإعدادات → التكاملات → MikroTik Router → إعادة المصادقة** لتحديث بيانات الاعتماد."
+    },
+    "ssl_error": {
+      "title": "خطأ اتصال SSL لـ {host}",
+      "description": "تعذر إنشاء اتصال SSL آمن مع جهاز MikroTik على {host}. انتقل إلى **الإعدادات → التكاملات → MikroTik Router → إعادة التهيئة** لتغيير إعدادات SSL أو تعطيل SSL."
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "بدون SSL — اتصال غير مشفر (افتراضي، منفذ 8728)",
+        "ssl": "SSL — مشفر، يقبل الشهادات الموقعة ذاتيًا (منفذ 8729)",
+        "ssl_verify": "SSL مع التحقق — يتطلب شهادة صالحة موقعة من CA"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": { "name": "درجة الحرارة" },
+      "system_voltage": { "name": "الجهد الكهربائي" },
+      "system_cpu_temperature": { "name": "درجة حرارة المعالج" },
+      "system_switch_temperature": { "name": "درجة حرارة المبدّل" },
+      "system_board_temperature1": { "name": "درجة حرارة اللوحة" },
+      "system_phy_temperature": { "name": "درجة حرارة PHY" },
+      "system_power_consumption": { "name": "استهلاك الطاقة" },
+      "system_poe_out_consumption": { "name": "استهلاك PoE الخارج" },
+      "system_fan1_speed": { "name": "سرعة المروحة 1" },
+      "system_fan2_speed": { "name": "سرعة المروحة 2" },
+      "system_fan3_speed": { "name": "سرعة المروحة 3" },
+      "system_fan4_speed": { "name": "سرعة المروحة 4" },
+      "system_psu1_current": { "name": "مزود الطاقة 1 التيار" },
+      "system_psu1_voltage": { "name": "مزود الطاقة 1 الجهد" },
+      "system_psu2_current": { "name": "مزود الطاقة 2 التيار" },
+      "system_psu2_voltage": { "name": "مزود الطاقة 2 الجهد" },
+      "system_uptime": { "name": "وقت التشغيل" },
+      "system_cpu_load": { "name": "حمل المعالج" },
+      "system_memory_usage": { "name": "استخدام الذاكرة" },
+      "system_hdd_usage": { "name": "استخدام القرص" },
+      "system_clients_wired": { "name": "العملاء السلكيون" },
+      "system_clients_wireless": { "name": "العملاء اللاسلكيون" },
+      "system_captive_authorized": { "name": "عملاء البوابة المقيدة" },
+      "system_gps_latitude": { "name": "خط العرض" },
+      "system_gps_longitude": { "name": "خط الطول" },
+      "traffic_tx": { "name": "TX" },
+      "traffic_rx": { "name": "RX" },
+      "tx_total": { "name": "TX إجمالي" },
+      "rx_total": { "name": "RX إجمالي" },
+      "client_traffic_tx": { "name": "TX" },
+      "client_traffic_rx": { "name": "RX" },
+      "ip_address": { "name": "عنوان IP" },
+      "cloud_public_address": { "name": "العنوان العام" },
+      "wireguard_peer_rx": { "name": "RX" },
+      "wireguard_peer_tx": { "name": "TX" },
+      "wireguard_peer_handshake": { "name": "آخر مصافحة" },
+      "system_device_mode": { "name": "وضع الجهاز" },
+      "system_packages": { "name": "الحزم" },
+      "container_status": { "name": "الحالة" }
+    },
+    "binary_sensor": {
+      "system_ups": { "name": "UPS" },
+      "ppp_tracker": { "name": "PPP" },
+      "interface_connection": { "name": "الاتصال" },
+      "netwatch": { "name": "Netwatch" },
+      "wireguard_peer": { "name": "متصل" }
+    },
+    "switch": {
+      "interface_port": { "name": "منفذ" },
+      "ppp_secret": { "name": "PPP secret" },
+      "kidcontrol_paused": { "name": "متوقف مؤقتًا" }
+    },
+    "button": {
+      "reboot": { "name": "إعادة التشغيل" }
     }
   }
 }

@@ -1,6 +1,20 @@
 {
   "config": {
     "step": {
+      "discovery": {
+        "title": "MikroTik Router जोड़ें",
+        "description": "अपने स्थानीय नेटवर्क पर MikroTik राउटर खोजें या पता मैन्युअल रूप से दर्ज करें।",
+        "data": {
+          "scan": "नेटवर्क पर MikroTik राउटर खोजें"
+        }
+      },
+      "pick_device": {
+        "title": "मिले MikroTik राउटर",
+        "description": "कॉन्फ़िगर करने के लिए एक राउटर चुनें या मैन्युअल प्रविष्टि चुनें।",
+        "data": {
+          "router": "राउटर चुनें"
+        }
+      },
       "user": {
         "title": "मिकरोटिक राउटर सेट करें",
         "description": "Mikrotik राउटर इन्टीग्रेशन सेट अप करें।",
@@ -10,11 +24,99 @@
           "port": "पोर्ट",
           "username": "उपयोगकर्ता नाम",
           "password": "पासवर्ड",
-          "ssl": "SSL का उपयोग करें",
-          "verify_ssl": "Verify SSL"
+          "ssl_mode": "कनेक्शन सुरक्षा"
         },
         "data_description": {
-          "verify_ssl": "Enable certificate and hostname validation. Only enable if your MikroTik has a valid SSL certificate with a matching hostname. Leave disabled for self-signed certificates (default)."
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Mikrotik Router सेटअप (2/4)",
+        "description": "इंटीग्रेशन को कॉन्फ़िगर करें",
+        "data": {
+          "scan_interval": "स्कैन अन्तराल (सेकन्ड)",
+          "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)",
+          "zone": "डिवाइस ट्रैकर के लिए ज़ोन"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Mikrotik Router सेटअप (3/4)",
+        "description": "सेंसर सक्रियण मोड चुनें",
+        "data": {
+          "sensor_preset": "सेंसर प्रीसेट"
+        },
+        "data_description": {
+          "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
+        }
+      },
+      "sensor_select": {
+        "title": "Mikrotik Router सेटअप (4/4)",
+        "description": "सेंसर और स्विच को एनेबल करें",
+        "data": {
+          "sensor_client_captive": "कैप्टिव पोर्टल डेटा",
+          "sensor_client_traffic": "क्लाइंट ट्रैफ़िक सेंसर",
+          "sensor_containers": "कंटेनर सेंसर",
+          "sensor_environment": "पारिस्थितिक वेरिएबल सेंसर",
+          "sensor_filter": "फ़िल्टर स्विच",
+          "sensor_kidcontrol": "बच्चों का नियंत्रण",
+          "sensor_mangle": "Mangle स्विच",
+          "sensor_nat": "NAT स्विच",
+          "sensor_netwatch_tracker": "Netwatch सेंसर",
+          "sensor_port_tracker": "पोर्ट ट्रैकर सेंसर",
+          "sensor_port_traffic": "पोर्ट ट्रैफ़िक सेंसर",
+          "sensor_ppp": "PPP यूज़र",
+          "sensor_routing_rules": "Routing Rules स्विच",
+          "sensor_scripts": "स्क्रिप्ट स्विच",
+          "sensor_simple_queues": "सामान्य कतार स्विच",
+          "track_network_hosts": "नेटवर्क डिवाइस को ट्रैक करें",
+          "sensor_wireguard": "WireGuard peer सेंसर"
+        },
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Mikrotik Router पुनः प्रमाणीकरण",
+        "description": "{host} के लिए नए क्रेडेंशियल दर्ज करें।",
+        "data": {
+          "username": "उपयोगकर्ता नाम",
+          "password": "पासवर्ड"
+        }
+      },
+      "reconfigure": {
+        "title": "Mikrotik Router पुनः कॉन्फ़िगर करें",
+        "description": "इस इंटीग्रेशन के कनेक्शन सेटिंग्स अपडेट करें।",
+        "data": {
+          "name": "इन्टीग्रेशन का नाम",
+          "host": "होस्ट",
+          "port": "पोर्ट",
+          "username": "उपयोगकर्ता नाम",
+          "password": "पासवर्ड",
+          "ssl_mode": "कनेक्शन सुरक्षा"
+        },
+        "data_description": {
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
         }
       }
     },
@@ -24,45 +126,167 @@
       "ssl_handshake_failure": "SSL हैन्डशेक विफ़ल हो गया",
       "connection_timeout": "Mikrotik कनेक्शन टाइम आउट हो गया।",
       "wrong_login": "अमान्य उपयोगकर्ता नाम या पासवर्ड।",
-      "ssl_verify_failure": "Certificate verify failed"
+      "ssl_verify_failure": "प्रमाणपत्र सत्यापन विफल",
+      "no_devices_found": "इस नेटवर्क पर कोई MikroTik राउटर नहीं मिला। राउटर का पता मैन्युअल रूप से दर्ज करें।"
+    },
+    "abort": {
+      "already_configured": "डिवाइस पहले से कॉन्फ़िगर है।",
+      "reauth_successful": "पुनः प्रमाणीकरण सफल रहा।",
+      "reconfigure_successful": "पुनः कॉन्फ़िगरेशन सफल रहा।"
     }
   },
   "options": {
     "step": {
       "basic_options": {
         "data": {
-          "scan_interval": "स्कैन अन्तराल (HA रिस्टार्ट आवश्यक है)",
+          "scan_interval": "स्कैन अन्तराल",
           "track_iface_clients": "ग्राहक का MAC और IP इन्टरफ़ेस पर दिखाएं",
           "unit_of_measurement": "माप का युनीट",
           "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)",
           "zone": "डिवाइस ट्रैकर के लिए ज़ोन"
         },
-        "title": "Mikrotik Router के विकल्प (1/2)",
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        },
+        "title": "Mikrotik Router के विकल्प (1/3)",
         "description": "इंटीग्रेशन को कॉन्फ़िगर करें"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "सेंसर प्रीसेट"
+        },
+        "data_description": {
+          "sensor_preset": "Select a preset to quickly configure which sensors and switches are enabled, or choose Custom to configure individually."
+        },
+        "title": "Mikrotik Router के विकल्प (2/3)",
+        "description": "सेंसर प्रीसेट चुनें"
       },
       "sensor_select": {
         "data": {
-          "sensor_client_captive": "Captive portal data",
+          "sensor_client_captive": "कैप्टिव पोर्टल डेटा",
           "sensor_client_traffic": "क्लाइंट ट्रैफ़िक सेंसर",
-          "sensor_containers": "Container sensors",
+          "sensor_containers": "कंटेनर सेंसर",
           "sensor_environment": "पारिस्थितिक वेरिएबल सेंसर",
           "sensor_filter": "फ़िल्टर स्विच",
-          "sensor_kidcontrol": "बच्चे के लिए कंट्रोल",
-          "sensor_mangle": "मैंगल स्विच",
+          "sensor_kidcontrol": "बच्चों का नियंत्रण",
+          "sensor_mangle": "Mangle स्विच",
           "sensor_nat": "NAT स्विच",
-          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_netwatch_tracker": "Netwatch सेंसर",
           "sensor_port_tracker": "पोर्ट ट्रैकर सेंसर",
-          "sensor_port_traffic": "पोर्ट ट्रैफ़िक सेंसर",
-          "sensor_ppp": "PPP यूज़र",
-          "sensor_routing_rules": "Routing Rules switches",
+          "sensor_port_traffic": "पोर्ट ट्रैफ़िक सेंसर",
+          "sensor_ppp": "PPP यूज़र",
+          "sensor_routing_rules": "Routing Rules स्विच",
           "sensor_scripts": "स्क्रिप्ट स्विच",
           "sensor_simple_queues": "सामान्य कतार स्विच",
           "track_network_hosts": "नेटवर्क डिवाइस को ट्रैक करें",
-          "sensor_wireguard": "WireGuard peer sensors"
+          "sensor_wireguard": "WireGuard peer सेंसर"
         },
-        "title": "Mikrotik Router के विकल्प (2/2)",
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        },
+        "title": "Mikrotik Router के विकल्प (3/3)",
         "description": "सेंसर और स्विच को एनेबल करें"
       }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "{host} के लिए प्रमाणीकरण विफल",
+      "description": "{host} पर MikroTik राउटर का उपयोगकर्ता नाम या पासवर्ड गलत है। अपने क्रेडेंशियल अपडेट करने के लिए **सेटिंग्स → इंटीग्रेशन → MikroTik Router → पुनः प्रमाणीकरण** पर जाएं।"
+    },
+    "ssl_error": {
+      "title": "{host} के लिए SSL कनेक्शन त्रुटि",
+      "description": "{host} पर MikroTik राउटर के साथ सुरक्षित SSL कनेक्शन स्थापित नहीं हो सका। SSL सेटिंग्स बदलने या SSL अक्षम करने के लिए **सेटिंग्स → इंटीग्रेशन → MikroTik Router → पुनः कॉन्फ़िगर** पर जाएं।"
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "SSL नहीं — अनएन्क्रिप्टेड कनेक्शन (डिफ़ॉल्ट, पोर्ट 8728)",
+        "ssl": "SSL — एन्क्रिप्टेड, स्व-हस्ताक्षरित प्रमाणपत्र स्वीकार करता है (पोर्ट 8729)",
+        "ssl_verify": "SSL सत्यापन के साथ — वैध CA-हस्ताक्षरित प्रमाणपत्र आवश्यक"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": { "name": "तापमान" },
+      "system_voltage": { "name": "वोल्टेज" },
+      "system_cpu_temperature": { "name": "CPU तापमान" },
+      "system_switch_temperature": { "name": "स्विच तापमान" },
+      "system_board_temperature1": { "name": "बोर्ड तापमान" },
+      "system_phy_temperature": { "name": "PHY तापमान" },
+      "system_power_consumption": { "name": "बिजली की खपत" },
+      "system_poe_out_consumption": { "name": "PoE आउटपुट खपत" },
+      "system_fan1_speed": { "name": "पंखा 1 गति" },
+      "system_fan2_speed": { "name": "पंखा 2 गति" },
+      "system_fan3_speed": { "name": "पंखा 3 गति" },
+      "system_fan4_speed": { "name": "पंखा 4 गति" },
+      "system_psu1_current": { "name": "पावर सप्लाई 1 करंट" },
+      "system_psu1_voltage": { "name": "पावर सप्लाई 1 वोल्टेज" },
+      "system_psu2_current": { "name": "पावर सप्लाई 2 करंट" },
+      "system_psu2_voltage": { "name": "पावर सप्लाई 2 वोल्टेज" },
+      "system_uptime": { "name": "अपटाइम" },
+      "system_cpu_load": { "name": "CPU लोड" },
+      "system_memory_usage": { "name": "मेमोरी उपयोग" },
+      "system_hdd_usage": { "name": "डिस्क उपयोग" },
+      "system_clients_wired": { "name": "वायर्ड क्लाइंट" },
+      "system_clients_wireless": { "name": "वायरलेस क्लाइंट" },
+      "system_captive_authorized": { "name": "कैप्टिव पोर्टल क्लाइंट" },
+      "system_gps_latitude": { "name": "अक्षांश" },
+      "system_gps_longitude": { "name": "देशांतर" },
+      "traffic_tx": { "name": "TX" },
+      "traffic_rx": { "name": "RX" },
+      "tx_total": { "name": "TX कुल" },
+      "rx_total": { "name": "RX कुल" },
+      "client_traffic_tx": { "name": "TX" },
+      "client_traffic_rx": { "name": "RX" },
+      "ip_address": { "name": "IP पता" },
+      "cloud_public_address": { "name": "सार्वजनिक पता" },
+      "wireguard_peer_rx": { "name": "RX" },
+      "wireguard_peer_tx": { "name": "TX" },
+      "wireguard_peer_handshake": { "name": "अंतिम हैंडशेक" },
+      "system_device_mode": { "name": "डिवाइस मोड" },
+      "system_packages": { "name": "पैकेज" },
+      "container_status": { "name": "स्थिति" }
+    },
+    "binary_sensor": {
+      "system_ups": { "name": "UPS" },
+      "ppp_tracker": { "name": "PPP" },
+      "interface_connection": { "name": "कनेक्शन" },
+      "netwatch": { "name": "Netwatch" },
+      "wireguard_peer": { "name": "जुड़ा हुआ" }
+    },
+    "switch": {
+      "interface_port": { "name": "पोर्ट" },
+      "ppp_secret": { "name": "PPP secret" },
+      "kidcontrol_paused": { "name": "रोका गया" }
+    },
+    "button": {
+      "reboot": { "name": "पुनः आरंभ" }
     }
   }
 }

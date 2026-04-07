@@ -1,6 +1,20 @@
 {
   "config": {
     "step": {
+      "discovery": {
+        "title": "Pridať MikroTik Router",
+        "description": "Prehľadajte miestnu sieť pre MikroTik smerovače alebo zadajte adresu manuálne.",
+        "data": {
+          "scan": "Vyhľadať MikroTik smerovače v sieti"
+        }
+      },
+      "pick_device": {
+        "title": "Nájdené MikroTik smerovače",
+        "description": "Vyberte smerovač na konfiguráciu alebo zvoľte manuálne zadanie.",
+        "data": {
+          "router": "Vybrať smerovač"
+        }
+      },
       "user": {
         "title": "Nastaviť Mikrotik Router",
         "description": "Nastaviť integráciu Mikrotik Router.",
@@ -10,11 +24,99 @@
           "port": "Port",
           "username": "Užívateľ",
           "password": "Heslo",
-          "ssl": "Použiť SSL",
-          "verify_ssl": "Verify SSL"
+          "ssl_mode": "Zabezpečenie pripojenia"
         },
         "data_description": {
-          "verify_ssl": "Enable certificate and hostname validation. Only enable if your MikroTik has a valid SSL certificate with a matching hostname. Leave disabled for self-signed certificates (default)."
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Nastavenie Mikrotik Router (2/4)",
+        "description": "Nakonfigurovať integráciu",
+        "data": {
+          "scan_interval": "Interval skenovania (sekundy)",
+          "track_network_hosts_timeout": "Časový limit sledovania sieťových zariadení (sekundy)",
+          "zone": "Zóna pre sledované zariadenia"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Nastavenie Mikrotik Router (3/4)",
+        "description": "Vyberte režim aktivácie senzorov",
+        "data": {
+          "sensor_preset": "Predvoľba senzorov"
+        },
+        "data_description": {
+          "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
+        }
+      },
+      "sensor_select": {
+        "title": "Nastavenie Mikrotik Router (4/4)",
+        "description": "Povoliť senzory a spínače",
+        "data": {
+          "sensor_client_captive": "Dáta captive portálu",
+          "sensor_client_traffic": "Senzory prenosu klientov",
+          "sensor_containers": "Senzory kontajnerov",
+          "sensor_environment": "Snímače prostredia",
+          "sensor_filter": "Prepínače filtrov",
+          "sensor_kidcontrol": "Rodičovská kontrola",
+          "sensor_mangle": "Prepínače Mangle",
+          "sensor_nat": "Prepínače NAT",
+          "sensor_netwatch_tracker": "Senzory Netwatch",
+          "sensor_port_tracker": "Senzory sledovania portov",
+          "sensor_port_traffic": "Senzory prenosu v porte",
+          "sensor_ppp": "PPP používatelia",
+          "sensor_routing_rules": "Prepínače Routing Rules",
+          "sensor_scripts": "Prepínače skriptov",
+          "sensor_simple_queues": "Prepínače jednoduchých radov",
+          "track_network_hosts": "Sledovanie sieťových zariadení",
+          "sensor_wireguard": "Senzory WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Opätovné overenie Mikrotik Router",
+        "description": "Zadajte nové prihlasovacie údaje pre {host}.",
+        "data": {
+          "username": "Užívateľ",
+          "password": "Heslo"
+        }
+      },
+      "reconfigure": {
+        "title": "Prekonfigurovanie Mikrotik Router",
+        "description": "Aktualizujte nastavenia pripojenia pre túto integráciu.",
+        "data": {
+          "name": "Názov integrácie",
+          "host": "Zariadenie",
+          "port": "Port",
+          "username": "Užívateľ",
+          "password": "Heslo",
+          "ssl_mode": "Zabezpečenie pripojenia"
+        },
+        "data_description": {
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
         }
       }
     },
@@ -24,45 +126,167 @@
       "ssl_handshake_failure": "Zlyhanie nadviazania spojenia SSL.",
       "connection_timeout": "Časový limit pripojenia vypršal.",
       "wrong_login": "Nesprávne užívateľské meno alebo heslo.",
-      "ssl_verify_failure": "Certificate verify failed"
+      "ssl_verify_failure": "Overenie certifikátu zlyhalo",
+      "no_devices_found": "V tejto sieti neboli nájdené žiadne MikroTik smerovače. Zadajte adresu smerovača manuálne."
+    },
+    "abort": {
+      "already_configured": "Zariadenie je už nakonfigurované.",
+      "reauth_successful": "Opätovné overenie bolo úspešné.",
+      "reconfigure_successful": "Prekonfigurovanie bolo úspešné."
     }
   },
   "options": {
     "step": {
       "basic_options": {
         "data": {
-          "scan_interval": "Interval skenovania (vyžaduje sa reštart HA)",
+          "scan_interval": "Interval skenovania",
           "track_iface_clients": "Zobraziť klientske MAC a IP na rozhraniach",
           "unit_of_measurement": "Merná jednotka",
           "track_network_hosts_timeout": "Časový limit sledovania sieťových zariadení (sekundy)",
           "zone": "Zóna pre sledované zariadenia"
         },
-        "title": "Možnosti Mikrotik Router (1/2)",
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        },
+        "title": "Možnosti Mikrotik Router (1/3)",
         "description": "Nakonfigurovať integráciu"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "Predvoľba senzorov"
+        },
+        "data_description": {
+          "sensor_preset": "Select a preset to quickly configure which sensors and switches are enabled, or choose Custom to configure individually."
+        },
+        "title": "Možnosti Mikrotik Router (2/3)",
+        "description": "Vybrať predvoľbu senzorov"
       },
       "sensor_select": {
         "data": {
-          "sensor_client_captive": "Captive portal data",
+          "sensor_client_captive": "Dáta captive portálu",
           "sensor_client_traffic": "Senzory prenosu klientov",
-          "sensor_containers": "Container sensors",
+          "sensor_containers": "Senzory kontajnerov",
           "sensor_environment": "Snímače prostredia",
           "sensor_filter": "Prepínače filtrov",
-          "sensor_kidcontrol": "Detská kontrola",
-          "sensor_mangle": "Mangle prepínače",
+          "sensor_kidcontrol": "Rodičovská kontrola",
+          "sensor_mangle": "Prepínače Mangle",
           "sensor_nat": "Prepínače NAT",
-          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_netwatch_tracker": "Senzory Netwatch",
           "sensor_port_tracker": "Senzory sledovania portov",
           "sensor_port_traffic": "Senzory prenosu v porte",
           "sensor_ppp": "PPP používatelia",
-          "sensor_routing_rules": "Routing Rules switches",
+          "sensor_routing_rules": "Prepínače Routing Rules",
           "sensor_scripts": "Prepínače skriptov",
-          "sensor_simple_queues": "Jednoduché prepínače radov",
+          "sensor_simple_queues": "Prepínače jednoduchých radov",
           "track_network_hosts": "Sledovanie sieťových zariadení",
-          "sensor_wireguard": "WireGuard peer sensors"
+          "sensor_wireguard": "Senzory WireGuard peer"
         },
-        "title": "Možnosti Mikrotik Router (2/2)",
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        },
+        "title": "Možnosti Mikrotik Router (3/3)",
         "description": "Povoliť senzory a spínače"
       }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Overenie zlyhalo pre {host}",
+      "description": "Užívateľské meno alebo heslo pre MikroTik smerovač na adrese {host} je nesprávne. Prejdite na **Nastavenia → Integrácie → MikroTik Router → Opätovné overenie** pre aktualizáciu prihlasovacích údajov."
+    },
+    "ssl_error": {
+      "title": "Chyba SSL pripojenia pre {host}",
+      "description": "Nepodarilo sa vytvoriť bezpečné SSL pripojenie k MikroTik smerovači na adrese {host}. Prejdite na **Nastavenia → Integrácie → MikroTik Router → Prekonfigurovanie** pre zmenu nastavení SSL alebo vypnutie SSL."
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "Bez SSL — nešifrované pripojenie (predvolené, port 8728)",
+        "ssl": "SSL — šifrované, akceptuje samopodpísané certifikáty (port 8729)",
+        "ssl_verify": "SSL s overením — vyžaduje platný certifikát podpísaný CA"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": { "name": "Teplota" },
+      "system_voltage": { "name": "Napätie" },
+      "system_cpu_temperature": { "name": "Teplota CPU" },
+      "system_switch_temperature": { "name": "Teplota switcha" },
+      "system_board_temperature1": { "name": "Teplota dosky" },
+      "system_phy_temperature": { "name": "Teplota PHY" },
+      "system_power_consumption": { "name": "Spotreba energie" },
+      "system_poe_out_consumption": { "name": "Spotreba PoE výstupu" },
+      "system_fan1_speed": { "name": "Otáčky ventilátora 1" },
+      "system_fan2_speed": { "name": "Otáčky ventilátora 2" },
+      "system_fan3_speed": { "name": "Otáčky ventilátora 3" },
+      "system_fan4_speed": { "name": "Otáčky ventilátora 4" },
+      "system_psu1_current": { "name": "Zdroj 1 prúd" },
+      "system_psu1_voltage": { "name": "Zdroj 1 napätie" },
+      "system_psu2_current": { "name": "Zdroj 2 prúd" },
+      "system_psu2_voltage": { "name": "Zdroj 2 napätie" },
+      "system_uptime": { "name": "Doba prevádzky" },
+      "system_cpu_load": { "name": "Zaťaženie CPU" },
+      "system_memory_usage": { "name": "Využitie pamäte" },
+      "system_hdd_usage": { "name": "Využitie disku" },
+      "system_clients_wired": { "name": "Káblový klienti" },
+      "system_clients_wireless": { "name": "Bezdrôtoví klienti" },
+      "system_captive_authorized": { "name": "Klienti captive portálu" },
+      "system_gps_latitude": { "name": "Zemepisná šírka" },
+      "system_gps_longitude": { "name": "Zemepisná dĺžka" },
+      "traffic_tx": { "name": "TX" },
+      "traffic_rx": { "name": "RX" },
+      "tx_total": { "name": "TX celkom" },
+      "rx_total": { "name": "RX celkom" },
+      "client_traffic_tx": { "name": "TX" },
+      "client_traffic_rx": { "name": "RX" },
+      "ip_address": { "name": "IP adresa" },
+      "cloud_public_address": { "name": "Verejná adresa" },
+      "wireguard_peer_rx": { "name": "RX" },
+      "wireguard_peer_tx": { "name": "TX" },
+      "wireguard_peer_handshake": { "name": "Posledný handshake" },
+      "system_device_mode": { "name": "Režim zariadenia" },
+      "system_packages": { "name": "Balíčky" },
+      "container_status": { "name": "Stav" }
+    },
+    "binary_sensor": {
+      "system_ups": { "name": "UPS" },
+      "ppp_tracker": { "name": "PPP" },
+      "interface_connection": { "name": "Pripojenie" },
+      "netwatch": { "name": "Netwatch" },
+      "wireguard_peer": { "name": "Pripojený" }
+    },
+    "switch": {
+      "interface_port": { "name": "Port" },
+      "ppp_secret": { "name": "PPP secret" },
+      "kidcontrol_paused": { "name": "Pozastavené" }
+    },
+    "button": {
+      "reboot": { "name": "Reštartovať" }
     }
   }
 }

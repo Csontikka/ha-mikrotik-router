@@ -1,6 +1,20 @@
 {
   "config": {
     "step": {
+      "discovery": {
+        "title": "Додати MikroTik Router",
+        "description": "Скануйте локальну мережу для пошуку MikroTik маршрутизаторів або введіть адресу вручну.",
+        "data": {
+          "scan": "Сканувати мережу для пошуку MikroTik маршрутизаторів"
+        }
+      },
+      "pick_device": {
+        "title": "Знайдені MikroTik маршрутизатори",
+        "description": "Виберіть маршрутизатор для налаштування або оберіть ручне введення.",
+        "data": {
+          "router": "Вибрати маршрутизатор"
+        }
+      },
       "user": {
         "title": "Налаштувати Mikrotik Router",
         "description": "Налаштувати Mikrotik Router інтеграцію",
@@ -10,59 +24,269 @@
           "port": "Порт",
           "username": "Користувач",
           "password": "Пароль",
-          "ssl": "Використовувати SSL",
-          "verify_ssl": "Verify SSL"
+          "ssl_mode": "Безпека з'єднання"
         },
         "data_description": {
-          "verify_ssl": "Enable certificate and hostname validation. Only enable if your MikroTik has a valid SSL certificate with a matching hostname. Leave disabled for self-signed certificates (default)."
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Налаштування Mikrotik Router (2/4)",
+        "description": "Налаштувати інтеграцію",
+        "data": {
+          "scan_interval": "Інтервал сканування (секунди)",
+          "track_network_hosts_timeout": "Тайм-аут відстеження мережевих пристроїв (секунди)",
+          "zone": "Зона для трекера пристроїв"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Налаштування Mikrotik Router (3/4)",
+        "description": "Оберіть режим активації сенсорів",
+        "data": {
+          "sensor_preset": "Пресет сенсорів"
+        },
+        "data_description": {
+          "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
+        }
+      },
+      "sensor_select": {
+        "title": "Налаштування Mikrotik Router (4/4)",
+        "description": "Увімкнути сенсори і перемикачі",
+        "data": {
+          "sensor_client_captive": "Дані Captive portal",
+          "sensor_client_traffic": "Сенсори трафіку клієнтів",
+          "sensor_containers": "Сенсори контейнерів",
+          "sensor_environment": "Сенсори змінних оточення",
+          "sensor_filter": "Перемикачі фільтрів",
+          "sensor_kidcontrol": "Батьківський контроль",
+          "sensor_mangle": "Перемикачі Mangle",
+          "sensor_nat": "Перемикачі NAT",
+          "sensor_netwatch_tracker": "Сенсори Netwatch",
+          "sensor_port_tracker": "Сенсори трекерів портів",
+          "sensor_port_traffic": "Сенсори трафіку портів",
+          "sensor_ppp": "Користувачі PPP",
+          "sensor_routing_rules": "Перемикачі Routing Rules",
+          "sensor_scripts": "Перемикачі скриптів",
+          "sensor_simple_queues": "Перемикачі простих черг",
+          "track_network_hosts": "Відстежувати мережеві пристрої",
+          "sensor_wireguard": "Сенсори WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Повторна автентифікація Mikrotik Router",
+        "description": "Введіть нові облікові дані для {host}.",
+        "data": {
+          "username": "Користувач",
+          "password": "Пароль"
+        }
+      },
+      "reconfigure": {
+        "title": "Переналаштування Mikrotik Router",
+        "description": "Оновіть параметри підключення для цієї інтеграції.",
+        "data": {
+          "name": "Назва інтеграції",
+          "host": "Хост",
+          "port": "Порт",
+          "username": "Користувач",
+          "password": "Пароль",
+          "ssl_mode": "Безпека з'єднання"
+        },
+        "data_description": {
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
         }
       }
     },
     "error": {
       "name_exists": "Назва вже існує.",
       "cannot_connect": "Не можу з'єднатися з Mikrotik.",
-      "ssl_handshake_failure": "Помилка SSH протоколу",
+      "ssl_handshake_failure": "Помилка SSL-з'єднання",
       "connection_timeout": "Тайм-аут з'єднання з Mikrotik",
       "wrong_login": "Невірне ім'я або пароль",
-      "ssl_verify_failure": "Certificate verify failed"
+      "ssl_verify_failure": "Перевірка сертифіката не вдалася",
+      "no_devices_found": "MikroTik маршрутизаторів не знайдено в цій мережі. Введіть адресу маршрутизатора вручну."
+    },
+    "abort": {
+      "already_configured": "Пристрій вже налаштовано.",
+      "reauth_successful": "Повторна автентифікація пройшла успішно.",
+      "reconfigure_successful": "Переналаштування пройшло успішно."
     }
   },
   "options": {
     "step": {
       "basic_options": {
         "data": {
-          "scan_interval": "Інтервал сканування (вимагає перезавантаження HA)",
+          "scan_interval": "Інтервал сканування",
           "track_iface_clients": "Показувати MAC і IP адреси клієнта",
           "unit_of_measurement": "Одиниці вимірювання",
           "track_network_hosts_timeout": "Тайм-аут відстеження мережевих пристроїв (секунди)",
           "zone": "Зона для трекера пристроїв"
         },
-        "title": "Налаштування Mikrotik роутера (1/2)",
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        },
+        "title": "Налаштування Mikrotik Router (1/3)",
         "description": "Налаштувати інтеграцію"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "Пресет сенсорів"
+        },
+        "data_description": {
+          "sensor_preset": "Select a preset to quickly configure which sensors and switches are enabled, or choose Custom to configure individually."
+        },
+        "title": "Налаштування Mikrotik Router (2/3)",
+        "description": "Вибрати пресет сенсорів"
       },
       "sensor_select": {
         "data": {
           "sensor_client_captive": "Дані Captive portal",
           "sensor_client_traffic": "Сенсори трафіку клієнтів",
-          "sensor_containers": "Container sensors",
+          "sensor_containers": "Сенсори контейнерів",
           "sensor_environment": "Сенсори змінних оточення",
-          "sensor_filter": "Фільтрувати перемикачі",
-          "sensor_kidcontrol": "Дитячий контроль",
-          "sensor_mangle": "Керувати перемикачами",
+          "sensor_filter": "Перемикачі фільтрів",
+          "sensor_kidcontrol": "Батьківський контроль",
+          "sensor_mangle": "Перемикачі Mangle",
           "sensor_nat": "Перемикачі NAT",
-          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_netwatch_tracker": "Сенсори Netwatch",
           "sensor_port_tracker": "Сенсори трекерів портів",
           "sensor_port_traffic": "Сенсори трафіку портів",
           "sensor_ppp": "Користувачі PPP",
-          "sensor_routing_rules": "Routing Rules switches",
+          "sensor_routing_rules": "Перемикачі Routing Rules",
           "sensor_scripts": "Перемикачі скриптів",
-          "sensor_simple_queues": "Прості черги і перемикачі",
+          "sensor_simple_queues": "Перемикачі простих черг",
           "track_network_hosts": "Відстежувати мережеві пристрої",
-          "sensor_wireguard": "WireGuard peer sensors"
+          "sensor_wireguard": "Сенсори WireGuard peer"
         },
-        "title": "Mikrotik Router options (2/2)",
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        },
+        "title": "Налаштування Mikrotik Router (3/3)",
         "description": "Увімкнути сенсори і перемикачі"
       }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Автентифікація не вдалася для {host}",
+      "description": "Ім'я користувача або пароль для маршрутизатора MikroTik за адресою {host} є невірними. Перейдіть до **Налаштування → Інтеграції → MikroTik Router → Повторна автентифікація** для оновлення облікових даних."
+    },
+    "ssl_error": {
+      "title": "Помилка SSL-з'єднання для {host}",
+      "description": "Не вдалося встановити безпечне SSL-з'єднання з маршрутизатором MikroTik за адресою {host}. Перейдіть до **Налаштування → Інтеграції → MikroTik Router → Переналаштування** для зміни параметрів SSL або вимкнення SSL."
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "Без SSL — незашифроване з'єднання (за замовчуванням, порт 8728)",
+        "ssl": "SSL — зашифроване, приймає самопідписані сертифікати (порт 8729)",
+        "ssl_verify": "SSL з перевіркою — потрібен дійсний сертифікат, підписаний CA"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": { "name": "Температура" },
+      "system_voltage": { "name": "Напруга" },
+      "system_cpu_temperature": { "name": "Температура CPU" },
+      "system_switch_temperature": { "name": "Температура комутатора" },
+      "system_board_temperature1": { "name": "Температура плати" },
+      "system_phy_temperature": { "name": "Температура PHY" },
+      "system_power_consumption": { "name": "Споживання енергії" },
+      "system_poe_out_consumption": { "name": "Споживання PoE виходу" },
+      "system_fan1_speed": { "name": "Швидкість вентилятора 1" },
+      "system_fan2_speed": { "name": "Швидкість вентилятора 2" },
+      "system_fan3_speed": { "name": "Швидкість вентилятора 3" },
+      "system_fan4_speed": { "name": "Швидкість вентилятора 4" },
+      "system_psu1_current": { "name": "БЖ 1 струм" },
+      "system_psu1_voltage": { "name": "БЖ 1 напруга" },
+      "system_psu2_current": { "name": "БЖ 2 струм" },
+      "system_psu2_voltage": { "name": "БЖ 2 напруга" },
+      "system_uptime": { "name": "Час роботи" },
+      "system_cpu_load": { "name": "Навантаження CPU" },
+      "system_memory_usage": { "name": "Використання пам'яті" },
+      "system_hdd_usage": { "name": "Використання диска" },
+      "system_clients_wired": { "name": "Дротові клієнти" },
+      "system_clients_wireless": { "name": "Бездротові клієнти" },
+      "system_captive_authorized": { "name": "Клієнти Captive portal" },
+      "system_gps_latitude": { "name": "Широта" },
+      "system_gps_longitude": { "name": "Довгота" },
+      "traffic_tx": { "name": "TX" },
+      "traffic_rx": { "name": "RX" },
+      "tx_total": { "name": "TX загалом" },
+      "rx_total": { "name": "RX загалом" },
+      "client_traffic_tx": { "name": "TX" },
+      "client_traffic_rx": { "name": "RX" },
+      "ip_address": { "name": "IP-адреса" },
+      "cloud_public_address": { "name": "Публічна адреса" },
+      "wireguard_peer_rx": { "name": "RX" },
+      "wireguard_peer_tx": { "name": "TX" },
+      "wireguard_peer_handshake": { "name": "Останній handshake" },
+      "system_device_mode": { "name": "Режим пристрою" },
+      "system_packages": { "name": "Пакети" },
+      "container_status": { "name": "Статус" }
+    },
+    "binary_sensor": {
+      "system_ups": { "name": "ДБЖ" },
+      "ppp_tracker": { "name": "PPP" },
+      "interface_connection": { "name": "З'єднання" },
+      "netwatch": { "name": "Netwatch" },
+      "wireguard_peer": { "name": "Підключено" }
+    },
+    "switch": {
+      "interface_port": { "name": "Порт" },
+      "ppp_secret": { "name": "PPP secret" },
+      "kidcontrol_paused": { "name": "Призупинено" }
+    },
+    "button": {
+      "reboot": { "name": "Перезавантаження" }
     }
   }
 }

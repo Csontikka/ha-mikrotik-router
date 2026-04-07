@@ -1,6 +1,20 @@
 {
   "config": {
     "step": {
+      "discovery": {
+        "title": "Thêm MikroTik Router",
+        "description": "Quét mạng cục bộ để tìm các bộ định tuyến MikroTik hoặc nhập địa chỉ thủ công.",
+        "data": {
+          "scan": "Quét mạng tìm bộ định tuyến MikroTik"
+        }
+      },
+      "pick_device": {
+        "title": "Bộ định tuyến MikroTik đã tìm thấy",
+        "description": "Chọn bộ định tuyến để cấu hình hoặc chọn nhập thủ công.",
+        "data": {
+          "router": "Chọn bộ định tuyến"
+        }
+      },
       "user": {
         "title": "Thiết lập Mikrotik Router",
         "description": "Thiết lập tích hợp Bộ định tuyến Mikrotik.",
@@ -10,59 +24,269 @@
           "port": "Cổng",
           "username": "Tên người dùng",
           "password": "Mật khẩu",
-          "ssl": "Sử dụng SSL",
-          "verify_ssl": "Verify SSL"
+          "ssl_mode": "Bảo mật kết nối"
         },
         "data_description": {
-          "verify_ssl": "Enable certificate and hostname validation. Only enable if your MikroTik has a valid SSL certificate with a matching hostname. Leave disabled for self-signed certificates (default)."
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Thiết lập Mikrotik Router (2/4)",
+        "description": "Đặt cấu hình tích hợp",
+        "data": {
+          "scan_interval": "Khoảng thời gian quét (giây)",
+          "track_network_hosts_timeout": "Thời gian chờ theo dõi thiết bị mạng (giây)",
+          "zone": "Khu vực cho trình theo dõi thiết bị"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Thiết lập Mikrotik Router (3/4)",
+        "description": "Chọn chế độ kích hoạt cảm biến",
+        "data": {
+          "sensor_preset": "Cài đặt trước cảm biến"
+        },
+        "data_description": {
+          "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
+        }
+      },
+      "sensor_select": {
+        "title": "Thiết lập Mikrotik Router (4/4)",
+        "description": "Bật cảm biến và công tắc",
+        "data": {
+          "sensor_client_captive": "Dữ liệu cổng captive",
+          "sensor_client_traffic": "Cảm biến lưu lượng máy khách",
+          "sensor_containers": "Cảm biến container",
+          "sensor_environment": "Cảm biến biến số môi trường",
+          "sensor_filter": "Công tắc bộ lọc",
+          "sensor_kidcontrol": "Kiểm soát trẻ em",
+          "sensor_mangle": "Công tắc Mangle",
+          "sensor_nat": "Công tắc NAT",
+          "sensor_netwatch_tracker": "Cảm biến Netwatch",
+          "sensor_port_tracker": "Cảm biến theo dõi cổng",
+          "sensor_port_traffic": "Cảm biến lưu lượng cổng",
+          "sensor_ppp": "Người dùng PPP",
+          "sensor_routing_rules": "Công tắc Routing Rules",
+          "sensor_scripts": "Công tắc script",
+          "sensor_simple_queues": "Công tắc hàng đợi đơn giản",
+          "track_network_hosts": "Theo dõi thiết bị mạng",
+          "sensor_wireguard": "Cảm biến WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Xác thực lại Mikrotik Router",
+        "description": "Nhập thông tin đăng nhập mới cho {host}.",
+        "data": {
+          "username": "Tên người dùng",
+          "password": "Mật khẩu"
+        }
+      },
+      "reconfigure": {
+        "title": "Cấu hình lại Mikrotik Router",
+        "description": "Cập nhật cài đặt kết nối cho tích hợp này.",
+        "data": {
+          "name": "Tên của tích hợp",
+          "host": "Máy chủ",
+          "port": "Cổng",
+          "username": "Tên người dùng",
+          "password": "Mật khẩu",
+          "ssl_mode": "Bảo mật kết nối"
+        },
+        "data_description": {
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
         }
       }
     },
     "error": {
-      "name_exists": "Tên người dùng đã tồn tại.",
+      "name_exists": "Tên đã tồn tại.",
       "cannot_connect": "Không thể kết nối với Mikrotik.",
       "ssl_handshake_failure": "Lỗi kết nối SSL",
       "connection_timeout": "Hết thời gian chờ kết nối Mikrotik.",
       "wrong_login": "Tên người dùng hoặc mật khẩu không hợp lệ.",
-      "ssl_verify_failure": "Certificate verify failed"
+      "ssl_verify_failure": "Xác minh chứng chỉ thất bại",
+      "no_devices_found": "Không tìm thấy bộ định tuyến MikroTik nào trên mạng này. Nhập địa chỉ bộ định tuyến thủ công."
+    },
+    "abort": {
+      "already_configured": "Thiết bị đã được cấu hình.",
+      "reauth_successful": "Xác thực lại thành công.",
+      "reconfigure_successful": "Cấu hình lại thành công."
     }
   },
   "options": {
     "step": {
       "basic_options": {
         "data": {
-          "scan_interval": "Khoảng thời gian quét (yêu cầu khởi động lại HA)",
+          "scan_interval": "Khoảng thời gian quét",
           "track_iface_clients": "Hiển thị MAC và IP của máy khách trên giao diện",
           "unit_of_measurement": "Đơn vị đo",
           "track_network_hosts_timeout": "Theo dõi thời gian chờ thiết bị mạng (giây)",
           "zone": "Khu vực cho trình theo dõi thiết bị"
         },
-        "title": "Cài đặt Mikrotik Router (1/2)",
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        },
+        "title": "Cài đặt Mikrotik Router (1/3)",
         "description": "Đặt cấu hình tích hợp"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "Cài đặt trước cảm biến"
+        },
+        "data_description": {
+          "sensor_preset": "Select a preset to quickly configure which sensors and switches are enabled, or choose Custom to configure individually."
+        },
+        "title": "Cài đặt Mikrotik Router (2/3)",
+        "description": "Chọn cài đặt trước cảm biến"
       },
       "sensor_select": {
         "data": {
-          "sensor_client_captive": "Captive portal data",
+          "sensor_client_captive": "Dữ liệu cổng captive",
           "sensor_client_traffic": "Cảm biến lưu lượng máy khách",
-          "sensor_containers": "Container sensors",
+          "sensor_containers": "Cảm biến container",
           "sensor_environment": "Cảm biến biến số môi trường",
           "sensor_filter": "Công tắc bộ lọc",
           "sensor_kidcontrol": "Kiểm soát trẻ em",
           "sensor_mangle": "Công tắc Mangle",
-          "sensor_nat": "Bộ chuyển đổi NAT",
-          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_nat": "Công tắc NAT",
+          "sensor_netwatch_tracker": "Cảm biến Netwatch",
           "sensor_port_tracker": "Cảm biến theo dõi cổng",
           "sensor_port_traffic": "Cảm biến lưu lượng cổng",
           "sensor_ppp": "Người dùng PPP",
-          "sensor_routing_rules": "Routing Rules switches",
-          "sensor_scripts": "Bộ chuyển đổi mã lệnh",
-          "sensor_simple_queues": "Bộ chuyển đổi hàng đợi đơn giản",
+          "sensor_routing_rules": "Công tắc Routing Rules",
+          "sensor_scripts": "Công tắc script",
+          "sensor_simple_queues": "Công tắc hàng đợi đơn giản",
           "track_network_hosts": "Theo dõi thiết bị mạng",
-          "sensor_wireguard": "WireGuard peer sensors"
+          "sensor_wireguard": "Cảm biến WireGuard peer"
         },
-        "title": "Cài đặt Mikrotik Router (2/2)",
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        },
+        "title": "Cài đặt Mikrotik Router (3/3)",
         "description": "Bật cảm biến và công tắc"
       }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Xác thực thất bại cho {host}",
+      "description": "Tên người dùng hoặc mật khẩu cho bộ định tuyến MikroTik tại {host} không đúng. Đi tới **Cài đặt → Tích hợp → MikroTik Router → Xác thực lại** để cập nhật thông tin đăng nhập."
+    },
+    "ssl_error": {
+      "title": "Lỗi kết nối SSL cho {host}",
+      "description": "Không thể thiết lập kết nối SSL an toàn với bộ định tuyến MikroTik tại {host}. Đi tới **Cài đặt → Tích hợp → MikroTik Router → Cấu hình lại** để thay đổi cài đặt SSL hoặc tắt SSL."
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "Không SSL — kết nối không mã hóa (mặc định, cổng 8728)",
+        "ssl": "SSL — mã hóa, chấp nhận chứng chỉ tự ký (cổng 8729)",
+        "ssl_verify": "SSL có xác minh — yêu cầu chứng chỉ hợp lệ do CA ký"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": { "name": "Nhiệt độ" },
+      "system_voltage": { "name": "Điện áp" },
+      "system_cpu_temperature": { "name": "Nhiệt độ CPU" },
+      "system_switch_temperature": { "name": "Nhiệt độ switch" },
+      "system_board_temperature1": { "name": "Nhiệt độ bo mạch" },
+      "system_phy_temperature": { "name": "Nhiệt độ PHY" },
+      "system_power_consumption": { "name": "Tiêu thụ điện năng" },
+      "system_poe_out_consumption": { "name": "Tiêu thụ PoE đầu ra" },
+      "system_fan1_speed": { "name": "Tốc độ quạt 1" },
+      "system_fan2_speed": { "name": "Tốc độ quạt 2" },
+      "system_fan3_speed": { "name": "Tốc độ quạt 3" },
+      "system_fan4_speed": { "name": "Tốc độ quạt 4" },
+      "system_psu1_current": { "name": "Nguồn 1 dòng điện" },
+      "system_psu1_voltage": { "name": "Nguồn 1 điện áp" },
+      "system_psu2_current": { "name": "Nguồn 2 dòng điện" },
+      "system_psu2_voltage": { "name": "Nguồn 2 điện áp" },
+      "system_uptime": { "name": "Thời gian hoạt động" },
+      "system_cpu_load": { "name": "Tải CPU" },
+      "system_memory_usage": { "name": "Sử dụng bộ nhớ" },
+      "system_hdd_usage": { "name": "Sử dụng ổ đĩa" },
+      "system_clients_wired": { "name": "Máy khách có dây" },
+      "system_clients_wireless": { "name": "Máy khách không dây" },
+      "system_captive_authorized": { "name": "Máy khách cổng captive" },
+      "system_gps_latitude": { "name": "Vĩ độ" },
+      "system_gps_longitude": { "name": "Kinh độ" },
+      "traffic_tx": { "name": "TX" },
+      "traffic_rx": { "name": "RX" },
+      "tx_total": { "name": "TX tổng" },
+      "rx_total": { "name": "RX tổng" },
+      "client_traffic_tx": { "name": "TX" },
+      "client_traffic_rx": { "name": "RX" },
+      "ip_address": { "name": "Địa chỉ IP" },
+      "cloud_public_address": { "name": "Địa chỉ công cộng" },
+      "wireguard_peer_rx": { "name": "RX" },
+      "wireguard_peer_tx": { "name": "TX" },
+      "wireguard_peer_handshake": { "name": "Lần bắt tay cuối" },
+      "system_device_mode": { "name": "Chế độ thiết bị" },
+      "system_packages": { "name": "Gói" },
+      "container_status": { "name": "Trạng thái" }
+    },
+    "binary_sensor": {
+      "system_ups": { "name": "UPS" },
+      "ppp_tracker": { "name": "PPP" },
+      "interface_connection": { "name": "Kết nối" },
+      "netwatch": { "name": "Netwatch" },
+      "wireguard_peer": { "name": "Đã kết nối" }
+    },
+    "switch": {
+      "interface_port": { "name": "Cổng" },
+      "ppp_secret": { "name": "PPP secret" },
+      "kidcontrol_paused": { "name": "Tạm dừng" }
+    },
+    "button": {
+      "reboot": { "name": "Khởi động lại" }
     }
   }
 }

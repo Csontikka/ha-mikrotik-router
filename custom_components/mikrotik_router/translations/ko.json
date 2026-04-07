@@ -1,6 +1,20 @@
 {
   "config": {
     "step": {
+      "discovery": {
+        "title": "MikroTik 라우터 추가",
+        "description": "로컬 네트워크에서 MikroTik 라우터를 검색하거나 주소를 수동으로 입력하세요.",
+        "data": {
+          "scan": "네트워크에서 MikroTik 라우터 검색"
+        }
+      },
+      "pick_device": {
+        "title": "발견된 MikroTik 라우터",
+        "description": "구성할 라우터를 선택하거나 수동 입력을 선택하세요.",
+        "data": {
+          "router": "라우터 선택"
+        }
+      },
       "user": {
         "title": "Mikrotik Router 설정",
         "description": "Mikrotik 라우터 통합을 설정합니다.",
@@ -10,11 +24,99 @@
           "port": "포트",
           "username": "사용자 이름",
           "password": "비밀번호",
-          "ssl": "SSL 사용",
-          "verify_ssl": "Verify SSL"
+          "ssl_mode": "연결 보안"
         },
         "data_description": {
-          "verify_ssl": "Enable certificate and hostname validation. Only enable if your MikroTik has a valid SSL certificate with a matching hostname. Leave disabled for self-signed certificates (default)."
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Mikrotik Router 설정 (2/4)",
+        "description": "통합 환경설정",
+        "data": {
+          "scan_interval": "스캔 간격(초)",
+          "track_network_hosts_timeout": "네트워크 기기 시간 초과 추적(초)",
+          "zone": "기기 추적기용 지역"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Mikrotik Router 설정 (3/4)",
+        "description": "센서 활성화 모드 선택",
+        "data": {
+          "sensor_preset": "센서 프리셋"
+        },
+        "data_description": {
+          "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
+        }
+      },
+      "sensor_select": {
+        "title": "Mikrotik Router 설정 (4/4)",
+        "description": "센서 및 스위치 활성화",
+        "data": {
+          "sensor_client_captive": "캡티브 포털 데이터",
+          "sensor_client_traffic": "클라이언트 트래픽 센서",
+          "sensor_containers": "컨테이너 센서",
+          "sensor_environment": "환경 변수 센서",
+          "sensor_filter": "필터 스위치",
+          "sensor_kidcontrol": "자녀 보호",
+          "sensor_mangle": "Mangle 스위치",
+          "sensor_nat": "NAT 스위치",
+          "sensor_netwatch_tracker": "Netwatch 센서",
+          "sensor_port_tracker": "포트 추적 센서",
+          "sensor_port_traffic": "포트 트래픽 센서",
+          "sensor_ppp": "PPP 사용자",
+          "sensor_routing_rules": "Routing Rules 스위치",
+          "sensor_scripts": "스크립트 스위치",
+          "sensor_simple_queues": "단순 대기열 스위치",
+          "track_network_hosts": "네트워크 기기 추적",
+          "sensor_wireguard": "WireGuard peer 센서"
+        },
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Mikrotik Router 재인증",
+        "description": "{host}의 새 자격 증명을 입력하세요.",
+        "data": {
+          "username": "사용자 이름",
+          "password": "비밀번호"
+        }
+      },
+      "reconfigure": {
+        "title": "Mikrotik Router 재구성",
+        "description": "이 통합의 연결 설정을 업데이트합니다.",
+        "data": {
+          "name": "통합 이름",
+          "host": "호스트",
+          "port": "포트",
+          "username": "사용자 이름",
+          "password": "비밀번호",
+          "ssl_mode": "연결 보안"
+        },
+        "data_description": {
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
         }
       }
     },
@@ -24,45 +126,167 @@
       "ssl_handshake_failure": "SSL 핸드셰이크 실패",
       "connection_timeout": "Mikrotik 연결 시간이 초과되었습니다.",
       "wrong_login": "사용자 이름 또는 비밀번호가 유효하지 않습니다.",
-      "ssl_verify_failure": "Certificate verify failed"
+      "ssl_verify_failure": "인증서 확인 실패",
+      "no_devices_found": "이 네트워크에서 MikroTik 라우터를 찾을 수 없습니다. 라우터 주소를 수동으로 입력하세요."
+    },
+    "abort": {
+      "already_configured": "기기가 이미 구성되어 있습니다.",
+      "reauth_successful": "재인증에 성공했습니다.",
+      "reconfigure_successful": "재구성에 성공했습니다."
     }
   },
   "options": {
     "step": {
       "basic_options": {
         "data": {
-          "scan_interval": "스캔 간격(HA 재시작 필요)",
+          "scan_interval": "스캔 간격",
           "track_iface_clients": "인터페이스에 클라이언트 MAC 및 IP 표시",
           "unit_of_measurement": "측정 단위",
           "track_network_hosts_timeout": "네트워크 기기 시간 초과 추적(초)",
           "zone": "기기 추적기용 지역"
         },
-        "title": "Mikrotik Router 옵션(1/2)",
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        },
+        "title": "Mikrotik Router 옵션 (1/3)",
         "description": "통합 환경설정"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "센서 프리셋"
+        },
+        "data_description": {
+          "sensor_preset": "Select a preset to quickly configure which sensors and switches are enabled, or choose Custom to configure individually."
+        },
+        "title": "Mikrotik Router 옵션 (2/3)",
+        "description": "센서 프리셋 선택"
       },
       "sensor_select": {
         "data": {
-          "sensor_client_captive": "Captive portal data",
+          "sensor_client_captive": "캡티브 포털 데이터",
           "sensor_client_traffic": "클라이언트 트래픽 센서",
-          "sensor_containers": "Container sensors",
+          "sensor_containers": "컨테이너 센서",
           "sensor_environment": "환경 변수 센서",
           "sensor_filter": "필터 스위치",
-          "sensor_kidcontrol": "어린이 이용 제어",
-          "sensor_mangle": "맹글 스위치",
-          "sensor_nat": "내트 스위치",
-          "sensor_netwatch_tracker": "Netwatch tracker sensors",
-          "sensor_port_tracker": "트래커 센서 복사",
-          "sensor_port_traffic": "트래픽 센서 복사",
+          "sensor_kidcontrol": "자녀 보호",
+          "sensor_mangle": "Mangle 스위치",
+          "sensor_nat": "NAT 스위치",
+          "sensor_netwatch_tracker": "Netwatch 센서",
+          "sensor_port_tracker": "포트 추적 센서",
+          "sensor_port_traffic": "포트 트래픽 센서",
           "sensor_ppp": "PPP 사용자",
-          "sensor_routing_rules": "Routing Rules switches",
+          "sensor_routing_rules": "Routing Rules 스위치",
           "sensor_scripts": "스크립트 스위치",
           "sensor_simple_queues": "단순 대기열 스위치",
           "track_network_hosts": "네트워크 기기 추적",
-          "sensor_wireguard": "WireGuard peer sensors"
+          "sensor_wireguard": "WireGuard peer 센서"
         },
-        "title": "Mikrotik Router 옵션(2/2)",
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        },
+        "title": "Mikrotik Router 옵션 (3/3)",
         "description": "센서 및 스위치 활성화"
       }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "{host} 인증 실패",
+      "description": "{host}의 MikroTik 라우터 사용자 이름 또는 비밀번호가 올바르지 않습니다. **설정 → 통합 → MikroTik Router → 재인증**으로 이동하여 자격 증명을 업데이트하세요."
+    },
+    "ssl_error": {
+      "title": "{host}의 SSL 연결 오류",
+      "description": "{host}의 MikroTik 라우터에 보안 SSL 연결을 설정할 수 없습니다. **설정 → 통합 → MikroTik Router → 재구성**으로 이동하여 SSL 설정을 변경하거나 SSL을 비활성화하세요."
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "SSL 없음 — 암호화되지 않은 연결 (기본값, 포트 8728)",
+        "ssl": "SSL — 암호화, 자체 서명 인증서 허용 (포트 8729)",
+        "ssl_verify": "SSL 검증 — 유효한 CA 서명 인증서 필요"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": { "name": "온도" },
+      "system_voltage": { "name": "전압" },
+      "system_cpu_temperature": { "name": "CPU 온도" },
+      "system_switch_temperature": { "name": "스위치 온도" },
+      "system_board_temperature1": { "name": "보드 온도" },
+      "system_phy_temperature": { "name": "PHY 온도" },
+      "system_power_consumption": { "name": "전력 소비" },
+      "system_poe_out_consumption": { "name": "PoE 출력 소비" },
+      "system_fan1_speed": { "name": "팬 1 속도" },
+      "system_fan2_speed": { "name": "팬 2 속도" },
+      "system_fan3_speed": { "name": "팬 3 속도" },
+      "system_fan4_speed": { "name": "팬 4 속도" },
+      "system_psu1_current": { "name": "전원 1 전류" },
+      "system_psu1_voltage": { "name": "전원 1 전압" },
+      "system_psu2_current": { "name": "전원 2 전류" },
+      "system_psu2_voltage": { "name": "전원 2 전압" },
+      "system_uptime": { "name": "가동 시간" },
+      "system_cpu_load": { "name": "CPU 부하" },
+      "system_memory_usage": { "name": "메모리 사용량" },
+      "system_hdd_usage": { "name": "디스크 사용량" },
+      "system_clients_wired": { "name": "유선 클라이언트" },
+      "system_clients_wireless": { "name": "무선 클라이언트" },
+      "system_captive_authorized": { "name": "캡티브 포털 클라이언트" },
+      "system_gps_latitude": { "name": "위도" },
+      "system_gps_longitude": { "name": "경도" },
+      "traffic_tx": { "name": "TX" },
+      "traffic_rx": { "name": "RX" },
+      "tx_total": { "name": "TX 합계" },
+      "rx_total": { "name": "RX 합계" },
+      "client_traffic_tx": { "name": "TX" },
+      "client_traffic_rx": { "name": "RX" },
+      "ip_address": { "name": "IP 주소" },
+      "cloud_public_address": { "name": "공인 주소" },
+      "wireguard_peer_rx": { "name": "RX" },
+      "wireguard_peer_tx": { "name": "TX" },
+      "wireguard_peer_handshake": { "name": "마지막 핸드셰이크" },
+      "system_device_mode": { "name": "기기 모드" },
+      "system_packages": { "name": "패키지" },
+      "container_status": { "name": "상태" }
+    },
+    "binary_sensor": {
+      "system_ups": { "name": "UPS" },
+      "ppp_tracker": { "name": "PPP" },
+      "interface_connection": { "name": "연결" },
+      "netwatch": { "name": "Netwatch" },
+      "wireguard_peer": { "name": "연결됨" }
+    },
+    "switch": {
+      "interface_port": { "name": "포트" },
+      "ppp_secret": { "name": "PPP secret" },
+      "kidcontrol_paused": { "name": "일시중지됨" }
+    },
+    "button": {
+      "reboot": { "name": "재시작" }
     }
   }
 }

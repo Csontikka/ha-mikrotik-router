@@ -1,68 +1,292 @@
 {
   "config": {
     "step": {
-      "user": {
-        "title": "Configuração do Mikrotik Router",
-        "description": "Configurando uma integração de roteador (Mikrotik).",
+      "discovery": {
+        "title": "Adicionar um Mikrotik Router",
+        "description": "Escaneia a rede local em busca de roteadores MikroTik, ou insira o endereco manualmente.",
         "data": {
-          "name": "Nome da mesclagem",
+          "scan": "Escanear a rede em busca de roteadores MikroTik"
+        }
+      },
+      "pick_device": {
+        "title": "Roteadores MikroTik encontrados",
+        "description": "Selecione o roteador que deseja configurar, ou escolha a entrada manual.",
+        "data": {
+          "router": "Selecionar roteador"
+        }
+      },
+      "user": {
+        "title": "Configuracao do Mikrotik Router",
+        "description": "Configurando uma integracao de roteador Mikrotik.",
+        "data": {
+          "name": "Nome da integracao",
           "host": "Host",
           "port": "Porta",
-          "username": "Nome de usuário",
+          "username": "Nome de usuario",
           "password": "Senha",
-          "ssl": "Usar SSL",
-          "verify_ssl": "Verify SSL"
+          "ssl_mode": "Seguranca da conexao"
         },
         "data_description": {
-          "verify_ssl": "Enable certificate and hostname validation. Only enable if your MikroTik has a valid SSL certificate with a matching hostname. Leave disabled for self-signed certificates (default)."
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Configuracao do Mikrotik Router (2/4)",
+        "description": "Configurar a integracao",
+        "data": {
+          "scan_interval": "Intervalo de escaneamento (segundos)",
+          "track_network_hosts_timeout": "Tempo limite de rastreamento de dispositivos (segundos)",
+          "zone": "Zona para rastreador de dispositivos"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Configuracao do Mikrotik Router (3/4)",
+        "description": "Selecionar modo de ativacao de sensores",
+        "data": {
+          "sensor_preset": "Predefinicao de sensores"
+        },
+        "data_description": {
+          "sensor_preset": "Recommended enables the most useful sensors with minimal entity count. Full enables everything — use with caution on large networks."
+        }
+      },
+      "sensor_select": {
+        "title": "Configuracao do Mikrotik Router (4/4)",
+        "description": "Ativar sensores e interruptores",
+        "data": {
+          "sensor_client_captive": "Dados do portal cativo",
+          "sensor_client_traffic": "Sensores de trafego do cliente",
+          "sensor_containers": "Sensores de conteineres",
+          "sensor_environment": "Sensores de variaveis de ambiente",
+          "sensor_filter": "Interruptores de filtro",
+          "sensor_kidcontrol": "Controle infantil",
+          "sensor_mangle": "Interruptores Mangle",
+          "sensor_nat": "Interruptores NAT",
+          "sensor_netwatch_tracker": "Sensores de Netwatch",
+          "sensor_port_tracker": "Sensores do rastreador de porta",
+          "sensor_port_traffic": "Sensores de trafego de porta",
+          "sensor_ppp": "Usuarios de PPP",
+          "sensor_routing_rules": "Interruptores de regras de roteamento",
+          "sensor_scripts": "Interruptores de script",
+          "sensor_simple_queues": "Interruptores de filas simples",
+          "track_network_hosts": "Rastrear dispositivos de rede",
+          "sensor_wireguard": "Sensores de peers WireGuard"
+        },
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reautenticar Mikrotik Router",
+        "description": "Insira as novas credenciais para {host}.",
+        "data": {
+          "username": "Nome de usuario",
+          "password": "Senha"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigurar Mikrotik Router",
+        "description": "Atualize as configuracoes de conexao desta integracao.",
+        "data": {
+          "name": "Nome da integracao",
+          "host": "Host",
+          "port": "Porta",
+          "username": "Nome de usuario",
+          "password": "Senha",
+          "ssl_mode": "Seguranca da conexao"
+        },
+        "data_description": {
+          "port": "RouterOS API port. Leave at 0 to use the default: 8728 (no SSL) or 8729 (SSL)."
         }
       }
     },
     "error": {
-      "name_exists": "O nome já existe.",
-      "cannot_connect": "Não consigo conectar ao Mikrotik.",
+      "name_exists": "O nome ja existe.",
+      "cannot_connect": "Nao consigo conectar ao Mikrotik.",
       "ssl_handshake_failure": "Falha no handshake SSL",
-      "connection_timeout": "Tempo limite de conexão do Mikrotik.",
-      "wrong_login": "Nome de usuário ou senha inválidos.",
-      "ssl_verify_failure": "Certificate verify failed"
+      "connection_timeout": "Tempo limite de conexao do Mikrotik.",
+      "wrong_login": "Nome de usuario ou senha invalidos.",
+      "ssl_verify_failure": "Falha na verificacao do certificado",
+      "no_devices_found": "Nenhum roteador MikroTik foi encontrado nesta rede. Insira o endereco do roteador manualmente."
+    },
+    "abort": {
+      "already_configured": "O dispositivo ja esta configurado.",
+      "reauth_successful": "Reautenticacao bem-sucedida.",
+      "reconfigure_successful": "Reconfiguracao bem-sucedida."
     }
   },
   "options": {
     "step": {
       "basic_options": {
         "data": {
-          "scan_interval": "Intervalo de escaneamento (requer reinicialização do HA)",
+          "scan_interval": "Intervalo de escaneamento",
           "track_iface_clients": "Mostrar MAC e IP do cliente nas interfaces",
           "unit_of_measurement": "Unidade de medida",
-          "track_network_hosts_timeout": "Rastrear o tempo limite dos dispositivos de rede (segundos)",
+          "track_network_hosts_timeout": "Tempo limite de rastreamento de dispositivos (segundos)",
           "zone": "Zona para rastreador de dispositivos"
         },
-        "title": "Opções de roteador Mikrotik (1/2)",
-        "description": "Inicialize a integração"
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Default: 30s. Lower values increase RouterOS API load.",
+          "track_network_hosts_timeout": "Wired devices only. Seconds before a device is considered offline if not seen in ARP. Default: 180s.",
+          "zone": "Home Assistant zone name to use when a tracked device is connected. Default: home."
+        },
+        "title": "Opcoes de roteador Mikrotik (1/3)",
+        "description": "Configurar a integracao"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "Predefinicao de sensores"
+        },
+        "data_description": {
+          "sensor_preset": "Select a preset to quickly configure which sensors and switches are enabled, or choose Custom to configure individually."
+        },
+        "title": "Opcoes de roteador Mikrotik (2/3)",
+        "description": "Selecionar predefinicao de sensores"
       },
       "sensor_select": {
         "data": {
-          "sensor_client_captive": "sensores de cliente cativo",
-          "sensor_client_traffic": "Sensores de tráfego do cliente",
-          "sensor_containers": "Container sensors",
-          "sensor_environment": "Sensores de variáveis de ambiente",
+          "sensor_client_captive": "Dados do portal cativo",
+          "sensor_client_traffic": "Sensores de trafego do cliente",
+          "sensor_containers": "Sensores de conteineres",
+          "sensor_environment": "Sensores de variaveis de ambiente",
           "sensor_filter": "Interruptores de filtro",
           "sensor_kidcontrol": "Controle infantil",
           "sensor_mangle": "Interruptores Mangle",
           "sensor_nat": "Interruptores NAT",
-          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_netwatch_tracker": "Sensores de Netwatch",
           "sensor_port_tracker": "Sensores do rastreador de porta",
-          "sensor_port_traffic": "Sensores de tráfego de porta",
-          "sensor_ppp": "Usuários de PPP",
-          "sensor_routing_rules": "Routing Rules switches",
+          "sensor_port_traffic": "Sensores de trafego de porta",
+          "sensor_ppp": "Usuarios de PPP",
+          "sensor_routing_rules": "Interruptores de regras de roteamento",
           "sensor_scripts": "Interruptores de script",
           "sensor_simple_queues": "Interruptores de filas simples",
           "track_network_hosts": "Rastrear dispositivos de rede",
-          "sensor_wireguard": "WireGuard peer sensors"
+          "sensor_wireguard": "Sensores de peers WireGuard"
         },
-        "title": "Opções de roteador Mikrotik (2/2)",
+        "data_description": {
+          "sensor_client_captive": "Adds hotspot authorization status to tracked devices. Only useful if a captive portal (hotspot) is configured.",
+          "sensor_client_traffic": "2 sensors per tracked device (TX/RX speed). Requires RouterOS 7 with Kid Control — the integration automatically creates a 'ha-monitoring' profile on the router when enabled. Sensors appear only for devices actively tracked by Kid Control. Note: RouterOS 6 is not supported.",
+          "sensor_containers": "Sensor and switch per container to monitor and start/stop Docker-like containers.",
+          "sensor_environment": "Sensors for RouterOS environment variables.",
+          "sensor_filter": "Switch per Filter rule to enable/disable firewall filter rules from HA. Warning: creates one entity per filter rule.",
+          "sensor_kidcontrol": "Switches for Kid Control device profiles (pause/resume internet access).",
+          "sensor_mangle": "Switch per Mangle rule to enable/disable packet marking rules from HA. Warning: creates one entity per Mangle rule.",
+          "sensor_nat": "Switch per NAT rule to enable/disable rules from HA. Warning: creates one entity per NAT rule.",
+          "sensor_netwatch_tracker": "Binary sensor per Netwatch entry showing reachability status.",
+          "sensor_port_tracker": "Binary sensor per port showing link up/down state.",
+          "sensor_port_traffic": "4 sensors per interface (TX/RX bytes and totals). Warning: creates 4 entities per interface — disable if traffic graphs are not needed.",
+          "sensor_ppp": "Switch per PPP secret (user) to enable/disable VPN/PPPoE accounts from HA.",
+          "sensor_routing_rules": "Switch per Routing Rule to enable/disable policy routing rules from HA. Warning: creates one entity per routing rule.",
+          "sensor_scripts": "Button per script to trigger RouterOS scripts from HA.",
+          "sensor_simple_queues": "Switch per Simple Queue entry to enable/disable bandwidth limits from HA. Warning: creates one entity per queue rule.",
+          "track_network_hosts": "Create a device tracker entity for every device seen in ARP/DHCP/wireless tables. Each tracked device creates a separate HA device. Warning: on large networks this can generate hundreds of devices and entities.",
+          "sensor_wireguard": "Sensors per WireGuard peer (last handshake, transfer, endpoint)."
+        },
+        "title": "Opcoes de roteador Mikrotik (3/3)",
         "description": "Ativar sensores e interruptores"
       }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Falha de autenticacao em {host}",
+      "description": "O nome de usuario ou a senha do roteador MikroTik em {host} estao incorretos. Va para **Configuracoes -> Integracoes -> MikroTik Router -> Reautenticar** para atualizar as credenciais."
+    },
+    "ssl_error": {
+      "title": "Erro de conexao SSL em {host}",
+      "description": "Nao foi possivel estabelecer uma conexao SSL segura com o roteador MikroTik em {host}. Va para **Configuracoes -> Integracoes -> MikroTik Router -> Reconfigurar** para alterar as configuracoes SSL ou desativar o SSL."
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Invalid MAC address format: {mac}. Expected format: AA:BB:CC:DD:EE:FF"
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "Sem SSL — conexao nao criptografada (padrao, porta 8728)",
+        "ssl": "SSL — criptografado, aceita certificados autoassinados (porta 8729)",
+        "ssl_verify": "SSL verificado — requer certificado valido assinado por CA"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": { "name": "Temperatura" },
+      "system_voltage": { "name": "Voltagem" },
+      "system_cpu_temperature": { "name": "Temperatura da CPU" },
+      "system_switch_temperature": { "name": "Temperatura do switch" },
+      "system_board_temperature1": { "name": "Temperatura da placa" },
+      "system_phy_temperature": { "name": "Temperatura PHY" },
+      "system_power_consumption": { "name": "Consumo de energia" },
+      "system_poe_out_consumption": { "name": "Consumo PoE de saida" },
+      "system_fan1_speed": { "name": "Velocidade do ventilador 1" },
+      "system_fan2_speed": { "name": "Velocidade do ventilador 2" },
+      "system_fan3_speed": { "name": "Velocidade do ventilador 3" },
+      "system_fan4_speed": { "name": "Velocidade do ventilador 4" },
+      "system_psu1_current": { "name": "Corrente da fonte 1" },
+      "system_psu1_voltage": { "name": "Voltagem da fonte 1" },
+      "system_psu2_current": { "name": "Corrente da fonte 2" },
+      "system_psu2_voltage": { "name": "Voltagem da fonte 2" },
+      "system_uptime": { "name": "Tempo de atividade" },
+      "system_cpu_load": { "name": "Carga da CPU" },
+      "system_memory_usage": { "name": "Uso de memoria" },
+      "system_hdd_usage": { "name": "Uso de disco" },
+      "system_clients_wired": { "name": "Clientes cabeados" },
+      "system_clients_wireless": { "name": "Clientes sem fio" },
+      "system_captive_authorized": { "name": "Clientes do portal cativo" },
+      "system_gps_latitude": { "name": "Latitude" },
+      "system_gps_longitude": { "name": "Longitude" },
+      "traffic_tx": { "name": "TX" },
+      "traffic_rx": { "name": "RX" },
+      "tx_total": { "name": "TX total" },
+      "rx_total": { "name": "RX total" },
+      "client_traffic_tx": { "name": "TX" },
+      "client_traffic_rx": { "name": "RX" },
+      "ip_address": { "name": "Endereco IP" },
+      "cloud_public_address": { "name": "Endereco publico" },
+      "wireguard_peer_rx": { "name": "RX" },
+      "wireguard_peer_tx": { "name": "TX" },
+      "wireguard_peer_handshake": { "name": "Ultimo handshake" },
+      "system_device_mode": { "name": "Modo do dispositivo" },
+      "system_packages": { "name": "Pacotes" },
+      "container_status": { "name": "Status" }
+    },
+    "binary_sensor": {
+      "system_ups": { "name": "Nobreak" },
+      "ppp_tracker": { "name": "PPP" },
+      "interface_connection": { "name": "Conexao" },
+      "netwatch": { "name": "Netwatch" },
+      "wireguard_peer": { "name": "Conectado" }
+    },
+    "switch": {
+      "interface_port": { "name": "Porta" },
+      "ppp_secret": { "name": "PPP secret" },
+      "kidcontrol_paused": { "name": "Pausado" }
+    },
+    "button": {
+      "reboot": { "name": "Reiniciar" }
     }
   }
 }
