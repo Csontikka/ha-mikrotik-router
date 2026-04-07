@@ -56,7 +56,7 @@
       },
       "sensor_select": {
         "title": "Настройка Mikrotik Router (4/4)",
-        "description": "Включить датчики и переключатели",
+        "description": "Включить сенсоры и переключатели",
         "data": {
           "sensor_client_captive": "Данные портала авторизации",
           "sensor_client_traffic": "Сенсоры клиентского трафика",
@@ -140,7 +140,7 @@
       "basic_options": {
         "data": {
           "scan_interval": "Интервал сканирования",
-          "track_iface_clients": "Показывать в интерфейсе MAC и IP клиентов",
+          "track_iface_clients": "Показывать на интерфейсах MAC и IP клиентов",
           "unit_of_measurement": "Единицы измерения",
           "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (в секундах)",
           "zone": "Зона для отслеживания устройств"
@@ -244,7 +244,7 @@
       "system_board_temperature1": { "name": "Температура платы" },
       "system_phy_temperature": { "name": "Температура PHY" },
       "system_power_consumption": { "name": "Потребление энергии" },
-      "system_poe_out_consumption": { "name": "Потребление PoE выход" },
+      "system_poe_out_consumption": { "name": "Выходная мощность PoE" },
       "system_fan1_speed": { "name": "Скорость вентилятора 1" },
       "system_fan2_speed": { "name": "Скорость вентилятора 2" },
       "system_fan3_speed": { "name": "Скорость вентилятора 3" },

@@ -16,7 +16,7 @@
         }
       },
       "user": {
-        "title": "Lestatiet Mikrotik Router",
+        "title": "Iestatiet Mikrotik Router",
         "description": "Mikrotik maršrutētāja integrācijas konfigurēšana.",
         "data": {
           "name": "Integrācijas nosaukums",
@@ -240,7 +240,7 @@
       "system_temperature": { "name": "Temperatūra" },
       "system_voltage": { "name": "Spriegums" },
       "system_cpu_temperature": { "name": "CPU temperatūra" },
-      "system_switch_temperature": { "name": "Slēdža temperatūra" },
+      "system_switch_temperature": { "name": "Komutatora temperatūra" },
       "system_board_temperature1": { "name": "Plates temperatūra" },
       "system_phy_temperature": { "name": "PHY temperatūra" },
       "system_power_consumption": { "name": "Enerģijas patēriņš" },
@@ -255,8 +255,8 @@
       "system_psu2_voltage": { "name": "Barošanas bloks 2 spriegums" },
       "system_uptime": { "name": "Darbības laiks" },
       "system_cpu_load": { "name": "CPU slodze" },
-      "system_memory_usage": { "name": "Atmiņas lietojums" },
-      "system_hdd_usage": { "name": "Diska lietojums" },
+      "system_memory_usage": { "name": "Atmiņas izmantošana" },
+      "system_hdd_usage": { "name": "Diska izmantošana" },
       "system_clients_wired": { "name": "Vadu klienti" },
       "system_clients_wireless": { "name": "Bezvadu klienti" },
       "system_captive_authorized": { "name": "Captive portal klienti" },

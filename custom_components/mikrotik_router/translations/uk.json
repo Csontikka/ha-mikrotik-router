@@ -51,7 +51,7 @@
           "sensor_preset": "Пресет сенсорів"
         },
         "data_description": {
-          "sensor_preset": "Recommended вмикає найкорисніші сенсори з мінімальною кількістю сутностей. Full вмикає все — використовуйте обережно у великих мережах."
+          "sensor_preset": "«Рекомендований» вмикає найкорисніші сенсори з мінімальною кількістю сутностей. «Повний» вмикає все — використовуйте обережно у великих мережах."
         }
       },
       "sensor_select": {
@@ -61,7 +61,7 @@
           "sensor_client_captive": "Дані Captive portal",
           "sensor_client_traffic": "Сенсори трафіку клієнтів",
           "sensor_containers": "Сенсори контейнерів",
-          "sensor_environment": "Сенсори змінних оточення",
+          "sensor_environment": "Сенсори змінних середовища",
           "sensor_filter": "Перемикачі фільтрів",
           "sensor_kidcontrol": "Батьківський контроль",
           "sensor_mangle": "Перемикачі Mangle",
@@ -122,10 +122,10 @@
     },
     "error": {
       "name_exists": "Назва вже існує.",
-      "cannot_connect": "Не можу з'єднатися з Mikrotik.",
+      "cannot_connect": "Не вдається з'єднатися з Mikrotik.",
       "ssl_handshake_failure": "Помилка SSL-з'єднання",
       "connection_timeout": "Тайм-аут з'єднання з Mikrotik",
-      "wrong_login": "Невірне ім'я або пароль",
+      "wrong_login": "Невірне ім'я користувача або пароль.",
       "ssl_verify_failure": "Перевірка сертифіката не вдалася",
       "no_devices_found": "MikroTik маршрутизаторів не знайдено в цій мережі. Введіть адресу маршрутизатора вручну."
     },
@@ -140,7 +140,7 @@
       "basic_options": {
         "data": {
           "scan_interval": "Інтервал сканування",
-          "track_iface_clients": "Показувати MAC і IP адреси клієнта",
+          "track_iface_clients": "Показувати MAC та IP клієнтів на інтерфейсах",
           "unit_of_measurement": "Одиниці вимірювання",
           "track_network_hosts_timeout": "Тайм-аут відстеження мережевих пристроїв (секунди)",
           "zone": "Зона для трекера пристроїв"
@@ -168,7 +168,7 @@
           "sensor_client_captive": "Дані Captive portal",
           "sensor_client_traffic": "Сенсори трафіку клієнтів",
           "sensor_containers": "Сенсори контейнерів",
-          "sensor_environment": "Сенсори змінних оточення",
+          "sensor_environment": "Сенсори змінних середовища",
           "sensor_filter": "Перемикачі фільтрів",
           "sensor_kidcontrol": "Батьківський контроль",
           "sensor_mangle": "Перемикачі Mangle",
@@ -218,7 +218,7 @@
     },
     "insufficient_permissions": {
       "title": "Недостатні права API для {host}",
-      "description": "Користувач `{username}` підключається до маршрутизатора MikroTik на {host}, але не має необхідних прав API. Відсутні права: `{missing}`\n\nЩоб виправити права, виконайте у терміналі RouterOS:\n\n```\n/user group set full policy=local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,password,web,sniff,sensitive,api,romon,rest-api\n```"
+      "description": "RouterOS-користувач **{username}** на маршрутизаторі **{host}** не має таких прав: `{missing}`.\n\nДеякі функції інтеграції не працюватимуть (перемикачі, кнопка перезавантаження, автоналаштування Kid Control). Щоб виправити це, додайте відсутні політики до групи користувача на маршрутизаторі:\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {

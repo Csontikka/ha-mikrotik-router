@@ -17,7 +17,7 @@
       },
       "user": {
         "title": "Mikrotik-Router einrichten",
-        "description": "Mikrotik-Router-Integration einstellen",
+        "description": "Mikrotik-Router-Integration einrichten.",
         "data": {
           "name": "Name der Integration",
           "host": "Host",
@@ -87,7 +87,7 @@
           "sensor_nat": "Schalter pro NAT-Regel zum Aktivieren/Deaktivieren von Regeln aus HA. Warnung: erstellt eine Entität pro NAT-Regel.",
           "sensor_netwatch_tracker": "Binärsensor pro Netwatch-Eintrag, der den Erreichbarkeitsstatus anzeigt.",
           "sensor_port_tracker": "Binärsensor pro Port, der den Link-Up/Down-Status anzeigt.",
-          "sensor_port_traffic": "4 Sensoren pro Interface (TX/RX-Bytes und Gesamtwerte). Warnung: erstellt 4 Entitäten pro Interface — deaktivieren, wenn Datenverkehrsgraphen nicht benötigt werden.",
+          "sensor_port_traffic": "4 Sensoren pro Interface (TX/RX-Bytes und Gesamtwerte). Warnung: erstellt 4 Entitäten pro Interface — deaktivieren, wenn Datenverkehrsdiagramme nicht benötigt werden.",
           "sensor_ppp": "Schalter pro PPP-Secret (Benutzer) zum Aktivieren/Deaktivieren von VPN/PPPoE-Konten aus HA.",
           "sensor_routing_rules": "Schalter pro Routing-Regel zum Aktivieren/Deaktivieren von Policy-Routing-Regeln aus HA. Warnung: erstellt eine Entität pro Routing-Regel.",
           "sensor_scripts": "Schaltfläche pro Skript zum Ausführen von RouterOS-Skripten aus HA.",
@@ -125,7 +125,7 @@
       "cannot_connect": "Verbindung zum MikroTik fehlgeschlagen.",
       "ssl_handshake_failure": "SSL Handshake Fehler",
       "connection_timeout": "Mikrotik-Verbindungstimeout.",
-      "wrong_login": "Ungültiger Benutzername oder Passwort.",
+      "wrong_login": "Ungültiger Benutzername oder ungültiges Passwort.",
       "ssl_verify_failure": "Zertifikatüberprüfung fehlgeschlagen",
       "no_devices_found": "Keine MikroTik-Router in diesem Netzwerk gefunden. Gib die Router-Adresse manuell ein."
     },
@@ -142,7 +142,7 @@
           "scan_interval": "Scan-Intervall",
           "track_iface_clients": "Client MAC und IP auf dem Interface anzeigen",
           "unit_of_measurement": "Maßeinheit",
-          "track_network_hosts_timeout": "Zeitlimit für Netzwerkgeräte verfolgen (Sekunden)",
+          "track_network_hosts_timeout": "Zeitlimit für Netzwerkgeräte-Verfolgung (Sekunden)",
           "zone": "Zone für Gerätetracker"
         },
         "data_description": {
@@ -194,7 +194,7 @@
           "sensor_nat": "Schalter pro NAT-Regel zum Aktivieren/Deaktivieren von Regeln aus HA. Warnung: erstellt eine Entität pro NAT-Regel.",
           "sensor_netwatch_tracker": "Binärsensor pro Netwatch-Eintrag, der den Erreichbarkeitsstatus anzeigt.",
           "sensor_port_tracker": "Binärsensor pro Port, der den Link-Up/Down-Status anzeigt.",
-          "sensor_port_traffic": "4 Sensoren pro Interface (TX/RX-Bytes und Gesamtwerte). Warnung: erstellt 4 Entitäten pro Interface — deaktivieren, wenn Datenverkehrsgraphen nicht benötigt werden.",
+          "sensor_port_traffic": "4 Sensoren pro Interface (TX/RX-Bytes und Gesamtwerte). Warnung: erstellt 4 Entitäten pro Interface — deaktivieren, wenn Datenverkehrsdiagramme nicht benötigt werden.",
           "sensor_ppp": "Schalter pro PPP-Secret (Benutzer) zum Aktivieren/Deaktivieren von VPN/PPPoE-Konten aus HA.",
           "sensor_routing_rules": "Schalter pro Routing-Regel zum Aktivieren/Deaktivieren von Policy-Routing-Regeln aus HA. Warnung: erstellt eine Entität pro Routing-Regel.",
           "sensor_scripts": "Schaltfläche pro Skript zum Ausführen von RouterOS-Skripten aus HA.",

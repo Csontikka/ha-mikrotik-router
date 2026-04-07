@@ -20,7 +20,7 @@
         "description": "Configura la integración del Mikrotik Router.",
         "data": {
           "name": "Nombre de la integración",
-          "host": "Servidor",
+          "host": "Host",
           "port": "Puerto",
           "username": "Nombre de usuario",
           "password": "Contraseña",
@@ -93,7 +93,7 @@
           "sensor_scripts": "Botón por script para ejecutar scripts de RouterOS desde HA.",
           "sensor_simple_queues": "Interruptor por entrada de Simple Queue para activar/desactivar límites de ancho de banda desde HA. Advertencia: crea una entidad por cada regla de cola.",
           "track_network_hosts": "Crea una entidad de seguimiento de dispositivo para cada dispositivo visto en las tablas ARP/DHCP/inalámbrica. Cada dispositivo rastreado crea un dispositivo HA independiente. Advertencia: en redes grandes esto puede generar cientos de dispositivos y entidades.",
-          "sensor_wireguard": "Sensores por par WireGuard (último handshake, transferencia, punto de conexión)."
+          "sensor_wireguard": "Sensores por peer WireGuard (último handshake, transferencia, punto de conexión)."
         }
       },
       "reauth_confirm": {
@@ -109,7 +109,7 @@
         "description": "Actualizar los ajustes de conexión de esta integración.",
         "data": {
           "name": "Nombre de la integración",
-          "host": "Servidor",
+          "host": "Host",
           "port": "Puerto",
           "username": "Nombre de usuario",
           "password": "Contraseña",
@@ -200,7 +200,7 @@
           "sensor_scripts": "Botón por script para ejecutar scripts de RouterOS desde HA.",
           "sensor_simple_queues": "Interruptor por entrada de Simple Queue para activar/desactivar límites de ancho de banda desde HA. Advertencia: crea una entidad por cada regla de cola.",
           "track_network_hosts": "Crea una entidad de seguimiento de dispositivo para cada dispositivo visto en las tablas ARP/DHCP/inalámbrica. Cada dispositivo rastreado crea un dispositivo HA independiente. Advertencia: en redes grandes esto puede generar cientos de dispositivos y entidades.",
-          "sensor_wireguard": "Sensores por par WireGuard (último handshake, transferencia, punto de conexión)."
+          "sensor_wireguard": "Sensores por peer WireGuard (último handshake, transferencia, punto de conexión)."
         },
         "title": "Opciones del Mikrotik Router (3/3)",
         "description": "Activar sensores e interruptores"
@@ -210,7 +210,7 @@
   "issues": {
     "wrong_credentials": {
       "title": "Autenticación fallida para {host}",
-      "description": "El nombre de usuario o la contraseña del router MikroTik en {host} es incorrecto. Ve a **Ajustes → Integraciones → MikroTik Router → Reautenticar** para actualizar tus credenciales."
+      "description": "El nombre de usuario o la contraseña del router MikroTik en {host} son incorrectos. Ve a **Ajustes → Integraciones → MikroTik Router → Reautenticar** para actualizar tus credenciales."
     },
     "ssl_error": {
       "title": "Error de conexión SSL para {host}",

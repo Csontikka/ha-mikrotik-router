@@ -16,7 +16,7 @@
         }
       },
       "user": {
-        "title": "设置 Mikrotik Router",
+        "title": "设置 Mikrotik 路由器",
         "description": "设置 Mikrotik 路由器集成。",
         "data": {
           "name": "集成名称",
@@ -27,7 +27,7 @@
           "ssl_mode": "连接安全"
         },
         "data_description": {
-          "port": "RouterOS API 端口。留空为 0 则使用默认值：8728（无 SSL）或 8729（SSL）。"
+          "port": "RouterOS API 端口。保留为 0 以使用默认值：8728（无 SSL）或 8729（SSL）。"
         }
       },
       "basic_options": {
@@ -70,7 +70,7 @@
           "sensor_port_tracker": "端口跟踪传感器",
           "sensor_port_traffic": "端口流量传感器",
           "sensor_ppp": "PPP 用户",
-          "sensor_routing_rules": "Routing Rules 开关",
+          "sensor_routing_rules": "路由规则开关",
           "sensor_scripts": "脚本开关",
           "sensor_simple_queues": "简单队列开关",
           "track_network_hosts": "跟踪网络设备",
@@ -116,7 +116,7 @@
           "ssl_mode": "连接安全"
         },
         "data_description": {
-          "port": "RouterOS API 端口。留空为 0 则使用默认值：8728（无 SSL）或 8729（SSL）。"
+          "port": "RouterOS API 端口。保留为 0 以使用默认值：8728（无 SSL）或 8729（SSL）。"
         }
       }
     },
@@ -177,7 +177,7 @@
           "sensor_port_tracker": "端口跟踪传感器",
           "sensor_port_traffic": "端口流量传感器",
           "sensor_ppp": "PPP 用户",
-          "sensor_routing_rules": "Routing Rules 开关",
+          "sensor_routing_rules": "路由规则开关",
           "sensor_scripts": "脚本开关",
           "sensor_simple_queues": "简单队列开关",
           "track_network_hosts": "跟踪网络设备",
@@ -218,7 +218,7 @@
     },
     "insufficient_permissions": {
       "title": "{host} 的 API 权限不足",
-      "description": "用户 `{username}` 正在连接 {host} 上的 MikroTik 路由器，但缺少所需的 API 权限。缺少的权限：`{missing}`\n\n要修复权限，请在 RouterOS 终端中运行以下命令：\n\n```\n/user group set full policy=local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,password,web,sniff,sensitive,api,romon,rest-api\n```"
+      "description": "RouterOS 用户 **{username}** 在路由器 **{host}** 上缺少以下权限：`{missing}`。\n\n部分集成功能将无法使用（开关、重启按钮、Kid Control 自动设置）。要修复此问题，请在路由器上将缺少的策略添加到用户组：\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {

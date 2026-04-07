@@ -17,12 +17,12 @@
       },
       "user": {
         "title": "Mikrotik Routerのセットアップ",
-        "description": "Mikrotikルータ統合をセットアップします。",
+        "description": "Mikrotikルーターインテグレーションをセットアップします。",
         "data": {
           "name": "統合名",
           "host": "ホスト",
           "port": "ポート",
-          "username": "ユーザ名",
+          "username": "ユーザー名",
           "password": "パスワード",
           "ssl_mode": "接続セキュリティ"
         },
@@ -36,7 +36,7 @@
         "data": {
           "scan_interval": "スキャン間隔（秒）",
           "track_network_hosts_timeout": "ネットワークデバイスのタイムアウト（秒）",
-          "zone": "デバイス追跡装置用ゾーン"
+          "zone": "デバイストラッカー用ゾーン"
         },
         "data_description": {
           "scan_interval": "最小値: 10s。デフォルト: 30s。値を小さくすると RouterOS API の負荷が増加します。",
@@ -100,7 +100,7 @@
         "title": "Mikrotik Router 再認証",
         "description": "{host} の新しい認証情報を入力してください。",
         "data": {
-          "username": "ユーザ名",
+          "username": "ユーザー名",
           "password": "パスワード"
         }
       },
@@ -111,7 +111,7 @@
           "name": "統合名",
           "host": "ホスト",
           "port": "ポート",
-          "username": "ユーザ名",
+          "username": "ユーザー名",
           "password": "パスワード",
           "ssl_mode": "接続セキュリティ"
         },
@@ -125,7 +125,7 @@
       "cannot_connect": "Mikrotikに接続できません。",
       "ssl_handshake_failure": "SSLハンドシェイクに失敗しました",
       "connection_timeout": "Mikrotik接続がタイムアウトしました。",
-      "wrong_login": "ユーザ名またはパスワードが無効です。",
+      "wrong_login": "ユーザー名またはパスワードが無効です。",
       "ssl_verify_failure": "証明書の検証に失敗しました",
       "no_devices_found": "このネットワークでMikroTikルーターが見つかりませんでした。ルーターのアドレスを手動で入力してください。"
     },
@@ -140,10 +140,10 @@
       "basic_options": {
         "data": {
           "scan_interval": "スキャン間隔",
-          "track_iface_clients": "クライアントのMACとインターフェイスのIPを表示",
+          "track_iface_clients": "インターフェイスにクライアントのMACとIPを表示",
           "unit_of_measurement": "測定単位",
           "track_network_hosts_timeout": "ネットワークデバイスのタイムアウト（秒）",
-          "zone": "デバイス追跡装置用ゾーン"
+          "zone": "デバイストラッカー用ゾーン"
         },
         "data_description": {
           "scan_interval": "最小値: 10s。デフォルト: 30s。値を小さくすると RouterOS API の負荷が増加します。",
@@ -218,7 +218,7 @@
     },
     "insufficient_permissions": {
       "title": "{host} の API 権限が不足しています",
-      "description": "ユーザー `{username}` が {host} の MikroTik ルーターに接続していますが、必要な API 権限がありません。不足している権限: `{missing}`\n\n権限を修正するには、RouterOS ターミナルで次のコマンドを実行してください:\n\n```\n/user group set full policy=local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,password,web,sniff,sensitive,api,romon,rest-api\n```"
+      "description": "RouterOS ユーザー **{username}** がルーター **{host}** で次の権限を持っていません: `{missing}`。\n\n一部のインテグレーション機能が動作しません（スイッチ、再起動ボタン、Kid Control 自動設定）。修正するには、ルーターのユーザーグループに不足しているポリシーを追加してください:\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {

@@ -3,7 +3,7 @@
     "step": {
       "discovery": {
         "title": "Adicionar um Mikrotik Router",
-        "description": "Escaneia a rede local em busca de roteadores MikroTik, ou insira o endereco manualmente.",
+        "description": "Escaneie a rede local em busca de roteadores MikroTik, ou insira o endereço manualmente.",
         "data": {
           "scan": "Escanear a rede em busca de roteadores MikroTik"
         }
@@ -16,23 +16,23 @@
         }
       },
       "user": {
-        "title": "Configuracao do Mikrotik Router",
-        "description": "Configurando uma integracao de roteador Mikrotik.",
+        "title": "Configuração do Mikrotik Router",
+        "description": "Configurando uma integração de roteador Mikrotik.",
         "data": {
-          "name": "Nome da integracao",
+          "name": "Nome da integração",
           "host": "Host",
           "port": "Porta",
-          "username": "Nome de usuario",
+          "username": "Nome de usuário",
           "password": "Senha",
-          "ssl_mode": "Seguranca da conexao"
+          "ssl_mode": "Segurança da conexão"
         },
         "data_description": {
           "port": "Porta da API RouterOS. Deixe em 0 para usar o padrão: 8728 (sem SSL) ou 8729 (com SSL)."
         }
       },
       "basic_options": {
-        "title": "Configuracao do Mikrotik Router (2/4)",
-        "description": "Configurar a integracao",
+        "title": "Configuração do Mikrotik Router (2/4)",
+        "description": "Configurar a integração",
         "data": {
           "scan_interval": "Intervalo de escaneamento (segundos)",
           "track_network_hosts_timeout": "Tempo limite de rastreamento de dispositivos (segundos)",
@@ -45,31 +45,31 @@
         }
       },
       "sensor_mode": {
-        "title": "Configuracao do Mikrotik Router (3/4)",
-        "description": "Selecionar modo de ativacao de sensores",
+        "title": "Configuração do Mikrotik Router (3/4)",
+        "description": "Selecionar modo de ativação de sensores",
         "data": {
-          "sensor_preset": "Predefinicao de sensores"
+          "sensor_preset": "Predefinição de sensores"
         },
         "data_description": {
           "sensor_preset": "Recomendado ativa os sensores mais úteis com um número mínimo de entidades. Completo ativa tudo — use com cautela em redes grandes."
         }
       },
       "sensor_select": {
-        "title": "Configuracao do Mikrotik Router (4/4)",
+        "title": "Configuração do Mikrotik Router (4/4)",
         "description": "Ativar sensores e interruptores",
         "data": {
           "sensor_client_captive": "Dados do portal cativo",
-          "sensor_client_traffic": "Sensores de trafego do cliente",
-          "sensor_containers": "Sensores de conteineres",
-          "sensor_environment": "Sensores de variaveis de ambiente",
+          "sensor_client_traffic": "Sensores de tráfego do cliente",
+          "sensor_containers": "Sensores de contêineres",
+          "sensor_environment": "Sensores de variáveis de ambiente",
           "sensor_filter": "Interruptores de filtro",
           "sensor_kidcontrol": "Controle infantil",
           "sensor_mangle": "Interruptores Mangle",
           "sensor_nat": "Interruptores NAT",
           "sensor_netwatch_tracker": "Sensores de Netwatch",
           "sensor_port_tracker": "Sensores do rastreador de porta",
-          "sensor_port_traffic": "Sensores de trafego de porta",
-          "sensor_ppp": "Usuarios de PPP",
+          "sensor_port_traffic": "Sensores de tráfego de porta",
+          "sensor_ppp": "Usuários de PPP",
           "sensor_routing_rules": "Interruptores de regras de roteamento",
           "sensor_scripts": "Interruptores de script",
           "sensor_simple_queues": "Interruptores de filas simples",
@@ -100,20 +100,20 @@
         "title": "Reautenticar Mikrotik Router",
         "description": "Insira as novas credenciais para {host}.",
         "data": {
-          "username": "Nome de usuario",
+          "username": "Nome de usuário",
           "password": "Senha"
         }
       },
       "reconfigure": {
         "title": "Reconfigurar Mikrotik Router",
-        "description": "Atualize as configuracoes de conexao desta integracao.",
+        "description": "Atualize as configurações de conexão desta integração.",
         "data": {
-          "name": "Nome da integracao",
+          "name": "Nome da integração",
           "host": "Host",
           "port": "Porta",
-          "username": "Nome de usuario",
+          "username": "Nome de usuário",
           "password": "Senha",
-          "ssl_mode": "Seguranca da conexao"
+          "ssl_mode": "Segurança da conexão"
         },
         "data_description": {
           "port": "Porta da API RouterOS. Deixe em 0 para usar o padrão: 8728 (sem SSL) ou 8729 (com SSL)."
@@ -121,18 +121,18 @@
       }
     },
     "error": {
-      "name_exists": "O nome ja existe.",
-      "cannot_connect": "Nao consigo conectar ao Mikrotik.",
+      "name_exists": "O nome já existe.",
+      "cannot_connect": "Não é possível conectar ao Mikrotik.",
       "ssl_handshake_failure": "Falha no handshake SSL",
-      "connection_timeout": "Tempo limite de conexao do Mikrotik.",
-      "wrong_login": "Nome de usuario ou senha invalidos.",
-      "ssl_verify_failure": "Falha na verificacao do certificado",
-      "no_devices_found": "Nenhum roteador MikroTik foi encontrado nesta rede. Insira o endereco do roteador manualmente."
+      "connection_timeout": "Tempo limite de conexão do Mikrotik.",
+      "wrong_login": "Nome de usuário ou senha inválidos.",
+      "ssl_verify_failure": "Falha na verificação do certificado",
+      "no_devices_found": "Nenhum roteador MikroTik foi encontrado nesta rede. Insira o endereço do roteador manualmente."
     },
     "abort": {
-      "already_configured": "O dispositivo ja esta configurado.",
-      "reauth_successful": "Reautenticacao bem-sucedida.",
-      "reconfigure_successful": "Reconfiguracao bem-sucedida."
+      "already_configured": "O dispositivo já está configurado.",
+      "reauth_successful": "Reautenticação bem-sucedida.",
+      "reconfigure_successful": "Reconfiguração bem-sucedida."
     }
   },
   "options": {
@@ -150,33 +150,33 @@
           "track_network_hosts_timeout": "Apenas dispositivos cabeados. Segundos antes de um dispositivo ser considerado offline se não for visto no ARP. Padrão: 180s.",
           "zone": "Nome da zona do Home Assistant a usar quando um dispositivo rastreado está conectado. Padrão: home."
         },
-        "title": "Opcoes de roteador Mikrotik (1/3)",
-        "description": "Configurar a integracao"
+        "title": "Opções de roteador Mikrotik (1/3)",
+        "description": "Configurar a integração"
       },
       "sensor_mode": {
         "data": {
-          "sensor_preset": "Predefinicao de sensores"
+          "sensor_preset": "Predefinição de sensores"
         },
         "data_description": {
           "sensor_preset": "Selecione uma predefinição para configurar rapidamente quais sensores e interruptores estão ativos, ou escolha Personalizado para configurar individualmente."
         },
-        "title": "Opcoes de roteador Mikrotik (2/3)",
-        "description": "Selecionar predefinicao de sensores"
+        "title": "Opções de roteador Mikrotik (2/3)",
+        "description": "Selecionar predefinição de sensores"
       },
       "sensor_select": {
         "data": {
           "sensor_client_captive": "Dados do portal cativo",
-          "sensor_client_traffic": "Sensores de trafego do cliente",
-          "sensor_containers": "Sensores de conteineres",
-          "sensor_environment": "Sensores de variaveis de ambiente",
+          "sensor_client_traffic": "Sensores de tráfego do cliente",
+          "sensor_containers": "Sensores de contêineres",
+          "sensor_environment": "Sensores de variáveis de ambiente",
           "sensor_filter": "Interruptores de filtro",
           "sensor_kidcontrol": "Controle infantil",
           "sensor_mangle": "Interruptores Mangle",
           "sensor_nat": "Interruptores NAT",
           "sensor_netwatch_tracker": "Sensores de Netwatch",
           "sensor_port_tracker": "Sensores do rastreador de porta",
-          "sensor_port_traffic": "Sensores de trafego de porta",
-          "sensor_ppp": "Usuarios de PPP",
+          "sensor_port_traffic": "Sensores de tráfego de porta",
+          "sensor_ppp": "Usuários de PPP",
           "sensor_routing_rules": "Interruptores de regras de roteamento",
           "sensor_scripts": "Interruptores de script",
           "sensor_simple_queues": "Interruptores de filas simples",
@@ -202,23 +202,23 @@
           "track_network_hosts": "Cria uma entidade de rastreador de dispositivos para cada dispositivo visto nas tabelas ARP/DHCP/wireless. Cada dispositivo rastreado cria um dispositivo HA separado. Aviso: em redes grandes, isso pode gerar centenas de dispositivos e entidades.",
           "sensor_wireguard": "Sensores por peer WireGuard (último handshake, transferência, endpoint)."
         },
-        "title": "Opcoes de roteador Mikrotik (3/3)",
+        "title": "Opções de roteador Mikrotik (3/3)",
         "description": "Ativar sensores e interruptores"
       }
     }
   },
   "issues": {
     "wrong_credentials": {
-      "title": "Falha de autenticacao em {host}",
-      "description": "O nome de usuario ou a senha do roteador MikroTik em {host} estao incorretos. Va para **Configuracoes -> Integracoes -> MikroTik Router -> Reautenticar** para atualizar as credenciais."
+      "title": "Falha de autenticação em {host}",
+      "description": "O nome de usuário ou a senha do roteador MikroTik em {host} estão incorretos. Vá para **Configurações -> Integrações -> MikroTik Router -> Reautenticar** para atualizar as credenciais."
     },
     "ssl_error": {
-      "title": "Erro de conexao SSL em {host}",
-      "description": "Nao foi possivel estabelecer uma conexao SSL segura com o roteador MikroTik em {host}. Va para **Configuracoes -> Integracoes -> MikroTik Router -> Reconfigurar** para alterar as configuracoes SSL ou desativar o SSL."
+      "title": "Erro de conexão SSL em {host}",
+      "description": "Não foi possível estabelecer uma conexão SSL segura com o roteador MikroTik em {host}. Vá para **Configurações -> Integrações -> MikroTik Router -> Reconfigurar** para alterar as configurações SSL ou desativar o SSL."
     },
     "insufficient_permissions": {
       "title": "Permissões de API insuficientes para {host}",
-      "description": "O usuário `{username}` está se conectando ao roteador MikroTik em {host}, mas não tem as permissões de API necessárias. Permissões ausentes: `{missing}`\n\nPara corrigir as permissões, execute o seguinte comando no terminal do RouterOS:\n\n```\n/user group set full policy=local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,password,web,sniff,sensitive,api,romon,rest-api\n```"
+      "description": "O usuário `{username}` está se conectando ao roteador MikroTik em {host}, mas não tem as permissões de API necessárias. Permissões ausentes: `{missing}`\n\nPara corrigir as permissões, execute o seguinte comando no terminal do RouterOS:\n\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {
@@ -229,9 +229,9 @@
   "selector": {
     "ssl_mode": {
       "options": {
-        "none": "Sem SSL — conexao nao criptografada (padrao, porta 8728)",
+        "none": "Sem SSL — conexão não criptografada (padrão, porta 8728)",
         "ssl": "SSL — criptografado, aceita certificados autoassinados (porta 8729)",
-        "ssl_verify": "SSL verificado — requer certificado valido assinado por CA"
+        "ssl_verify": "SSL verificado — requer certificado válido assinado por CA"
       }
     }
   },
@@ -244,7 +244,7 @@
       "system_board_temperature1": { "name": "Temperatura da placa" },
       "system_phy_temperature": { "name": "Temperatura PHY" },
       "system_power_consumption": { "name": "Consumo de energia" },
-      "system_poe_out_consumption": { "name": "Consumo PoE de saida" },
+      "system_poe_out_consumption": { "name": "Consumo PoE de saída" },
       "system_fan1_speed": { "name": "Velocidade do ventilador 1" },
       "system_fan2_speed": { "name": "Velocidade do ventilador 2" },
       "system_fan3_speed": { "name": "Velocidade do ventilador 3" },
@@ -255,7 +255,7 @@
       "system_psu2_voltage": { "name": "Voltagem da fonte 2" },
       "system_uptime": { "name": "Tempo de atividade" },
       "system_cpu_load": { "name": "Carga da CPU" },
-      "system_memory_usage": { "name": "Uso de memoria" },
+      "system_memory_usage": { "name": "Uso de memória" },
       "system_hdd_usage": { "name": "Uso de disco" },
       "system_clients_wired": { "name": "Clientes cabeados" },
       "system_clients_wireless": { "name": "Clientes sem fio" },
@@ -268,11 +268,11 @@
       "rx_total": { "name": "RX total" },
       "client_traffic_tx": { "name": "TX" },
       "client_traffic_rx": { "name": "RX" },
-      "ip_address": { "name": "Endereco IP" },
-      "cloud_public_address": { "name": "Endereco publico" },
+      "ip_address": { "name": "Endereço IP" },
+      "cloud_public_address": { "name": "Endereço público" },
       "wireguard_peer_rx": { "name": "RX" },
       "wireguard_peer_tx": { "name": "TX" },
-      "wireguard_peer_handshake": { "name": "Ultimo handshake" },
+      "wireguard_peer_handshake": { "name": "Último handshake" },
       "system_device_mode": { "name": "Modo do dispositivo" },
       "system_packages": { "name": "Pacotes" },
       "container_status": { "name": "Status" }
@@ -280,7 +280,7 @@
     "binary_sensor": {
       "system_ups": { "name": "Nobreak" },
       "ppp_tracker": { "name": "PPP" },
-      "interface_connection": { "name": "Conexao" },
+      "interface_connection": { "name": "Conexão" },
       "netwatch": { "name": "Netwatch" },
       "wireguard_peer": { "name": "Conectado" }
     },

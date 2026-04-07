@@ -16,7 +16,7 @@
         }
       },
       "user": {
-        "title": "Állítsa fel a Mikrotik Router",
+        "title": "Mikrotik Router beállítása",
         "description": "Állítsd be a Mikrotik Router integrációt.",
         "data": {
           "name": "Integráció neve",
@@ -56,19 +56,19 @@
       },
       "sensor_select": {
         "title": "Mikrotik Router beállítás (4/4)",
-        "description": "Érzékelők és kapcsolók engedélyezése",
+        "description": "Szenzorok és kapcsolók engedélyezése",
         "data": {
           "sensor_client_captive": "Captive portal adat",
-          "sensor_client_traffic": "Kliensforgalom érzékelők",
+          "sensor_client_traffic": "Kliensforgalom szenzorok",
           "sensor_containers": "Konténer szenzorok",
-          "sensor_environment": "Környezeti változó érzékelők",
+          "sensor_environment": "Környezeti változó szenzorok",
           "sensor_filter": "Szűrő kapcsolók",
           "sensor_kidcontrol": "Szülői felügyelet",
           "sensor_mangle": "Mangle kapcsolók",
           "sensor_nat": "NAT kapcsolók",
           "sensor_netwatch_tracker": "Netwatch tracker szenzorok",
-          "sensor_port_tracker": "Portfigyelő érzékelők",
-          "sensor_port_traffic": "Portforgalom érzékelők",
+          "sensor_port_tracker": "Portfigyelő szenzorok",
+          "sensor_port_traffic": "Portforgalom szenzorok",
           "sensor_ppp": "PPP felhasználók",
           "sensor_routing_rules": "Routing Rules kapcsolók",
           "sensor_scripts": "Szkript gombok",
@@ -78,7 +78,7 @@
         },
         "data_description": {
           "sensor_client_captive": "Hotspot engedélyezési állapotot ad a követett eszközökhöz. Csak akkor hasznos, ha captive portal (hotspot) van beállítva.",
-          "sensor_client_traffic": "2 szenzor nyomkövetett eszközönként (TX/RX sebesség). RouterOS 7 és Kid Control szükséges — az integráció automatikusan létrehozza a 'ha-monitoring' profilt a routeren. Szenzorok csak a Kid Control által aktívan követett eszközöknél jelennek meg.",
+          "sensor_client_traffic": "2 szenzor követett eszközönként (TX/RX sebesség). RouterOS 7 és Kid Control szükséges — az integráció automatikusan létrehozza a 'ha-monitoring' profilt a routeren. Szenzorok csak a Kid Control által aktívan követett eszközöknél jelennek meg.",
           "sensor_containers": "Szenzor és kapcsoló konténerenként Docker-szerű konténerek monitorozásához és indításához/leállításához.",
           "sensor_environment": "Szenzorok RouterOS környezeti változókhoz.",
           "sensor_filter": "Kapcsoló szűrési szabályonként a tűzfal filter szabályok HA-ból való engedélyezéséhez/tiltásához. Figyelmeztetés: filter szabályonként egy entitást hoz létre.",
@@ -88,7 +88,7 @@
           "sensor_netwatch_tracker": "Bináris szenzor Netwatch bejegyzésenként az elérhetőség állapotának megjelenítéséhez.",
           "sensor_port_tracker": "Bináris szenzor portonként a kapcsolat állapotának (fel/le) megjelenítéséhez.",
           "sensor_port_traffic": "4 szenzor interfészenként (TX/RX bájtok és összesítők). Figyelmeztetés: interfészenként 4 entitást hoz létre — kapcsold ki, ha nincs szükség forgalomgrafikonokra.",
-          "sensor_ppp": "Kapcsoló PPP secret (felhasználó) onként VPN/PPPoE fiókok HA-ból való engedélyezéséhez/tiltásához.",
+          "sensor_ppp": "Kapcsoló PPP secretenként (felhasználónként) VPN/PPPoE fiókok HA-ból való engedélyezéséhez/tiltásához.",
           "sensor_routing_rules": "Kapcsoló routing szabályonként a policy routing szabályok HA-ból való kezeléséhez. Figyelmeztetés: routing szabályonként egy entitást hoz létre.",
           "sensor_scripts": "Gomb szkriptenként RouterOS szkriptek HA-ból való futtatásához.",
           "sensor_simple_queues": "Kapcsoló Simple Queue bejegyzésenként a sávszélesség korlátok HA-ból való kezeléséhez. Figyelmeztetés: queue szabályonként egy entitást hoz létre.",
@@ -140,7 +140,7 @@
       "basic_options": {
         "data": {
           "scan_interval": "Felderítési időköz",
-          "track_iface_clients": "Ügyfél MAC- és IP-cím megjelenítése az interfészeken",
+          "track_iface_clients": "Kliens MAC- és IP-cím megjelenítése az interfészeken",
           "unit_of_measurement": "Mértékegység",
           "track_network_hosts_timeout": "Hálózati eszközök követésének időtúllépése (másodperc)",
           "zone": "Zóna az eszközkövető számára"
@@ -166,16 +166,16 @@
       "sensor_select": {
         "data": {
           "sensor_client_captive": "Captive portal adat",
-          "sensor_client_traffic": "Kliensforgalom érzékelők",
+          "sensor_client_traffic": "Kliensforgalom szenzorok",
           "sensor_containers": "Konténer szenzorok",
-          "sensor_environment": "Környezeti változó érzékelők",
+          "sensor_environment": "Környezeti változó szenzorok",
           "sensor_filter": "Szűrő kapcsolók",
           "sensor_kidcontrol": "Szülői felügyelet",
           "sensor_mangle": "Mangle kapcsolók",
           "sensor_nat": "NAT kapcsolók",
           "sensor_netwatch_tracker": "Netwatch tracker szenzorok",
-          "sensor_port_tracker": "Portfigyelő érzékelők",
-          "sensor_port_traffic": "Portforgalom érzékelők",
+          "sensor_port_tracker": "Portfigyelő szenzorok",
+          "sensor_port_traffic": "Portforgalom szenzorok",
           "sensor_ppp": "PPP felhasználók",
           "sensor_routing_rules": "Routing Rules kapcsolók",
           "sensor_scripts": "Szkript gombok",
@@ -185,7 +185,7 @@
         },
         "data_description": {
           "sensor_client_captive": "Hotspot engedélyezési állapotot ad a követett eszközökhöz. Csak akkor hasznos, ha captive portal (hotspot) van beállítva.",
-          "sensor_client_traffic": "2 szenzor nyomkövetett eszközönként (TX/RX sebesség). RouterOS 7 és Kid Control szükséges — az integráció automatikusan létrehozza a 'ha-monitoring' profilt a routeren. Szenzorok csak a Kid Control által aktívan követett eszközöknél jelennek meg.",
+          "sensor_client_traffic": "2 szenzor követett eszközönként (TX/RX sebesség). RouterOS 7 és Kid Control szükséges — az integráció automatikusan létrehozza a 'ha-monitoring' profilt a routeren. Szenzorok csak a Kid Control által aktívan követett eszközöknél jelennek meg.",
           "sensor_containers": "Szenzor és kapcsoló konténerenként Docker-szerű konténerek monitorozásához és indításához/leállításához.",
           "sensor_environment": "Szenzorok RouterOS környezeti változókhoz.",
           "sensor_filter": "Kapcsoló szűrési szabályonként a tűzfal filter szabályok HA-ból való engedélyezéséhez/tiltásához. Figyelmeztetés: filter szabályonként egy entitást hoz létre.",
@@ -195,7 +195,7 @@
           "sensor_netwatch_tracker": "Bináris szenzor Netwatch bejegyzésenként az elérhetőség állapotának megjelenítéséhez.",
           "sensor_port_tracker": "Bináris szenzor portonként a kapcsolat állapotának (fel/le) megjelenítéséhez.",
           "sensor_port_traffic": "4 szenzor interfészenként (TX/RX bájtok és összesítők). Figyelmeztetés: interfészenként 4 entitást hoz létre — kapcsold ki, ha nincs szükség forgalomgrafikonokra.",
-          "sensor_ppp": "Kapcsoló PPP secret (felhasználó) onként VPN/PPPoE fiókok HA-ból való engedélyezéséhez/tiltásához.",
+          "sensor_ppp": "Kapcsoló PPP secretenként (felhasználónként) VPN/PPPoE fiókok HA-ból való engedélyezéséhez/tiltásához.",
           "sensor_routing_rules": "Kapcsoló routing szabályonként a policy routing szabályok HA-ból való kezeléséhez. Figyelmeztetés: routing szabályonként egy entitást hoz létre.",
           "sensor_scripts": "Gomb szkriptenként RouterOS szkriptek HA-ból való futtatásához.",
           "sensor_simple_queues": "Kapcsoló Simple Queue bejegyzésenként a sávszélesség korlátok HA-ból való kezeléséhez. Figyelmeztetés: queue szabályonként egy entitást hoz létre.",
@@ -203,7 +203,7 @@
           "sensor_wireguard": "Szenzorok WireGuard peerenként (utolsó kézfogás, forgalom, végpont)."
         },
         "title": "Mikrotik Router opciók (3/3)",
-        "description": "Érzékelők és kapcsolók engedélyezése"
+        "description": "Szenzorok és kapcsolók engedélyezése"
       }
     }
   },
@@ -260,8 +260,8 @@
       "system_clients_wired": { "name": "Vezetékes kliensek" },
       "system_clients_wireless": { "name": "Vezeték nélküli kliensek" },
       "system_captive_authorized": { "name": "Captive portal kliensek" },
-      "system_gps_latitude": { "name": "Szélesség" },
-      "system_gps_longitude": { "name": "Hosszúság" },
+      "system_gps_latitude": { "name": "Szélességi fok" },
+      "system_gps_longitude": { "name": "Hosszúsági fok" },
       "traffic_tx": { "name": "TX" },
       "traffic_rx": { "name": "RX" },
       "tx_total": { "name": "TX összesen" },

@@ -20,7 +20,7 @@
         "description": "Configurar a integração do Mikrotik Router.",
         "data": {
           "name": "Nome da integração",
-          "host": "Anfitrião",
+          "host": "Host",
           "port": "Porta",
           "username": "Nome de utilizador",
           "password": "Palavra-passe",
@@ -109,7 +109,7 @@
         "description": "Atualizar as definições de ligação desta integração.",
         "data": {
           "name": "Nome da integração",
-          "host": "Anfitrião",
+          "host": "Host",
           "port": "Porta",
           "username": "Nome de utilizador",
           "password": "Palavra-passe",
@@ -123,7 +123,7 @@
     "error": {
       "name_exists": "O nome já existe.",
       "cannot_connect": "Não é possível ligar à Mikrotik.",
-      "ssl_handshake_failure": "Falha no reconhecimento SSL",
+      "ssl_handshake_failure": "Falha no handshake SSL",
       "connection_timeout": "Tempo limite da ligação à Mikrotik.",
       "wrong_login": "Nome de utilizador ou palavra-passe inválidos.",
       "ssl_verify_failure": "Verificação de certificado falhou",

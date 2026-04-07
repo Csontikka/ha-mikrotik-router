@@ -58,7 +58,7 @@
         "title": "Mikrotik Router instelling (4/4)",
         "description": "Sensoren en schakelaars inschakelen",
         "data": {
-          "sensor_client_captive": "Captive portal data",
+          "sensor_client_captive": "Captive-portalgegevens",
           "sensor_client_traffic": "Clientverkeersensors",
           "sensor_containers": "Containersensors",
           "sensor_environment": "Omgevingsvariabelesensors",
@@ -86,7 +86,7 @@
           "sensor_mangle": "Schakelaar per Mangle-regel om pakketmarkeringsregels in/uit te schakelen vanuit HA. Waarschuwing: maakt één entiteit per Mangle-regel aan.",
           "sensor_nat": "Schakelaar per NAT-regel om regels in/uit te schakelen vanuit HA. Waarschuwing: maakt één entiteit per NAT-regel aan.",
           "sensor_netwatch_tracker": "Binaire sensor per Netwatch-item die de bereikbaarheidsstatus toont.",
-          "sensor_port_tracker": "Binaire sensor per poort die de verbindingsstatus (aan/uit) toont.",
+          "sensor_port_tracker": "Binaire sensor per poort die de verbindingsstatus (actief/inactief) toont.",
           "sensor_port_traffic": "4 sensoren per interface (TX/RX-bytes en totalen). Waarschuwing: maakt 4 entiteiten per interface aan — schakel uit als verkeersgrafieken niet nodig zijn.",
           "sensor_ppp": "Schakelaar per PPP-secret (gebruiker) om VPN/PPPoE-accounts in/uit te schakelen vanuit HA.",
           "sensor_routing_rules": "Schakelaar per Routing Rule om beleidsrouteringsregels in/uit te schakelen vanuit HA. Waarschuwing: maakt één entiteit per routeringsregel aan.",
@@ -140,7 +140,7 @@
       "basic_options": {
         "data": {
           "scan_interval": "Scaninterval",
-          "track_iface_clients": "Mac en IP van client weergeven op interfaces",
+          "track_iface_clients": "MAC en IP van client weergeven op interfaces",
           "unit_of_measurement": "Meeteenheid",
           "track_network_hosts_timeout": "Volg de time-out van netwerkapparaten (seconden)",
           "zone": "Zone voor apparaattracker"
@@ -165,7 +165,7 @@
       },
       "sensor_select": {
         "data": {
-          "sensor_client_captive": "Captive portal data",
+          "sensor_client_captive": "Captive-portalgegevens",
           "sensor_client_traffic": "Clientverkeersensors",
           "sensor_containers": "Containersensors",
           "sensor_environment": "Omgevingsvariabelesensors",
@@ -193,7 +193,7 @@
           "sensor_mangle": "Schakelaar per Mangle-regel om pakketmarkeringsregels in/uit te schakelen vanuit HA. Waarschuwing: maakt één entiteit per Mangle-regel aan.",
           "sensor_nat": "Schakelaar per NAT-regel om regels in/uit te schakelen vanuit HA. Waarschuwing: maakt één entiteit per NAT-regel aan.",
           "sensor_netwatch_tracker": "Binaire sensor per Netwatch-item die de bereikbaarheidsstatus toont.",
-          "sensor_port_tracker": "Binaire sensor per poort die de verbindingsstatus (aan/uit) toont.",
+          "sensor_port_tracker": "Binaire sensor per poort die de verbindingsstatus (actief/inactief) toont.",
           "sensor_port_traffic": "4 sensoren per interface (TX/RX-bytes en totalen). Waarschuwing: maakt 4 entiteiten per interface aan — schakel uit als verkeersgrafieken niet nodig zijn.",
           "sensor_ppp": "Schakelaar per PPP-secret (gebruiker) om VPN/PPPoE-accounts in/uit te schakelen vanuit HA.",
           "sensor_routing_rules": "Schakelaar per Routing Rule om beleidsrouteringsregels in/uit te schakelen vanuit HA. Waarschuwing: maakt één entiteit per routeringsregel aan.",

@@ -21,7 +21,7 @@
         "data": {
           "name": "Heiti samþættingar",
           "host": "Hýsill",
-          "port": "Port",
+          "port": "Gátt",
           "username": "Notandanafn",
           "password": "Lykilorð",
           "ssl_mode": "Öryggistengingar"
@@ -86,10 +86,10 @@
           "sensor_mangle": "Rofi fyrir hverja Mangle-reglu til að virkja/slökkva á pakkamerkingareglum frá HA. Viðvörun: býr til eina einingu fyrir hverja Mangle-reglu.",
           "sensor_nat": "Rofi fyrir hverja NAT-reglu til að virkja/slökkva á reglum frá HA. Viðvörun: býr til eina einingu fyrir hverja NAT-reglu.",
           "sensor_netwatch_tracker": "Tvíundarskynjari fyrir hverja Netwatch-færslu sem sýnir aðgengileika.",
-          "sensor_port_tracker": "Tvíundarkynjari fyrir hvern port sem sýnir tengistöðu (tengd/ótengd).",
+          "sensor_port_tracker": "Tvíundarskynjari fyrir hvern port sem sýnir tengistöðu (tengd/ótengd).",
           "sensor_port_traffic": "4 skynjarar fyrir hvert viðmót (TX/RX bæti og samtölur). Viðvörun: býr til 4 einingar fyrir hvert viðmót — slökktu á ef umferðargröf eru ekki þörf.",
           "sensor_ppp": "Rofi fyrir hverja PPP secret (notanda) til að virkja/slökkva á VPN/PPPoE reikningum frá HA.",
-          "sensor_routing_rules": "Rofi fyrir hverja Routing Rule til að virkja/slökkva á stefnuleið reglum frá HA. Viðvörun: býr til eina einingu fyrir hverja leiðarreglu.",
+          "sensor_routing_rules": "Rofi fyrir hverja Routing Rule til að virkja/slökkva á stefnuleiðarreglum frá HA. Viðvörun: býr til eina einingu fyrir hverja leiðarreglu.",
           "sensor_scripts": "Hnappur fyrir hvert script til að keyra RouterOS script frá HA.",
           "sensor_simple_queues": "Rofi fyrir hverja Simple Queue-færslu til að virkja/slökkva á bandbreiddarhámarkum frá HA. Viðvörun: býr til eina einingu fyrir hverja biðraðarreglu.",
           "track_network_hosts": "Býr til tækjarakningareiningu fyrir hvert tæki sem sést í ARP/DHCP/þráðlausum töflum. Hvert rakið tæki býr til sérstakt HA-tæki. Viðvörun: á stórum netum getur þetta myndað hundruð tækja og eininga.",
@@ -110,7 +110,7 @@
         "data": {
           "name": "Heiti samþættingar",
           "host": "Hýsill",
-          "port": "Port",
+          "port": "Gátt",
           "username": "Notandanafn",
           "password": "Lykilorð",
           "ssl_mode": "Öryggistengingar"
@@ -193,10 +193,10 @@
           "sensor_mangle": "Rofi fyrir hverja Mangle-reglu til að virkja/slökkva á pakkamerkingareglum frá HA. Viðvörun: býr til eina einingu fyrir hverja Mangle-reglu.",
           "sensor_nat": "Rofi fyrir hverja NAT-reglu til að virkja/slökkva á reglum frá HA. Viðvörun: býr til eina einingu fyrir hverja NAT-reglu.",
           "sensor_netwatch_tracker": "Tvíundarskynjari fyrir hverja Netwatch-færslu sem sýnir aðgengileika.",
-          "sensor_port_tracker": "Tvíundarkynjari fyrir hvern port sem sýnir tengistöðu (tengd/ótengd).",
+          "sensor_port_tracker": "Tvíundarskynjari fyrir hvern port sem sýnir tengistöðu (tengd/ótengd).",
           "sensor_port_traffic": "4 skynjarar fyrir hvert viðmót (TX/RX bæti og samtölur). Viðvörun: býr til 4 einingar fyrir hvert viðmót — slökktu á ef umferðargröf eru ekki þörf.",
           "sensor_ppp": "Rofi fyrir hverja PPP secret (notanda) til að virkja/slökkva á VPN/PPPoE reikningum frá HA.",
-          "sensor_routing_rules": "Rofi fyrir hverja Routing Rule til að virkja/slökkva á stefnuleið reglum frá HA. Viðvörun: býr til eina einingu fyrir hverja leiðarreglu.",
+          "sensor_routing_rules": "Rofi fyrir hverja Routing Rule til að virkja/slökkva á stefnuleiðarreglum frá HA. Viðvörun: býr til eina einingu fyrir hverja leiðarreglu.",
           "sensor_scripts": "Hnappur fyrir hvert script til að keyra RouterOS script frá HA.",
           "sensor_simple_queues": "Rofi fyrir hverja Simple Queue-færslu til að virkja/slökkva á bandbreiddarhámarkum frá HA. Viðvörun: býr til eina einingu fyrir hverja biðraðarreglu.",
           "track_network_hosts": "Býr til tækjarakningareiningu fyrir hvert tæki sem sést í ARP/DHCP/þráðlausum töflum. Hvert rakið tæki býr til sérstakt HA-tæki. Viðvörun: á stórum netum getur þetta myndað hundruð tækja og eininga.",
@@ -218,7 +218,7 @@
     },
     "insufficient_permissions": {
       "title": "Ófullnægjandi API-heimildir fyrir {host}",
-      "description": "RouterOS notandinn **{username}** á beini **{host}** vantar eftirfarandi heimildir: `{missing}`.\n\nNokkrar samþættingaraðgerðir munu ekki virka (rotar, endurræsingarhnappurinn, sjálfvirk uppsetning Kid Control). Til að laga þetta skaltu bæta við heimildunum sem vantar í notendahópinn á beininum:\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
+      "description": "RouterOS notandinn **{username}** á beini **{host}** vantar eftirfarandi heimildir: `{missing}`.\n\nNokkrar samþættingaraðgerðir munu ekki virka (rofar, endurræsingarhnappurinn, sjálfvirk uppsetning Kid Control). Til að laga þetta skaltu bæta við heimildunum sem vantar í notendahópinn á beininum:\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {
@@ -229,8 +229,8 @@
   "selector": {
     "ssl_mode": {
       "options": {
-        "none": "Ekkert SSL — ódulkóðuð tenging (sjálfgefið, port 8728)",
-        "ssl": "SSL — dulkóðað, samþykkir sjálfundirrituð vottorð (port 8729)",
+        "none": "Ekkert SSL — ódulkóðuð tenging (sjálfgefið, gátt 8728)",
+        "ssl": "SSL — dulkóðað, samþykkir sjálfundirrituð vottorð (gátt 8729)",
         "ssl_verify": "SSL með staðfestingu — krefst gilds CA-undirritaðs vottorðs"
       }
     }
@@ -257,7 +257,7 @@
       "system_cpu_load": { "name": "CPU álag" },
       "system_memory_usage": { "name": "Minnisnotkun" },
       "system_hdd_usage": { "name": "Diskanotkun" },
-      "system_clients_wired": { "name": "Tengdir biðlarar" },
+      "system_clients_wired": { "name": "Þráðtengdir biðlarar" },
       "system_clients_wireless": { "name": "Þráðlausir biðlarar" },
       "system_captive_authorized": { "name": "Captive portal biðlarar" },
       "system_gps_latitude": { "name": "Breiddargráða" },

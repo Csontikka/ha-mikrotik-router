@@ -86,7 +86,7 @@
           "sensor_mangle": "Công tắc cho mỗi quy tắc Mangle để bật/tắt quy tắc đánh dấu gói tin từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc Mangle.",
           "sensor_nat": "Công tắc cho mỗi quy tắc NAT để bật/tắt quy tắc từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc NAT.",
           "sensor_netwatch_tracker": "Cảm biến nhị phân cho mỗi mục Netwatch hiển thị trạng thái có thể tiếp cận.",
-          "sensor_port_tracker": "Cảm biến nhị phân cho mỗi cổng hiển thị trạng thái kết nối (lên/xuống).",
+          "sensor_port_tracker": "Cảm biến nhị phân cho mỗi cổng hiển thị trạng thái kết nối (kết nối/mất kết nối).",
           "sensor_port_traffic": "4 cảm biến cho mỗi giao diện (byte TX/RX và tổng cộng). Cảnh báo: tạo 4 thực thể cho mỗi giao diện — tắt nếu không cần đồ thị lưu lượng.",
           "sensor_ppp": "Công tắc cho mỗi PPP secret (người dùng) để bật/tắt tài khoản VPN/PPPoE từ HA.",
           "sensor_routing_rules": "Công tắc cho mỗi Routing Rule để bật/tắt quy tắc định tuyến chính sách từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc định tuyến.",
@@ -142,7 +142,7 @@
           "scan_interval": "Khoảng thời gian quét",
           "track_iface_clients": "Hiển thị MAC và IP của máy khách trên giao diện",
           "unit_of_measurement": "Đơn vị đo",
-          "track_network_hosts_timeout": "Theo dõi thời gian chờ thiết bị mạng (giây)",
+          "track_network_hosts_timeout": "Thời gian chờ theo dõi thiết bị mạng (giây)",
           "zone": "Khu vực cho trình theo dõi thiết bị"
         },
         "data_description": {
@@ -193,7 +193,7 @@
           "sensor_mangle": "Công tắc cho mỗi quy tắc Mangle để bật/tắt quy tắc đánh dấu gói tin từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc Mangle.",
           "sensor_nat": "Công tắc cho mỗi quy tắc NAT để bật/tắt quy tắc từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc NAT.",
           "sensor_netwatch_tracker": "Cảm biến nhị phân cho mỗi mục Netwatch hiển thị trạng thái có thể tiếp cận.",
-          "sensor_port_tracker": "Cảm biến nhị phân cho mỗi cổng hiển thị trạng thái kết nối (lên/xuống).",
+          "sensor_port_tracker": "Cảm biến nhị phân cho mỗi cổng hiển thị trạng thái kết nối (kết nối/mất kết nối).",
           "sensor_port_traffic": "4 cảm biến cho mỗi giao diện (byte TX/RX và tổng cộng). Cảnh báo: tạo 4 thực thể cho mỗi giao diện — tắt nếu không cần đồ thị lưu lượng.",
           "sensor_ppp": "Công tắc cho mỗi PPP secret (người dùng) để bật/tắt tài khoản VPN/PPPoE từ HA.",
           "sensor_routing_rules": "Công tắc cho mỗi Routing Rule để bật/tắt quy tắc định tuyến chính sách từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc định tuyến.",
@@ -218,7 +218,7 @@
     },
     "insufficient_permissions": {
       "title": "Quyền API không đủ cho {host}",
-      "description": "Người dùng `{username}` đang kết nối với bộ định tuyến MikroTik tại {host} nhưng không có các quyền API cần thiết. Các quyền còn thiếu: `{missing}`\n\nĐể khắc phục quyền, hãy chạy lệnh sau trong terminal RouterOS:\n\n```\n/user group set full policy=local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,password,web,sniff,sensitive,api,romon,rest-api\n```"
+      "description": "Người dùng RouterOS **{username}** trên bộ định tuyến **{host}** thiếu các quyền sau: `{missing}`.\n\nMột số tính năng tích hợp sẽ không hoạt động (công tắc, nút khởi động lại, thiết lập tự động Kid Control). Để khắc phục, hãy thêm các chính sách còn thiếu vào nhóm người dùng trên bộ định tuyến:\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {

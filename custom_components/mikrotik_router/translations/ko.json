@@ -35,7 +35,7 @@
         "description": "통합 환경설정",
         "data": {
           "scan_interval": "스캔 간격(초)",
-          "track_network_hosts_timeout": "네트워크 기기 시간 초과 추적(초)",
+          "track_network_hosts_timeout": "네트워크 기기 추적 시간 초과(초)",
           "zone": "기기 추적기용 지역"
         },
         "data_description": {
@@ -121,7 +121,7 @@
       }
     },
     "error": {
-      "name_exists": "존재하는 이름입니다.",
+      "name_exists": "이름이 이미 존재합니다.",
       "cannot_connect": "Mikrotik에 연결할 수 없습니다.",
       "ssl_handshake_failure": "SSL 핸드셰이크 실패",
       "connection_timeout": "Mikrotik 연결 시간이 초과되었습니다.",
@@ -142,7 +142,7 @@
           "scan_interval": "스캔 간격",
           "track_iface_clients": "인터페이스에 클라이언트 MAC 및 IP 표시",
           "unit_of_measurement": "측정 단위",
-          "track_network_hosts_timeout": "네트워크 기기 시간 초과 추적(초)",
+          "track_network_hosts_timeout": "네트워크 기기 추적 시간 초과(초)",
           "zone": "기기 추적기용 지역"
         },
         "data_description": {
@@ -218,7 +218,7 @@
     },
     "insufficient_permissions": {
       "title": "{host}에 대한 API 권한 부족",
-      "description": "사용자 `{username}`이(가) {host}의 MikroTik 라우터에 연결 중이지만 필요한 API 권한이 없습니다. 누락된 권한: `{missing}`\n\n권한을 수정하려면 RouterOS 터미널에서 다음 명령을 실행하세요:\n\n```\n/user group set full policy=local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,password,web,sniff,sensitive,api,romon,rest-api\n```"
+      "description": "RouterOS 사용자 **{username}**이(가) 라우터 **{host}**에서 다음 권한이 없습니다: `{missing}`.\n\n일부 통합 기능이 작동하지 않습니다(스위치, 재시작 버튼, Kid Control 자동 설정). 이를 수정하려면 라우터의 사용자 그룹에 누락된 정책을 추가하세요:\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {

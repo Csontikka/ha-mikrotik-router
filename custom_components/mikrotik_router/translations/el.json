@@ -17,9 +17,9 @@
       },
       "user": {
         "title": "Ρύθμιση του Mikrotik Router",
-        "description": "Ολοκλήρωση εγκατάστασης Mikrotik Router.",
+        "description": "Ενσωμάτωση εγκατάστασης Mikrotik Router.",
         "data": {
-          "name": "Όνομα ολοκλήρωσης",
+          "name": "Όνομα ενσωμάτωσης",
           "host": "Εξυπηρετητής",
           "port": "Θύρα",
           "username": "Όνομα χρήστη",
@@ -32,7 +32,7 @@
       },
       "basic_options": {
         "title": "Ρύθμιση Mikrotik Router (2/4)",
-        "description": "Διαμόρφωση ολοκλήρωσης",
+        "description": "Διαμόρφωση ενσωμάτωσης",
         "data": {
           "scan_interval": "Διάστημα σάρωσης (δευτερόλεπτα)",
           "track_network_hosts_timeout": "Χρονικό όριο ανίχνευσης συσκευών δικτύου (δευτερόλεπτα)",
@@ -60,7 +60,7 @@
         "data": {
           "sensor_client_captive": "Δεδομένα captive portal",
           "sensor_client_traffic": "Αισθητήρες κίνησης πελατών",
-          "sensor_containers": "Αισθητήρες εμπορευματοκιβωτίων",
+          "sensor_containers": "Αισθητήρες container",
           "sensor_environment": "Αισθητήρες μεταβλητών περιβάλλοντος",
           "sensor_filter": "Διακόπτες φίλτρου",
           "sensor_kidcontrol": "Γονικός έλεγχος",
@@ -106,9 +106,9 @@
       },
       "reconfigure": {
         "title": "Επαναρύθμιση Mikrotik Router",
-        "description": "Ενημέρωση ρυθμίσεων σύνδεσης για αυτήν την ολοκλήρωση.",
+        "description": "Ενημέρωση ρυθμίσεων σύνδεσης για αυτήν την ενσωμάτωση.",
         "data": {
-          "name": "Όνομα ολοκλήρωσης",
+          "name": "Όνομα ενσωμάτωσης",
           "host": "Εξυπηρετητής",
           "port": "Θύρα",
           "username": "Όνομα χρήστη",
@@ -124,7 +124,7 @@
       "name_exists": "Το όνομα υπάρχει ήδη.",
       "cannot_connect": "Αδυναμία σύνδεσης στον Mikrotik.",
       "ssl_handshake_failure": "Αποτυχία χειραψίας SSL",
-      "connection_timeout": "Διακοπή σύνδεσης με Mikrotik.",
+      "connection_timeout": "Λήξη χρονικού ορίου σύνδεσης με Mikrotik.",
       "wrong_login": "Το όνομα χρήστη και ο κωδικός πρόσβασης δεν είναι έγκυρα.",
       "ssl_verify_failure": "Αποτυχία επαλήθευσης πιστοποιητικού",
       "no_devices_found": "Δεν βρέθηκαν δρομολογητές MikroTik σε αυτό το δίκτυο. Εισάγετε τη διεύθυνση του δρομολογητή χειροκίνητα."
@@ -151,7 +151,7 @@
           "zone": "Όνομα ζώνης Home Assistant για χρήση όταν μια παρακολουθούμενη συσκευή συνδέεται. Προεπιλογή: home."
         },
         "title": "Επιλογές Mikrotik Router (1/3)",
-        "description": "Διαμόρφωση ολοκλήρωσης"
+        "description": "Διαμόρφωση ενσωμάτωσης"
       },
       "sensor_mode": {
         "data": {
@@ -167,7 +167,7 @@
         "data": {
           "sensor_client_captive": "Δεδομένα captive portal",
           "sensor_client_traffic": "Αισθητήρες κίνησης πελατών",
-          "sensor_containers": "Αισθητήρες εμπορευματοκιβωτίων",
+          "sensor_containers": "Αισθητήρες container",
           "sensor_environment": "Αισθητήρες μεταβλητών περιβάλλοντος",
           "sensor_filter": "Διακόπτες φίλτρου",
           "sensor_kidcontrol": "Γονικός έλεγχος",

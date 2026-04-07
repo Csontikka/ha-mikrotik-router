@@ -16,7 +16,7 @@
         }
       },
       "user": {
-        "title": "मिकरोटिक राउटर सेट करें",
+        "title": "Mikrotik Router सेट करें",
         "description": "Mikrotik राउटर इन्टीग्रेशन सेट अप करें।",
         "data": {
           "name": "इन्टीग्रेशन का नाम",
@@ -61,7 +61,7 @@
           "sensor_client_captive": "कैप्टिव पोर्टल डेटा",
           "sensor_client_traffic": "क्लाइंट ट्रैफ़िक सेंसर",
           "sensor_containers": "कंटेनर सेंसर",
-          "sensor_environment": "पारिस्थितिक वेरिएबल सेंसर",
+          "sensor_environment": "एनवायरनमेंट वेरिएबल सेंसर",
           "sensor_filter": "फ़िल्टर स्विच",
           "sensor_kidcontrol": "बच्चों का नियंत्रण",
           "sensor_mangle": "Mangle स्विच",
@@ -122,8 +122,8 @@
     },
     "error": {
       "name_exists": "नाम पहले से मौजूद है।",
-      "cannot_connect": "Mikrotik से कनेक्ट नही कर सकते।",
-      "ssl_handshake_failure": "SSL हैन्डशेक विफ़ल हो गया",
+      "cannot_connect": "Mikrotik से कनेक्ट नहीं कर सकते।",
+      "ssl_handshake_failure": "SSL हैंडशेक विफल हो गया",
       "connection_timeout": "Mikrotik कनेक्शन टाइम आउट हो गया।",
       "wrong_login": "अमान्य उपयोगकर्ता नाम या पासवर्ड।",
       "ssl_verify_failure": "प्रमाणपत्र सत्यापन विफल",
@@ -140,7 +140,7 @@
       "basic_options": {
         "data": {
           "scan_interval": "स्कैन अन्तराल",
-          "track_iface_clients": "ग्राहक का MAC और IP इन्टरफ़ेस पर दिखाएं",
+          "track_iface_clients": "क्लाइंट का MAC और IP इन्टरफ़ेस पर दिखाएं",
           "unit_of_measurement": "माप का युनीट",
           "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)",
           "zone": "डिवाइस ट्रैकर के लिए ज़ोन"
@@ -168,7 +168,7 @@
           "sensor_client_captive": "कैप्टिव पोर्टल डेटा",
           "sensor_client_traffic": "क्लाइंट ट्रैफ़िक सेंसर",
           "sensor_containers": "कंटेनर सेंसर",
-          "sensor_environment": "पारिस्थितिक वेरिएबल सेंसर",
+          "sensor_environment": "एनवायरनमेंट वेरिएबल सेंसर",
           "sensor_filter": "फ़िल्टर स्विच",
           "sensor_kidcontrol": "बच्चों का नियंत्रण",
           "sensor_mangle": "Mangle स्विच",
@@ -218,7 +218,7 @@
     },
     "insufficient_permissions": {
       "title": "{host} के लिए अपर्याप्त API अनुमतियाँ",
-      "description": "उपयोगकर्ता `{username}` {host} पर MikroTik राउटर से कनेक्ट हो रहा है लेकिन आवश्यक API अनुमतियाँ नहीं हैं। अनुपस्थित अनुमतियाँ: `{missing}`\n\nअनुमतियाँ ठीक करने के लिए RouterOS टर्मिनल में यह कमांड चलाएं:\n\n```\n/user group set full policy=local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,password,web,sniff,sensitive,api,romon,rest-api\n```"
+      "description": "RouterOS उपयोगकर्ता **{username}** राउटर **{host}** पर निम्नलिखित अनुमतियाँ नहीं हैं: `{missing}`।\n\nकुछ इंटीग्रेशन सुविधाएं काम नहीं करेंगी (स्विच, रीबूट बटन, Kid Control स्वचालित सेटअप)। इसे ठीक करने के लिए, राउटर पर उपयोगकर्ता समूह में अनुपस्थित नीतियाँ जोड़ें:\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {

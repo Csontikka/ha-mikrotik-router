@@ -58,7 +58,7 @@
         "title": "Konfiguracja Mikrotik Router (4/4)",
         "description": "Włącz czujniki i przełączniki",
         "data": {
-          "sensor_client_captive": "Dane portalu przechwytywania",
+          "sensor_client_captive": "Dane captive portal",
           "sensor_client_traffic": "Czujniki ruchu klienta",
           "sensor_containers": "Czujniki kontenerów",
           "sensor_environment": "Czujniki zmiennych środowiskowych",
@@ -86,7 +86,7 @@
           "sensor_mangle": "Przełącznik na regułę Mangle do włączania/wyłączania reguł oznaczania pakietów z HA. Uwaga: tworzy jedną encję na regułę Mangle.",
           "sensor_nat": "Przełącznik na regułę NAT do włączania/wyłączania reguł z HA. Uwaga: tworzy jedną encję na regułę NAT.",
           "sensor_netwatch_tracker": "Czujnik binarny na wpis Netwatch pokazujący stan osiągalności.",
-          "sensor_port_tracker": "Czujnik binarny na port pokazujący stan łącza (góra/dół).",
+          "sensor_port_tracker": "Czujnik binarny na port pokazujący stan łącza (aktywny/nieaktywny).",
           "sensor_port_traffic": "4 czujniki na interfejs (bajty TX/RX i sumy). Uwaga: tworzy 4 encje na interfejs — wyłącz jeśli wykresy ruchu nie są potrzebne.",
           "sensor_ppp": "Przełącznik na sekret PPP (użytkownika) do włączania/wyłączania kont VPN/PPPoE z HA.",
           "sensor_routing_rules": "Przełącznik na regułę routingu do włączania/wyłączania reguł routingu polityki z HA. Uwaga: tworzy jedną encję na regułę routingu.",
@@ -142,7 +142,7 @@
           "scan_interval": "Częstotliwość skanowania",
           "track_iface_clients": "Pokaż w interfejsach adres MAC i IP klienta",
           "unit_of_measurement": "Jednostka miary",
-          "track_network_hosts_timeout": "Śledź limity czasu dla urządzeń sieciowych (sekundy)",
+          "track_network_hosts_timeout": "Limit czasu śledzenia urządzeń sieciowych (sekundy)",
           "zone": "Strefa programu do śledzenia urządzeń"
         },
         "data_description": {
@@ -165,7 +165,7 @@
       },
       "sensor_select": {
         "data": {
-          "sensor_client_captive": "Dane portalu przechwytywania",
+          "sensor_client_captive": "Dane captive portal",
           "sensor_client_traffic": "Czujniki ruchu klienta",
           "sensor_containers": "Czujniki kontenerów",
           "sensor_environment": "Czujniki zmiennych środowiskowych",
@@ -193,7 +193,7 @@
           "sensor_mangle": "Przełącznik na regułę Mangle do włączania/wyłączania reguł oznaczania pakietów z HA. Uwaga: tworzy jedną encję na regułę Mangle.",
           "sensor_nat": "Przełącznik na regułę NAT do włączania/wyłączania reguł z HA. Uwaga: tworzy jedną encję na regułę NAT.",
           "sensor_netwatch_tracker": "Czujnik binarny na wpis Netwatch pokazujący stan osiągalności.",
-          "sensor_port_tracker": "Czujnik binarny na port pokazujący stan łącza (góra/dół).",
+          "sensor_port_tracker": "Czujnik binarny na port pokazujący stan łącza (aktywny/nieaktywny).",
           "sensor_port_traffic": "4 czujniki na interfejs (bajty TX/RX i sumy). Uwaga: tworzy 4 encje na interfejs — wyłącz jeśli wykresy ruchu nie są potrzebne.",
           "sensor_ppp": "Przełącznik na sekret PPP (użytkownika) do włączania/wyłączania kont VPN/PPPoE z HA.",
           "sensor_routing_rules": "Przełącznik na regułę routingu do włączania/wyłączania reguł routingu polityki z HA. Uwaga: tworzy jedną encję na regułę routingu.",

@@ -123,9 +123,9 @@
     "error": {
       "name_exists": "Bu ad zaten var.",
       "cannot_connect": "Mikrotik'e bağlanılamıyor.",
-      "ssl_handshake_failure": "SSL uyuşma hatası",
+      "ssl_handshake_failure": "SSL el sıkışma hatası",
       "connection_timeout": "Mikrotik bağlantısı zaman aşımı.",
-      "wrong_login": "Geçersiz kullanıcı adı veya şifresi.",
+      "wrong_login": "Geçersiz kullanıcı adı veya şifre.",
       "ssl_verify_failure": "Sertifika doğrulaması başarısız",
       "no_devices_found": "Bu ağda MikroTik yönlendirici bulunamadı. Yönlendirici adresini manuel olarak girin."
     },
@@ -140,7 +140,7 @@
       "basic_options": {
         "data": {
           "scan_interval": "Tarama aralığı",
-          "track_iface_clients": "Müşteri MAC'ini ve IP'sini arayüzlerde göster",
+          "track_iface_clients": "İstemci MAC ve IP adresini arayüzlerde göster",
           "unit_of_measurement": "Ölçü birimi",
           "track_network_hosts_timeout": "Ağ cihazı izleme zaman aşımı (saniyeler)",
           "zone": "Cihaz izleyici için alan"
@@ -218,7 +218,7 @@
     },
     "insufficient_permissions": {
       "title": "{host} için yetersiz API izinleri",
-      "description": "`{username}` kullanıcısı {host} adresindeki MikroTik yönlendiriciye bağlanıyor ancak gerekli API izinlerine sahip değil. Eksik izinler: `{missing}`\n\nİzinleri düzeltmek için RouterOS terminalinde şu komutu çalıştırın:\n\n```\n/user group set full policy=local,telnet,ssh,ftp,reboot,read,write,policy,test,winbox,password,web,sniff,sensitive,api,romon,rest-api\n```"
+      "description": "RouterOS kullanıcısı **{username}**, **{host}** yönlendiricisinde şu izinlere sahip değil: `{missing}`.\n\nBazı entegrasyon özellikleri çalışmayacak (anahtarlar, yeniden başlatma düğmesi, Kid Control otomatik kurulumu). Bunu düzeltmek için yönlendiricide kullanıcı grubuna eksik politikaları ekleyin:\n```\n/user/group/set [find name=<group>] policy=read,write,api,reboot,policy,test,sensitive\n```"
     }
   },
   "exceptions": {

@@ -16,8 +16,8 @@
         }
       },
       "user": {
-        "title": "Configurare il Mikrotik Router",
-        "description": "Imposta integrazione Mikrotik Router",
+        "title": "Configura il Mikrotik Router",
+        "description": "Imposta l'integrazione Mikrotik Router",
         "data": {
           "name": "Nome integrazione",
           "host": "Host",
@@ -32,7 +32,7 @@
       },
       "basic_options": {
         "title": "Configurazione Mikrotik Router (2/4)",
-        "description": "Configura integrazione",
+        "description": "Configura l'integrazione",
         "data": {
           "scan_interval": "Intervallo scansione (secondi)",
           "track_network_hosts_timeout": "Timeout tracciamento dispositivi di rete (secondi)",
@@ -61,7 +61,7 @@
           "sensor_client_captive": "Dati portale captive",
           "sensor_client_traffic": "Sensori di traffico del client",
           "sensor_containers": "Sensori container",
-          "sensor_environment": "Sensori di variabili ambientali",
+          "sensor_environment": "Sensori di variabili d'ambiente",
           "sensor_filter": "Interruttori del filtro",
           "sensor_kidcontrol": "Controllo genitori",
           "sensor_mangle": "Interruttori Mangle",
@@ -86,7 +86,7 @@
           "sensor_mangle": "Interruttore per ogni regola Mangle per abilitare/disabilitare le regole di marcatura pacchetti da HA. Attenzione: crea un'entità per ogni regola Mangle.",
           "sensor_nat": "Interruttore per ogni regola NAT per abilitare/disabilitare le regole da HA. Attenzione: crea un'entità per ogni regola NAT.",
           "sensor_netwatch_tracker": "Sensore binario per ogni voce Netwatch che mostra lo stato di raggiungibilità.",
-          "sensor_port_tracker": "Sensore binario per ogni porta che mostra lo stato del collegamento (su/giù).",
+          "sensor_port_tracker": "Sensore binario per ogni porta che mostra lo stato del collegamento (attivo/inattivo).",
           "sensor_port_traffic": "4 sensori per interfaccia (byte TX/RX e totali). Attenzione: crea 4 entità per interfaccia — disabilita se i grafici di traffico non sono necessari.",
           "sensor_ppp": "Interruttore per ogni segreto PPP (utente) per abilitare/disabilitare account VPN/PPPoE da HA.",
           "sensor_routing_rules": "Interruttore per ogni Routing Rule per abilitare/disabilitare le regole di routing da HA. Attenzione: crea un'entità per ogni regola di routing.",
@@ -140,9 +140,9 @@
       "basic_options": {
         "data": {
           "scan_interval": "Intervallo scansione",
-          "track_iface_clients": "Mostra client MAC e IP sulle interfacce",
+          "track_iface_clients": "Mostra MAC e IP del client sulle interfacce",
           "unit_of_measurement": "Unità di misura",
-          "track_network_hosts_timeout": "Traccia timeout dei dispositivi di rete (secondi)",
+          "track_network_hosts_timeout": "Timeout tracciamento dispositivi di rete (secondi)",
           "zone": "Zona per localizzatore dispositivo"
         },
         "data_description": {
@@ -151,7 +151,7 @@
           "zone": "Nome della zona di Home Assistant da usare quando un dispositivo tracciato è connesso. Predefinito: home."
         },
         "title": "Opzioni Mikrotik Router (1/3)",
-        "description": "Configura integrazione"
+        "description": "Configura l'integrazione"
       },
       "sensor_mode": {
         "data": {
@@ -168,7 +168,7 @@
           "sensor_client_captive": "Dati portale captive",
           "sensor_client_traffic": "Sensori di traffico del client",
           "sensor_containers": "Sensori container",
-          "sensor_environment": "Sensori di variabili ambientali",
+          "sensor_environment": "Sensori di variabili d'ambiente",
           "sensor_filter": "Interruttori del filtro",
           "sensor_kidcontrol": "Controllo genitori",
           "sensor_mangle": "Interruttori Mangle",
@@ -193,7 +193,7 @@
           "sensor_mangle": "Interruttore per ogni regola Mangle per abilitare/disabilitare le regole di marcatura pacchetti da HA. Attenzione: crea un'entità per ogni regola Mangle.",
           "sensor_nat": "Interruttore per ogni regola NAT per abilitare/disabilitare le regole da HA. Attenzione: crea un'entità per ogni regola NAT.",
           "sensor_netwatch_tracker": "Sensore binario per ogni voce Netwatch che mostra lo stato di raggiungibilità.",
-          "sensor_port_tracker": "Sensore binario per ogni porta che mostra lo stato del collegamento (su/giù).",
+          "sensor_port_tracker": "Sensore binario per ogni porta che mostra lo stato del collegamento (attivo/inattivo).",
           "sensor_port_traffic": "4 sensori per interfaccia (byte TX/RX e totali). Attenzione: crea 4 entità per interfaccia — disabilita se i grafici di traffico non sono necessari.",
           "sensor_ppp": "Interruttore per ogni segreto PPP (utente) per abilitare/disabilitare account VPN/PPPoE da HA.",
           "sensor_routing_rules": "Interruttore per ogni Routing Rule per abilitare/disabilitare le regole di routing da HA. Attenzione: crea un'entità per ogni regola di routing.",

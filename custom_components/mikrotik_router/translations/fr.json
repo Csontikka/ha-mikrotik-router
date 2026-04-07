@@ -56,44 +56,44 @@
       },
       "sensor_select": {
         "title": "Configuration Mikrotik Router (4/4)",
-        "description": "Activer les capteurs et les commutateurs",
+        "description": "Activer les capteurs et les interrupteurs",
         "data": {
           "sensor_client_captive": "Données du portail captif",
           "sensor_client_traffic": "Capteurs de trafic de clients",
           "sensor_containers": "Capteurs de conteneurs",
           "sensor_environment": "Capteurs de variables d'environnement",
-          "sensor_filter": "Commutateurs de filtrage",
+          "sensor_filter": "Interrupteurs de filtrage",
           "sensor_kidcontrol": "Contrôle parental",
-          "sensor_mangle": "Commutateurs Mangle",
-          "sensor_nat": "Commutateurs NAT",
+          "sensor_mangle": "Interrupteurs Mangle",
+          "sensor_nat": "Interrupteurs NAT",
           "sensor_netwatch_tracker": "Capteurs Netwatch",
           "sensor_port_tracker": "Capteurs d'état des interfaces",
           "sensor_port_traffic": "Capteurs de trafic par interface",
           "sensor_ppp": "Utilisateurs PPP",
-          "sensor_routing_rules": "Commutateurs Routing Rules",
-          "sensor_scripts": "Commutateurs de scripts",
-          "sensor_simple_queues": "Commutateurs de files d'attente simples",
+          "sensor_routing_rules": "Interrupteurs Routing Rules",
+          "sensor_scripts": "Interrupteurs de scripts",
+          "sensor_simple_queues": "Interrupteurs de files d'attente simples",
           "track_network_hosts": "Suivre les appareils du réseau",
           "sensor_wireguard": "Capteurs WireGuard peer"
         },
         "data_description": {
           "sensor_client_captive": "Ajoute le statut d'autorisation hotspot aux appareils suivis. Utile uniquement si un portail captif (hotspot) est configuré.",
           "sensor_client_traffic": "2 capteurs par appareil suivi (vitesse TX/RX). Nécessite RouterOS 7 avec Kid Control — l'intégration crée automatiquement un profil 'ha-monitoring' sur le routeur lors de l'activation. Les capteurs n'apparaissent que pour les appareils activement suivis par Kid Control. Remarque : RouterOS 6 n'est pas pris en charge.",
-          "sensor_containers": "Capteur et commutateur par conteneur pour surveiller et démarrer/arrêter des conteneurs de type Docker.",
+          "sensor_containers": "Capteur et interrupteur par conteneur pour surveiller et démarrer/arrêter des conteneurs de type Docker.",
           "sensor_environment": "Capteurs pour les variables d'environnement RouterOS.",
-          "sensor_filter": "Commutateur par règle de filtre pour activer/désactiver les règles de filtre pare-feu depuis HA. Attention : crée une entité par règle de filtre.",
-          "sensor_kidcontrol": "Commutateurs pour les profils d'appareils Kid Control (pause/reprise de l'accès Internet).",
-          "sensor_mangle": "Commutateur par règle Mangle pour activer/désactiver les règles de marquage de paquets depuis HA. Attention : crée une entité par règle Mangle.",
-          "sensor_nat": "Commutateur par règle NAT pour activer/désactiver les règles depuis HA. Attention : crée une entité par règle NAT.",
+          "sensor_filter": "Interrupteur par règle de filtre pour activer/désactiver les règles de filtre pare-feu depuis HA. Attention : crée une entité par règle de filtre.",
+          "sensor_kidcontrol": "Interrupteurs pour les profils d'appareils Kid Control (pause/reprise de l'accès Internet).",
+          "sensor_mangle": "Interrupteur par règle Mangle pour activer/désactiver les règles de marquage de paquets depuis HA. Attention : crée une entité par règle Mangle.",
+          "sensor_nat": "Interrupteur par règle NAT pour activer/désactiver les règles depuis HA. Attention : crée une entité par règle NAT.",
           "sensor_netwatch_tracker": "Capteur binaire par entrée Netwatch indiquant le statut d'accessibilité.",
-          "sensor_port_tracker": "Capteur binaire par port indiquant l'état de liaison montante/descendante.",
+          "sensor_port_tracker": "Capteur binaire par port indiquant l'état du lien (actif/inactif).",
           "sensor_port_traffic": "4 capteurs par interface (octets TX/RX et totaux). Attention : crée 4 entités par interface — désactiver si les graphiques de trafic ne sont pas nécessaires.",
-          "sensor_ppp": "Commutateur par secret PPP (utilisateur) pour activer/désactiver les comptes VPN/PPPoE depuis HA.",
-          "sensor_routing_rules": "Commutateur par règle de routage pour activer/désactiver les règles de routage par politique depuis HA. Attention : crée une entité par règle de routage.",
+          "sensor_ppp": "Interrupteur par secret PPP (utilisateur) pour activer/désactiver les comptes VPN/PPPoE depuis HA.",
+          "sensor_routing_rules": "Interrupteur par règle de routage pour activer/désactiver les règles de routage par politique depuis HA. Attention : crée une entité par règle de routage.",
           "sensor_scripts": "Bouton par script pour déclencher des scripts RouterOS depuis HA.",
-          "sensor_simple_queues": "Commutateur par entrée Simple Queue pour activer/désactiver les limitations de bande passante depuis HA. Attention : crée une entité par règle de file d'attente.",
+          "sensor_simple_queues": "Interrupteur par entrée Simple Queue pour activer/désactiver les limitations de bande passante depuis HA. Attention : crée une entité par règle de file d'attente.",
           "track_network_hosts": "Crée une entité de suivi d'appareil pour chaque appareil visible dans les tables ARP/DHCP/sans fil. Chaque appareil suivi crée un appareil HA distinct. Attention : sur les grands réseaux, cela peut générer des centaines d'appareils et d'entités.",
-          "sensor_wireguard": "Capteurs par pair WireGuard (dernier handshake, transfert, point de terminaison)."
+          "sensor_wireguard": "Capteurs par peer WireGuard (dernier handshake, transfert, point de terminaison)."
         }
       },
       "reauth_confirm": {
@@ -142,7 +142,7 @@
           "scan_interval": "Intervalle d'analyse",
           "track_iface_clients": "Afficher l'IP et le MAC du client sur les interfaces",
           "unit_of_measurement": "Unité de mesure",
-          "track_network_hosts_timeout": "Suivre l'expiration des appareils du réseau (secondes)",
+          "track_network_hosts_timeout": "Délai d'expiration du suivi des appareils réseau (secondes)",
           "zone": "Zone pour le traceur d'appareil"
         },
         "data_description": {
@@ -158,7 +158,7 @@
           "sensor_preset": "Préréglage capteurs"
         },
         "data_description": {
-          "sensor_preset": "Sélectionnez un préréglage pour configurer rapidement les capteurs et commutateurs activés, ou choisissez Personnalisé pour configurer individuellement."
+          "sensor_preset": "Sélectionnez un préréglage pour configurer rapidement les capteurs et interrupteurs activés, ou choisissez Personnalisé pour configurer individuellement."
         },
         "title": "Options Mikrotik Router (2/3)",
         "description": "Sélectionner un préréglage capteurs"
@@ -169,41 +169,41 @@
           "sensor_client_traffic": "Capteurs de trafic de clients",
           "sensor_containers": "Capteurs de conteneurs",
           "sensor_environment": "Capteurs de variables d'environnement",
-          "sensor_filter": "Commutateurs de filtrage",
+          "sensor_filter": "Interrupteurs de filtrage",
           "sensor_kidcontrol": "Contrôle parental",
-          "sensor_mangle": "Commutateurs Mangle",
-          "sensor_nat": "Commutateurs NAT",
+          "sensor_mangle": "Interrupteurs Mangle",
+          "sensor_nat": "Interrupteurs NAT",
           "sensor_netwatch_tracker": "Capteurs Netwatch",
           "sensor_port_tracker": "Capteurs d'état des interfaces",
           "sensor_port_traffic": "Capteurs de trafic par interface",
           "sensor_ppp": "Utilisateurs PPP",
-          "sensor_routing_rules": "Commutateurs Routing Rules",
-          "sensor_scripts": "Commutateurs de scripts",
-          "sensor_simple_queues": "Commutateurs de files d'attente simples",
+          "sensor_routing_rules": "Interrupteurs Routing Rules",
+          "sensor_scripts": "Interrupteurs de scripts",
+          "sensor_simple_queues": "Interrupteurs de files d'attente simples",
           "track_network_hosts": "Suivre les appareils du réseau",
           "sensor_wireguard": "Capteurs WireGuard peer"
         },
         "data_description": {
           "sensor_client_captive": "Ajoute le statut d'autorisation hotspot aux appareils suivis. Utile uniquement si un portail captif (hotspot) est configuré.",
           "sensor_client_traffic": "2 capteurs par appareil suivi (vitesse TX/RX). Nécessite RouterOS 7 avec Kid Control — l'intégration crée automatiquement un profil 'ha-monitoring' sur le routeur lors de l'activation. Les capteurs n'apparaissent que pour les appareils activement suivis par Kid Control. Remarque : RouterOS 6 n'est pas pris en charge.",
-          "sensor_containers": "Capteur et commutateur par conteneur pour surveiller et démarrer/arrêter des conteneurs de type Docker.",
+          "sensor_containers": "Capteur et interrupteur par conteneur pour surveiller et démarrer/arrêter des conteneurs de type Docker.",
           "sensor_environment": "Capteurs pour les variables d'environnement RouterOS.",
-          "sensor_filter": "Commutateur par règle de filtre pour activer/désactiver les règles de filtre pare-feu depuis HA. Attention : crée une entité par règle de filtre.",
-          "sensor_kidcontrol": "Commutateurs pour les profils d'appareils Kid Control (pause/reprise de l'accès Internet).",
-          "sensor_mangle": "Commutateur par règle Mangle pour activer/désactiver les règles de marquage de paquets depuis HA. Attention : crée une entité par règle Mangle.",
-          "sensor_nat": "Commutateur par règle NAT pour activer/désactiver les règles depuis HA. Attention : crée une entité par règle NAT.",
+          "sensor_filter": "Interrupteur par règle de filtre pour activer/désactiver les règles de filtre pare-feu depuis HA. Attention : crée une entité par règle de filtre.",
+          "sensor_kidcontrol": "Interrupteurs pour les profils d'appareils Kid Control (pause/reprise de l'accès Internet).",
+          "sensor_mangle": "Interrupteur par règle Mangle pour activer/désactiver les règles de marquage de paquets depuis HA. Attention : crée une entité par règle Mangle.",
+          "sensor_nat": "Interrupteur par règle NAT pour activer/désactiver les règles depuis HA. Attention : crée une entité par règle NAT.",
           "sensor_netwatch_tracker": "Capteur binaire par entrée Netwatch indiquant le statut d'accessibilité.",
-          "sensor_port_tracker": "Capteur binaire par port indiquant l'état de liaison montante/descendante.",
+          "sensor_port_tracker": "Capteur binaire par port indiquant l'état du lien (actif/inactif).",
           "sensor_port_traffic": "4 capteurs par interface (octets TX/RX et totaux). Attention : crée 4 entités par interface — désactiver si les graphiques de trafic ne sont pas nécessaires.",
-          "sensor_ppp": "Commutateur par secret PPP (utilisateur) pour activer/désactiver les comptes VPN/PPPoE depuis HA.",
-          "sensor_routing_rules": "Commutateur par règle de routage pour activer/désactiver les règles de routage par politique depuis HA. Attention : crée une entité par règle de routage.",
+          "sensor_ppp": "Interrupteur par secret PPP (utilisateur) pour activer/désactiver les comptes VPN/PPPoE depuis HA.",
+          "sensor_routing_rules": "Interrupteur par règle de routage pour activer/désactiver les règles de routage par politique depuis HA. Attention : crée une entité par règle de routage.",
           "sensor_scripts": "Bouton par script pour déclencher des scripts RouterOS depuis HA.",
-          "sensor_simple_queues": "Commutateur par entrée Simple Queue pour activer/désactiver les limitations de bande passante depuis HA. Attention : crée une entité par règle de file d'attente.",
+          "sensor_simple_queues": "Interrupteur par entrée Simple Queue pour activer/désactiver les limitations de bande passante depuis HA. Attention : crée une entité par règle de file d'attente.",
           "track_network_hosts": "Crée une entité de suivi d'appareil pour chaque appareil visible dans les tables ARP/DHCP/sans fil. Chaque appareil suivi crée un appareil HA distinct. Attention : sur les grands réseaux, cela peut générer des centaines d'appareils et d'entités.",
-          "sensor_wireguard": "Capteurs par pair WireGuard (dernier handshake, transfert, point de terminaison)."
+          "sensor_wireguard": "Capteurs par peer WireGuard (dernier handshake, transfert, point de terminaison)."
         },
         "title": "Options Mikrotik Router (3/3)",
-        "description": "Activer les capteurs et les commutateurs"
+        "description": "Activer les capteurs et les interrupteurs"
       }
     }
   },
