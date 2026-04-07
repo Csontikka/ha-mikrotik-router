@@ -197,7 +197,7 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
 > **\*RouterOS 6 is not officially supported.** Basic features may still work, but v6 is not tested or maintained. Upgrade to RouterOS 7 is strongly recommended.
 >
-> Active development and testing is done on a **MikroTik hAP ax³** running the latest stable RouterOS 7.
+> Active development and testing is done on a **MikroTik hAP ax³** running the latest stable RouterOS 7 and a **Cloud Hosted Router (CHR)** virtual instance.
 
 ## Installation
 
