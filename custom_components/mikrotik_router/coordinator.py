@@ -715,6 +715,24 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 if async_delete_issue is not None:
                     async_delete_issue(self.hass, DOMAIN, "wrong_credentials")
                     async_delete_issue(self.hass, DOMAIN, "ssl_error")
+                if async_create_issue is not None:
+                    missing = self.ds.get("access_missing", [])
+                    if missing:
+                        async_create_issue(
+                            self.hass,
+                            DOMAIN,
+                            "insufficient_permissions",
+                            is_fixable=False,
+                            severity=IssueSeverity.WARNING,
+                            translation_key="insufficient_permissions",
+                            translation_placeholders={
+                                "host": self.host,
+                                "username": self.config_entry.data[CONF_USERNAME],
+                                "missing": ", ".join(missing),
+                            },
+                        )
+                    else:
+                        async_delete_issue(self.hass, DOMAIN, "insufficient_permissions")
 
         await self.hass.async_add_executor_job(self.get_system_resource)
 
@@ -868,18 +886,18 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 tmp_user[self.config_entry.data[CONF_USERNAME]]["group"]
             ]["policy"].split(",")
 
+        required = ("write", "policy", "reboot", "test")
+        missing = [p for p in required if p not in self.ds["access"]]
+        self.ds["access_missing"] = missing
+
         if not self.accessrights_reported:
             self.accessrights_reported = True
-            if (
-                "write" not in self.ds["access"]
-                or "policy" not in self.ds["access"]
-                or "reboot" not in self.ds["access"]
-                or "test" not in self.ds["access"]
-            ):
+            if missing:
                 _LOGGER.warning(
-                    "Mikrotik %s user %s does not have sufficient access rights. Integration functionality will be limited.",
+                    "Mikrotik %s user %s is missing access rights: %s. Integration functionality will be limited.",
                     self.host,
                     self.config_entry.data[CONF_USERNAME],
+                    ", ".join(missing),
                 )
 
     # ---------------------------
