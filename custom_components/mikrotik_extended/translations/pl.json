@@ -1,0 +1,398 @@
+{
+  "config": {
+    "step": {
+      "discovery": {
+        "title": "Dodaj router MikroTik",
+        "description": "Przeskanuj sieć lokalną w poszukiwaniu routerów MikroTik lub wpisz adres ręcznie.",
+        "data": {
+          "scan": "Skanuj sieć w poszukiwaniu routerów MikroTik"
+        }
+      },
+      "pick_device": {
+        "title": "Znalezione routery MikroTik",
+        "description": "Wybierz router do konfiguracji lub wprowadź dane ręcznie.",
+        "data": {
+          "router": "Wybierz router"
+        }
+      },
+      "user": {
+        "title": "Skonfiguruj MikroTik Extended",
+        "description": "Skonfiguruj integrację z MikroTik Extended.",
+        "data": {
+          "name": "Nazwa integracji",
+          "host": "Host",
+          "port": "Port",
+          "username": "Nazwa użytkownika",
+          "password": "Hasło",
+          "ssl_mode": "Bezpieczeństwo połączenia"
+        },
+        "data_description": {
+          "port": "Port API RouterOS. Pozostaw 0, aby użyć domyślnego: 8728 (bez SSL) lub 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Konfiguracja MikroTik Extended (2/4)",
+        "description": "Skonfiguruj integrację",
+        "data": {
+          "scan_interval": "Częstotliwość skanowania (sekundy)",
+          "track_network_hosts_timeout": "Limit czasu śledzenia urządzeń sieciowych (sekundy)",
+          "zone": "Strefa programu do śledzenia urządzeń"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Domyślnie: 30s. Niższe wartości zwiększają obciążenie API RouterOS.",
+          "track_network_hosts_timeout": "Tylko urządzenia przewodowe. Liczba sekund, po której urządzenie jest uznawane za offline, jeśli nie pojawia się w ARP. Domyślnie: 180s.",
+          "zone": "Nazwa strefy Home Assistant używana gdy śledzone urządzenie jest połączone. Domyślnie: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Konfiguracja MikroTik Extended (3/4)",
+        "description": "Wybierz tryb aktywacji czujników",
+        "data": {
+          "sensor_preset": "Preset czujników"
+        },
+        "data_description": {
+          "sensor_preset": "Zalecany włącza najbardziej przydatne czujniki przy minimalnej liczbie encji. Pełny włącza wszystko — używaj ostrożnie w dużych sieciach."
+        }
+      },
+      "sensor_select": {
+        "title": "Konfiguracja MikroTik Extended (4/4)",
+        "description": "Włącz czujniki i przełączniki",
+        "data": {
+          "sensor_client_captive": "Dane captive portal",
+          "sensor_client_traffic": "Czujniki ruchu klienta",
+          "sensor_containers": "Czujniki kontenerów",
+          "sensor_environment": "Czujniki zmiennych środowiskowych",
+          "sensor_filter": "Przełączniki filtrów",
+          "sensor_kidcontrol": "Kontrola rodzicielska",
+          "sensor_mangle": "Przełączniki Mangle",
+          "sensor_nat": "Przełączniki NAT",
+          "sensor_netwatch_tracker": "Czujniki Netwatch",
+          "sensor_port_tracker": "Czujniki monitora portu",
+          "sensor_port_traffic": "Czujniki ruchu portowego",
+          "sensor_ppp": "Użytkownicy PPP",
+          "sensor_routing_rules": "Przełączniki Routing Rules",
+          "sensor_scripts": "Przełączniki skryptów",
+          "sensor_simple_queues": "Przełączniki prostych kolejek",
+          "track_network_hosts": "Śledź urządzenia sieciowe",
+          "sensor_wireguard": "Czujniki WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Dodaje status autoryzacji hotspot do śledzonych urządzeń. Przydatne tylko gdy skonfigurowany jest captive portal (hotspot).",
+          "sensor_client_traffic": "2 czujniki na śledzone urządzenie (prędkość TX/RX). Wymaga RouterOS 7 z Kid Control — integracja automatycznie tworzy profil 'ha-monitoring' na routerze po włączeniu. Czujniki pojawiają się tylko dla urządzeń aktywnie śledzonych przez Kid Control. Uwaga: RouterOS 6 nie jest obsługiwany.",
+          "sensor_containers": "Czujnik i przełącznik na kontener do monitorowania oraz uruchamiania/zatrzymywania kontenerów Docker.",
+          "sensor_environment": "Czujniki zmiennych środowiskowych RouterOS.",
+          "sensor_filter": "Przełącznik na regułę Filter do włączania/wyłączania reguł zapory z HA. Uwaga: tworzy jedną encję na regułę filtra.",
+          "sensor_kidcontrol": "Przełączniki dla profili urządzeń Kid Control (wstrzymanie/wznowienie dostępu do internetu).",
+          "sensor_mangle": "Przełącznik na regułę Mangle do włączania/wyłączania reguł oznaczania pakietów z HA. Uwaga: tworzy jedną encję na regułę Mangle.",
+          "sensor_nat": "Przełącznik na regułę NAT do włączania/wyłączania reguł z HA. Uwaga: tworzy jedną encję na regułę NAT.",
+          "sensor_netwatch_tracker": "Czujnik binarny na wpis Netwatch pokazujący stan osiągalności.",
+          "sensor_port_tracker": "Czujnik binarny na port pokazujący stan łącza (aktywny/nieaktywny).",
+          "sensor_port_traffic": "4 czujniki na interfejs (bajty TX/RX i sumy). Uwaga: tworzy 4 encje na interfejs — wyłącz jeśli wykresy ruchu nie są potrzebne.",
+          "sensor_ppp": "Przełącznik na sekret PPP (użytkownika) do włączania/wyłączania kont VPN/PPPoE z HA.",
+          "sensor_routing_rules": "Przełącznik na regułę routingu do włączania/wyłączania reguł routingu polityki z HA. Uwaga: tworzy jedną encję na regułę routingu.",
+          "sensor_scripts": "Przycisk na skrypt do uruchamiania skryptów RouterOS z HA.",
+          "sensor_simple_queues": "Przełącznik na wpis Simple Queue do włączania/wyłączania limitów przepustowości z HA. Uwaga: tworzy jedną encję na regułę kolejki.",
+          "track_network_hosts": "Tworzy encję śledzącą urządzenie dla każdego urządzenia widocznego w tabelach ARP/DHCP/wireless. Każde śledzone urządzenie tworzy osobne urządzenie HA. Uwaga: w dużych sieciach może to wygenerować setki urządzeń i encji.",
+          "sensor_wireguard": "Czujniki na peer WireGuard (ostatni handshake, transfer, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Ponowna autoryzacja MikroTik Extended",
+        "description": "Wprowadź nowe dane logowania dla {host}.",
+        "data": {
+          "username": "Nazwa użytkownika",
+          "password": "Hasło"
+        }
+      },
+      "reconfigure": {
+        "title": "Rekonfiguracja MikroTik Extended",
+        "description": "Zaktualizuj ustawienia połączenia tej integracji.",
+        "data": {
+          "name": "Nazwa integracji",
+          "host": "Host",
+          "port": "Port",
+          "username": "Nazwa użytkownika",
+          "password": "Hasło",
+          "ssl_mode": "Bezpieczeństwo połączenia"
+        },
+        "data_description": {
+          "port": "Port API RouterOS. Pozostaw 0, aby użyć domyślnego: 8728 (bez SSL) lub 8729 (SSL)."
+        }
+      }
+    },
+    "error": {
+      "name_exists": "Nazwa już istnieje",
+      "cannot_connect": "Nie można połączyć się z Mikrotik.",
+      "ssl_handshake_failure": "Błąd uzgadniania SSL",
+      "connection_timeout": "Limit czasu dla połączenia Mikrotik został przekroczony.",
+      "wrong_login": "Nieprawidłowa nazwa użytkownika lub hasło.",
+      "ssl_verify_failure": "Weryfikacja certyfikatu nie powiodła się",
+      "no_devices_found": "Nie znaleziono routerów MikroTik w tej sieci. Wprowadź adres routera ręcznie."
+    },
+    "abort": {
+      "already_configured": "Urządzenie jest już skonfigurowane.",
+      "reauth_successful": "Ponowna autoryzacja powiodła się.",
+      "reconfigure_successful": "Rekonfiguracja powiodła się."
+    }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Częstotliwość skanowania",
+          "track_iface_clients": "Pokaż w interfejsach adres MAC i IP klienta",
+          "unit_of_measurement": "Jednostka miary",
+          "track_network_hosts_timeout": "Limit czasu śledzenia urządzeń sieciowych (sekundy)",
+          "zone": "Strefa programu do śledzenia urządzeń"
+        },
+        "data_description": {
+          "scan_interval": "Minimum: 10s. Domyślnie: 30s. Niższe wartości zwiększają obciążenie API RouterOS.",
+          "track_network_hosts_timeout": "Tylko urządzenia przewodowe. Liczba sekund, po której urządzenie jest uznawane za offline, jeśli nie pojawia się w ARP. Domyślnie: 180s.",
+          "zone": "Nazwa strefy Home Assistant używana gdy śledzone urządzenie jest połączone. Domyślnie: home."
+        },
+        "title": "Opcje MikroTik Extended (1/3)",
+        "description": "Skonfiguruj integrację"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "Preset czujników"
+        },
+        "data_description": {
+          "sensor_preset": "Wybierz preset, aby szybko skonfigurować które czujniki i przełączniki są włączone, lub wybierz Niestandardowy, aby skonfigurować je indywidualnie."
+        },
+        "title": "Opcje MikroTik Extended (2/3)",
+        "description": "Wybierz preset czujników"
+      },
+      "sensor_select": {
+        "data": {
+          "sensor_client_captive": "Dane captive portal",
+          "sensor_client_traffic": "Czujniki ruchu klienta",
+          "sensor_containers": "Czujniki kontenerów",
+          "sensor_environment": "Czujniki zmiennych środowiskowych",
+          "sensor_filter": "Przełączniki filtrów",
+          "sensor_kidcontrol": "Kontrola rodzicielska",
+          "sensor_mangle": "Przełączniki Mangle",
+          "sensor_nat": "Przełączniki NAT",
+          "sensor_netwatch_tracker": "Czujniki Netwatch",
+          "sensor_port_tracker": "Czujniki monitora portu",
+          "sensor_port_traffic": "Czujniki ruchu portowego",
+          "sensor_ppp": "Użytkownicy PPP",
+          "sensor_routing_rules": "Przełączniki Routing Rules",
+          "sensor_scripts": "Przełączniki skryptów",
+          "sensor_simple_queues": "Przełączniki prostych kolejek",
+          "track_network_hosts": "Śledź urządzenia sieciowe",
+          "sensor_wireguard": "Czujniki WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Dodaje status autoryzacji hotspot do śledzonych urządzeń. Przydatne tylko gdy skonfigurowany jest captive portal (hotspot).",
+          "sensor_client_traffic": "2 czujniki na śledzone urządzenie (prędkość TX/RX). Wymaga RouterOS 7 z Kid Control — integracja automatycznie tworzy profil 'ha-monitoring' na routerze po włączeniu. Czujniki pojawiają się tylko dla urządzeń aktywnie śledzonych przez Kid Control. Uwaga: RouterOS 6 nie jest obsługiwany.",
+          "sensor_containers": "Czujnik i przełącznik na kontener do monitorowania oraz uruchamiania/zatrzymywania kontenerów Docker.",
+          "sensor_environment": "Czujniki zmiennych środowiskowych RouterOS.",
+          "sensor_filter": "Przełącznik na regułę Filter do włączania/wyłączania reguł zapory z HA. Uwaga: tworzy jedną encję na regułę filtra.",
+          "sensor_kidcontrol": "Przełączniki dla profili urządzeń Kid Control (wstrzymanie/wznowienie dostępu do internetu).",
+          "sensor_mangle": "Przełącznik na regułę Mangle do włączania/wyłączania reguł oznaczania pakietów z HA. Uwaga: tworzy jedną encję na regułę Mangle.",
+          "sensor_nat": "Przełącznik na regułę NAT do włączania/wyłączania reguł z HA. Uwaga: tworzy jedną encję na regułę NAT.",
+          "sensor_netwatch_tracker": "Czujnik binarny na wpis Netwatch pokazujący stan osiągalności.",
+          "sensor_port_tracker": "Czujnik binarny na port pokazujący stan łącza (aktywny/nieaktywny).",
+          "sensor_port_traffic": "4 czujniki na interfejs (bajty TX/RX i sumy). Uwaga: tworzy 4 encje na interfejs — wyłącz jeśli wykresy ruchu nie są potrzebne.",
+          "sensor_ppp": "Przełącznik na sekret PPP (użytkownika) do włączania/wyłączania kont VPN/PPPoE z HA.",
+          "sensor_routing_rules": "Przełącznik na regułę routingu do włączania/wyłączania reguł routingu polityki z HA. Uwaga: tworzy jedną encję na regułę routingu.",
+          "sensor_scripts": "Przycisk na skrypt do uruchamiania skryptów RouterOS z HA.",
+          "sensor_simple_queues": "Przełącznik na wpis Simple Queue do włączania/wyłączania limitów przepustowości z HA. Uwaga: tworzy jedną encję na regułę kolejki.",
+          "track_network_hosts": "Tworzy encję śledzącą urządzenie dla każdego urządzenia widocznego w tabelach ARP/DHCP/wireless. Każde śledzone urządzenie tworzy osobne urządzenie HA. Uwaga: w dużych sieciach może to wygenerować setki urządzeń i encji.",
+          "sensor_wireguard": "Czujniki na peer WireGuard (ostatni handshake, transfer, endpoint)."
+        },
+        "title": "Opcje MikroTik Extended (3/3)",
+        "description": "Włącz czujniki i przełączniki"
+      }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Uwierzytelnianie nie powiodło się dla {host}",
+      "description": "Nazwa użytkownika lub hasło routera MikroTik pod adresem {host} jest nieprawidłowe. Przejdź do **Ustawienia → Integracje → MikroTik Router → Ponowna autoryzacja**, aby zaktualizować dane logowania."
+    },
+    "ssl_error": {
+      "title": "Błąd połączenia SSL dla {host}",
+      "description": "Nie udało się nawiązać bezpiecznego połączenia SSL z routerem MikroTik pod adresem {host}. Przejdź do **Ustawienia → Integracje → MikroTik Router → Rekonfiguracja**, aby zmienić ustawienia SSL lub wyłączyć SSL."
+    },
+    "insufficient_permissions": {
+      "title": "Niewystarczające uprawnienia API dla {host}",
+      "description": "Użytkownik RouterOS **{username}** na routerze **{host}** nie ma następujących uprawnień: **{missing}**.\n\nNiektóre funkcje integracji nie będą działać (przełączniki, przycisk restartu, automatyczna konfiguracja Kid Control). Aby to naprawić, dodaj brakujące zasady do grupy użytkownika na routerze:\n\n/user/group/set [find name=YOUR_GROUP] policy=read,write,api,reboot,policy,test,sensitive"
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Nieprawidłowy format adresu MAC: {mac}. Oczekiwany format: AA:BB:CC:DD:EE:FF"
+    },
+    "missing_value": {
+      "message": "A value is required for add or set actions."
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "Bez SSL — nieszyfrowane połączenie (domyślnie, port 8728)",
+        "ssl": "SSL — szyfrowane, akceptuje certyfikaty samopodpisane (port 8729)",
+        "ssl_verify": "SSL z weryfikacją — wymaga ważnego certyfikatu podpisanego przez CA"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": {
+        "name": "Temperatura"
+      },
+      "system_voltage": {
+        "name": "Napięcie"
+      },
+      "system_cpu_temperature": {
+        "name": "Temperatura CPU"
+      },
+      "system_switch_temperature": {
+        "name": "Temperatura switcha"
+      },
+      "system_board_temperature1": {
+        "name": "Temperatura płyty"
+      },
+      "system_phy_temperature": {
+        "name": "Temperatura PHY"
+      },
+      "system_power_consumption": {
+        "name": "Pobór mocy"
+      },
+      "system_poe_out_consumption": {
+        "name": "Pobór mocy PoE wyjście"
+      },
+      "system_fan1_speed": {
+        "name": "Prędkość wentylatora 1"
+      },
+      "system_fan2_speed": {
+        "name": "Prędkość wentylatora 2"
+      },
+      "system_fan3_speed": {
+        "name": "Prędkość wentylatora 3"
+      },
+      "system_fan4_speed": {
+        "name": "Prędkość wentylatora 4"
+      },
+      "system_psu1_current": {
+        "name": "Zasilacz 1 prąd"
+      },
+      "system_psu1_voltage": {
+        "name": "Zasilacz 1 napięcie"
+      },
+      "system_psu2_current": {
+        "name": "Zasilacz 2 prąd"
+      },
+      "system_psu2_voltage": {
+        "name": "Zasilacz 2 napięcie"
+      },
+      "system_uptime": {
+        "name": "Czas pracy"
+      },
+      "system_cpu_load": {
+        "name": "Obciążenie CPU"
+      },
+      "system_memory_usage": {
+        "name": "Użycie pamięci"
+      },
+      "system_hdd_usage": {
+        "name": "Użycie dysku"
+      },
+      "system_clients_wired": {
+        "name": "Klienci przewodowi"
+      },
+      "system_clients_wireless": {
+        "name": "Klienci bezprzewodowi"
+      },
+      "system_captive_authorized": {
+        "name": "Klienci portalu captive"
+      },
+      "system_gps_latitude": {
+        "name": "Szerokość geograficzna"
+      },
+      "system_gps_longitude": {
+        "name": "Długość geograficzna"
+      },
+      "traffic_tx": {
+        "name": "TX"
+      },
+      "traffic_rx": {
+        "name": "RX"
+      },
+      "tx_total": {
+        "name": "TX łącznie"
+      },
+      "rx_total": {
+        "name": "RX łącznie"
+      },
+      "client_traffic_tx": {
+        "name": "TX"
+      },
+      "client_traffic_rx": {
+        "name": "RX"
+      },
+      "ip_address": {
+        "name": "Adres IP"
+      },
+      "cloud_public_address": {
+        "name": "Adres publiczny"
+      },
+      "wireguard_peer_rx": {
+        "name": "RX"
+      },
+      "wireguard_peer_tx": {
+        "name": "TX"
+      },
+      "wireguard_peer_handshake": {
+        "name": "Ostatni handshake"
+      },
+      "system_device_mode": {
+        "name": "Tryb urządzenia"
+      },
+      "system_packages": {
+        "name": "Pakiety"
+      },
+      "system_dhcp_leases": {
+        "name": "DHCP leases"
+      },
+      "container_status": {
+        "name": "Status"
+      }
+    },
+    "binary_sensor": {
+      "system_ups": {
+        "name": "UPS"
+      },
+      "ppp_tracker": {
+        "name": "PPP"
+      },
+      "interface_connection": {
+        "name": "Połączenie"
+      },
+      "netwatch": {
+        "name": "Netwatch"
+      },
+      "wireguard_peer": {
+        "name": "Połączony"
+      }
+    },
+    "switch": {
+      "interface_port": {
+        "name": "Port"
+      },
+      "ppp_secret": {
+        "name": "PPP secret"
+      },
+      "kidcontrol_paused": {
+        "name": "Wstrzymany"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "Uruchom ponownie"
+      }
+    }
+  }
+}

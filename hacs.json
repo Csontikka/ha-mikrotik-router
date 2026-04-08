@@ -1,5 +1,5 @@
 {
-    "name": "Mikrotik Router",
+    "name": "MikroTik Extended",
     "homeassistant": "2024.3.0",
     "render_readme": true
 }

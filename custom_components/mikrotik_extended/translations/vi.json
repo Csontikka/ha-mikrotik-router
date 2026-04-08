@@ -1,0 +1,398 @@
+{
+  "config": {
+    "step": {
+      "discovery": {
+        "title": "Thêm MikroTik Router",
+        "description": "Quét mạng cục bộ để tìm các bộ định tuyến MikroTik hoặc nhập địa chỉ thủ công.",
+        "data": {
+          "scan": "Quét mạng tìm bộ định tuyến MikroTik"
+        }
+      },
+      "pick_device": {
+        "title": "Bộ định tuyến MikroTik đã tìm thấy",
+        "description": "Chọn bộ định tuyến để cấu hình hoặc chọn nhập thủ công.",
+        "data": {
+          "router": "Chọn bộ định tuyến"
+        }
+      },
+      "user": {
+        "title": "Thiết lập MikroTik Extended",
+        "description": "Thiết lập tích hợp Bộ định tuyến Mikrotik.",
+        "data": {
+          "name": "Tên của tích hợp",
+          "host": "Máy chủ",
+          "port": "Cổng",
+          "username": "Tên người dùng",
+          "password": "Mật khẩu",
+          "ssl_mode": "Bảo mật kết nối"
+        },
+        "data_description": {
+          "port": "Cổng RouterOS API. Để 0 để dùng mặc định: 8728 (không SSL) hoặc 8729 (có SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Thiết lập MikroTik Extended (2/4)",
+        "description": "Đặt cấu hình tích hợp",
+        "data": {
+          "scan_interval": "Khoảng thời gian quét (giây)",
+          "track_network_hosts_timeout": "Thời gian chờ theo dõi thiết bị mạng (giây)",
+          "zone": "Khu vực cho trình theo dõi thiết bị"
+        },
+        "data_description": {
+          "scan_interval": "Tối thiểu: 10s. Mặc định: 30s. Giá trị thấp hơn làm tăng tải RouterOS API.",
+          "track_network_hosts_timeout": "Chỉ thiết bị có dây. Số giây trước khi thiết bị bị coi là ngoại tuyến nếu không thấy trong ARP. Mặc định: 180s.",
+          "zone": "Tên vùng Home Assistant để sử dụng khi thiết bị được theo dõi kết nối. Mặc định: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Thiết lập MikroTik Extended (3/4)",
+        "description": "Chọn chế độ kích hoạt cảm biến",
+        "data": {
+          "sensor_preset": "Cài đặt trước cảm biến"
+        },
+        "data_description": {
+          "sensor_preset": "Khuyến nghị kích hoạt các cảm biến hữu ích nhất với số lượng thực thể tối thiểu. Đầy đủ kích hoạt tất cả — dùng thận trọng trên mạng lớn."
+        }
+      },
+      "sensor_select": {
+        "title": "Thiết lập MikroTik Extended (4/4)",
+        "description": "Bật cảm biến và công tắc",
+        "data": {
+          "sensor_client_captive": "Dữ liệu cổng captive",
+          "sensor_client_traffic": "Cảm biến lưu lượng máy khách",
+          "sensor_containers": "Cảm biến container",
+          "sensor_environment": "Cảm biến biến số môi trường",
+          "sensor_filter": "Công tắc bộ lọc",
+          "sensor_kidcontrol": "Kiểm soát trẻ em",
+          "sensor_mangle": "Công tắc Mangle",
+          "sensor_nat": "Công tắc NAT",
+          "sensor_netwatch_tracker": "Cảm biến Netwatch",
+          "sensor_port_tracker": "Cảm biến theo dõi cổng",
+          "sensor_port_traffic": "Cảm biến lưu lượng cổng",
+          "sensor_ppp": "Người dùng PPP",
+          "sensor_routing_rules": "Công tắc Routing Rules",
+          "sensor_scripts": "Công tắc script",
+          "sensor_simple_queues": "Công tắc hàng đợi đơn giản",
+          "track_network_hosts": "Theo dõi thiết bị mạng",
+          "sensor_wireguard": "Cảm biến WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Thêm trạng thái xác thực hotspot vào thiết bị được theo dõi. Chỉ hữu ích nếu captive portal (hotspot) được cấu hình.",
+          "sensor_client_traffic": "2 cảm biến cho mỗi thiết bị được theo dõi (tốc độ TX/RX). Yêu cầu RouterOS 7 với Kid Control — tích hợp tự động tạo hồ sơ 'ha-monitoring' trên bộ định tuyến khi bật. Cảm biến chỉ xuất hiện cho các thiết bị đang được Kid Control theo dõi. Lưu ý: RouterOS 6 không được hỗ trợ.",
+          "sensor_containers": "Cảm biến và công tắc cho mỗi container để theo dõi và khởi động/dừng các container kiểu Docker.",
+          "sensor_environment": "Cảm biến cho các biến môi trường RouterOS.",
+          "sensor_filter": "Công tắc cho mỗi quy tắc Filter để bật/tắt quy tắc tường lửa từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc lọc.",
+          "sensor_kidcontrol": "Công tắc cho hồ sơ thiết bị Kid Control (tạm dừng/tiếp tục truy cập internet).",
+          "sensor_mangle": "Công tắc cho mỗi quy tắc Mangle để bật/tắt quy tắc đánh dấu gói tin từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc Mangle.",
+          "sensor_nat": "Công tắc cho mỗi quy tắc NAT để bật/tắt quy tắc từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc NAT.",
+          "sensor_netwatch_tracker": "Cảm biến nhị phân cho mỗi mục Netwatch hiển thị trạng thái có thể tiếp cận.",
+          "sensor_port_tracker": "Cảm biến nhị phân cho mỗi cổng hiển thị trạng thái kết nối (kết nối/mất kết nối).",
+          "sensor_port_traffic": "4 cảm biến cho mỗi giao diện (byte TX/RX và tổng cộng). Cảnh báo: tạo 4 thực thể cho mỗi giao diện — tắt nếu không cần đồ thị lưu lượng.",
+          "sensor_ppp": "Công tắc cho mỗi PPP secret (người dùng) để bật/tắt tài khoản VPN/PPPoE từ HA.",
+          "sensor_routing_rules": "Công tắc cho mỗi Routing Rule để bật/tắt quy tắc định tuyến chính sách từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc định tuyến.",
+          "sensor_scripts": "Nút cho mỗi script để kích hoạt script RouterOS từ HA.",
+          "sensor_simple_queues": "Công tắc cho mỗi mục Simple Queue để bật/tắt giới hạn băng thông từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc hàng đợi.",
+          "track_network_hosts": "Tạo thực thể theo dõi thiết bị cho mỗi thiết bị thấy trong bảng ARP/DHCP/không dây. Mỗi thiết bị được theo dõi tạo một thiết bị HA riêng. Cảnh báo: trên mạng lớn có thể tạo ra hàng trăm thiết bị và thực thể.",
+          "sensor_wireguard": "Cảm biến cho mỗi WireGuard peer (lần bắt tay cuối, truyền tải, điểm cuối)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Xác thực lại MikroTik Extended",
+        "description": "Nhập thông tin đăng nhập mới cho {host}.",
+        "data": {
+          "username": "Tên người dùng",
+          "password": "Mật khẩu"
+        }
+      },
+      "reconfigure": {
+        "title": "Cấu hình lại MikroTik Extended",
+        "description": "Cập nhật cài đặt kết nối cho tích hợp này.",
+        "data": {
+          "name": "Tên của tích hợp",
+          "host": "Máy chủ",
+          "port": "Cổng",
+          "username": "Tên người dùng",
+          "password": "Mật khẩu",
+          "ssl_mode": "Bảo mật kết nối"
+        },
+        "data_description": {
+          "port": "Cổng RouterOS API. Để 0 để dùng mặc định: 8728 (không SSL) hoặc 8729 (có SSL)."
+        }
+      }
+    },
+    "error": {
+      "name_exists": "Tên đã tồn tại.",
+      "cannot_connect": "Không thể kết nối với Mikrotik.",
+      "ssl_handshake_failure": "Lỗi kết nối SSL",
+      "connection_timeout": "Hết thời gian chờ kết nối Mikrotik.",
+      "wrong_login": "Tên người dùng hoặc mật khẩu không hợp lệ.",
+      "ssl_verify_failure": "Xác minh chứng chỉ thất bại",
+      "no_devices_found": "Không tìm thấy bộ định tuyến MikroTik nào trên mạng này. Nhập địa chỉ bộ định tuyến thủ công."
+    },
+    "abort": {
+      "already_configured": "Thiết bị đã được cấu hình.",
+      "reauth_successful": "Xác thực lại thành công.",
+      "reconfigure_successful": "Cấu hình lại thành công."
+    }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Khoảng thời gian quét",
+          "track_iface_clients": "Hiển thị MAC và IP của máy khách trên giao diện",
+          "unit_of_measurement": "Đơn vị đo",
+          "track_network_hosts_timeout": "Thời gian chờ theo dõi thiết bị mạng (giây)",
+          "zone": "Khu vực cho trình theo dõi thiết bị"
+        },
+        "data_description": {
+          "scan_interval": "Tối thiểu: 10s. Mặc định: 30s. Giá trị thấp hơn làm tăng tải RouterOS API.",
+          "track_network_hosts_timeout": "Chỉ thiết bị có dây. Số giây trước khi thiết bị bị coi là ngoại tuyến nếu không thấy trong ARP. Mặc định: 180s.",
+          "zone": "Tên vùng Home Assistant để sử dụng khi thiết bị được theo dõi kết nối. Mặc định: home."
+        },
+        "title": "Cài đặt MikroTik Extended (1/3)",
+        "description": "Đặt cấu hình tích hợp"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "Cài đặt trước cảm biến"
+        },
+        "data_description": {
+          "sensor_preset": "Chọn cài đặt trước để nhanh chóng cấu hình cảm biến và công tắc nào được bật, hoặc chọn Tùy chỉnh để cấu hình từng mục."
+        },
+        "title": "Cài đặt MikroTik Extended (2/3)",
+        "description": "Chọn cài đặt trước cảm biến"
+      },
+      "sensor_select": {
+        "data": {
+          "sensor_client_captive": "Dữ liệu cổng captive",
+          "sensor_client_traffic": "Cảm biến lưu lượng máy khách",
+          "sensor_containers": "Cảm biến container",
+          "sensor_environment": "Cảm biến biến số môi trường",
+          "sensor_filter": "Công tắc bộ lọc",
+          "sensor_kidcontrol": "Kiểm soát trẻ em",
+          "sensor_mangle": "Công tắc Mangle",
+          "sensor_nat": "Công tắc NAT",
+          "sensor_netwatch_tracker": "Cảm biến Netwatch",
+          "sensor_port_tracker": "Cảm biến theo dõi cổng",
+          "sensor_port_traffic": "Cảm biến lưu lượng cổng",
+          "sensor_ppp": "Người dùng PPP",
+          "sensor_routing_rules": "Công tắc Routing Rules",
+          "sensor_scripts": "Công tắc script",
+          "sensor_simple_queues": "Công tắc hàng đợi đơn giản",
+          "track_network_hosts": "Theo dõi thiết bị mạng",
+          "sensor_wireguard": "Cảm biến WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Thêm trạng thái xác thực hotspot vào thiết bị được theo dõi. Chỉ hữu ích nếu captive portal (hotspot) được cấu hình.",
+          "sensor_client_traffic": "2 cảm biến cho mỗi thiết bị được theo dõi (tốc độ TX/RX). Yêu cầu RouterOS 7 với Kid Control — tích hợp tự động tạo hồ sơ 'ha-monitoring' trên bộ định tuyến khi bật. Cảm biến chỉ xuất hiện cho các thiết bị đang được Kid Control theo dõi. Lưu ý: RouterOS 6 không được hỗ trợ.",
+          "sensor_containers": "Cảm biến và công tắc cho mỗi container để theo dõi và khởi động/dừng các container kiểu Docker.",
+          "sensor_environment": "Cảm biến cho các biến môi trường RouterOS.",
+          "sensor_filter": "Công tắc cho mỗi quy tắc Filter để bật/tắt quy tắc tường lửa từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc lọc.",
+          "sensor_kidcontrol": "Công tắc cho hồ sơ thiết bị Kid Control (tạm dừng/tiếp tục truy cập internet).",
+          "sensor_mangle": "Công tắc cho mỗi quy tắc Mangle để bật/tắt quy tắc đánh dấu gói tin từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc Mangle.",
+          "sensor_nat": "Công tắc cho mỗi quy tắc NAT để bật/tắt quy tắc từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc NAT.",
+          "sensor_netwatch_tracker": "Cảm biến nhị phân cho mỗi mục Netwatch hiển thị trạng thái có thể tiếp cận.",
+          "sensor_port_tracker": "Cảm biến nhị phân cho mỗi cổng hiển thị trạng thái kết nối (kết nối/mất kết nối).",
+          "sensor_port_traffic": "4 cảm biến cho mỗi giao diện (byte TX/RX và tổng cộng). Cảnh báo: tạo 4 thực thể cho mỗi giao diện — tắt nếu không cần đồ thị lưu lượng.",
+          "sensor_ppp": "Công tắc cho mỗi PPP secret (người dùng) để bật/tắt tài khoản VPN/PPPoE từ HA.",
+          "sensor_routing_rules": "Công tắc cho mỗi Routing Rule để bật/tắt quy tắc định tuyến chính sách từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc định tuyến.",
+          "sensor_scripts": "Nút cho mỗi script để kích hoạt script RouterOS từ HA.",
+          "sensor_simple_queues": "Công tắc cho mỗi mục Simple Queue để bật/tắt giới hạn băng thông từ HA. Cảnh báo: tạo một thực thể cho mỗi quy tắc hàng đợi.",
+          "track_network_hosts": "Tạo thực thể theo dõi thiết bị cho mỗi thiết bị thấy trong bảng ARP/DHCP/không dây. Mỗi thiết bị được theo dõi tạo một thiết bị HA riêng. Cảnh báo: trên mạng lớn có thể tạo ra hàng trăm thiết bị và thực thể.",
+          "sensor_wireguard": "Cảm biến cho mỗi WireGuard peer (lần bắt tay cuối, truyền tải, điểm cuối)."
+        },
+        "title": "Cài đặt MikroTik Extended (3/3)",
+        "description": "Bật cảm biến và công tắc"
+      }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Xác thực thất bại cho {host}",
+      "description": "Tên người dùng hoặc mật khẩu cho bộ định tuyến MikroTik tại {host} không đúng. Đi tới **Cài đặt → Tích hợp → MikroTik Router → Xác thực lại** để cập nhật thông tin đăng nhập."
+    },
+    "ssl_error": {
+      "title": "Lỗi kết nối SSL cho {host}",
+      "description": "Không thể thiết lập kết nối SSL an toàn với bộ định tuyến MikroTik tại {host}. Đi tới **Cài đặt → Tích hợp → MikroTik Router → Cấu hình lại** để thay đổi cài đặt SSL hoặc tắt SSL."
+    },
+    "insufficient_permissions": {
+      "title": "Quyền API không đủ cho {host}",
+      "description": "Người dùng RouterOS **{username}** trên bộ định tuyến **{host}** thiếu các quyền sau: **{missing}**.\n\nMột số tính năng tích hợp sẽ không hoạt động (công tắc, nút khởi động lại, thiết lập tự động Kid Control). Để khắc phục, hãy thêm các chính sách còn thiếu vào nhóm người dùng trên bộ định tuyến:\n\n/user/group/set [find name=YOUR_GROUP] policy=read,write,api,reboot,policy,test,sensitive"
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Định dạng địa chỉ MAC không hợp lệ: {mac}. Định dạng mong đợi: AA:BB:CC:DD:EE:FF"
+    },
+    "missing_value": {
+      "message": "A value is required for add or set actions."
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "Không SSL — kết nối không mã hóa (mặc định, cổng 8728)",
+        "ssl": "SSL — mã hóa, chấp nhận chứng chỉ tự ký (cổng 8729)",
+        "ssl_verify": "SSL có xác minh — yêu cầu chứng chỉ hợp lệ do CA ký"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": {
+        "name": "Nhiệt độ"
+      },
+      "system_voltage": {
+        "name": "Điện áp"
+      },
+      "system_cpu_temperature": {
+        "name": "Nhiệt độ CPU"
+      },
+      "system_switch_temperature": {
+        "name": "Nhiệt độ switch"
+      },
+      "system_board_temperature1": {
+        "name": "Nhiệt độ bo mạch"
+      },
+      "system_phy_temperature": {
+        "name": "Nhiệt độ PHY"
+      },
+      "system_power_consumption": {
+        "name": "Tiêu thụ điện năng"
+      },
+      "system_poe_out_consumption": {
+        "name": "Tiêu thụ PoE đầu ra"
+      },
+      "system_fan1_speed": {
+        "name": "Tốc độ quạt 1"
+      },
+      "system_fan2_speed": {
+        "name": "Tốc độ quạt 2"
+      },
+      "system_fan3_speed": {
+        "name": "Tốc độ quạt 3"
+      },
+      "system_fan4_speed": {
+        "name": "Tốc độ quạt 4"
+      },
+      "system_psu1_current": {
+        "name": "Nguồn 1 dòng điện"
+      },
+      "system_psu1_voltage": {
+        "name": "Nguồn 1 điện áp"
+      },
+      "system_psu2_current": {
+        "name": "Nguồn 2 dòng điện"
+      },
+      "system_psu2_voltage": {
+        "name": "Nguồn 2 điện áp"
+      },
+      "system_uptime": {
+        "name": "Thời gian hoạt động"
+      },
+      "system_cpu_load": {
+        "name": "Tải CPU"
+      },
+      "system_memory_usage": {
+        "name": "Sử dụng bộ nhớ"
+      },
+      "system_hdd_usage": {
+        "name": "Sử dụng ổ đĩa"
+      },
+      "system_clients_wired": {
+        "name": "Máy khách có dây"
+      },
+      "system_clients_wireless": {
+        "name": "Máy khách không dây"
+      },
+      "system_captive_authorized": {
+        "name": "Máy khách cổng captive"
+      },
+      "system_gps_latitude": {
+        "name": "Vĩ độ"
+      },
+      "system_gps_longitude": {
+        "name": "Kinh độ"
+      },
+      "traffic_tx": {
+        "name": "TX"
+      },
+      "traffic_rx": {
+        "name": "RX"
+      },
+      "tx_total": {
+        "name": "TX tổng"
+      },
+      "rx_total": {
+        "name": "RX tổng"
+      },
+      "client_traffic_tx": {
+        "name": "TX"
+      },
+      "client_traffic_rx": {
+        "name": "RX"
+      },
+      "ip_address": {
+        "name": "Địa chỉ IP"
+      },
+      "cloud_public_address": {
+        "name": "Địa chỉ công cộng"
+      },
+      "wireguard_peer_rx": {
+        "name": "RX"
+      },
+      "wireguard_peer_tx": {
+        "name": "TX"
+      },
+      "wireguard_peer_handshake": {
+        "name": "Lần bắt tay cuối"
+      },
+      "system_device_mode": {
+        "name": "Chế độ thiết bị"
+      },
+      "system_packages": {
+        "name": "Gói"
+      },
+      "system_dhcp_leases": {
+        "name": "DHCP leases"
+      },
+      "container_status": {
+        "name": "Trạng thái"
+      }
+    },
+    "binary_sensor": {
+      "system_ups": {
+        "name": "UPS"
+      },
+      "ppp_tracker": {
+        "name": "PPP"
+      },
+      "interface_connection": {
+        "name": "Kết nối"
+      },
+      "netwatch": {
+        "name": "Netwatch"
+      },
+      "wireguard_peer": {
+        "name": "Đã kết nối"
+      }
+    },
+    "switch": {
+      "interface_port": {
+        "name": "Cổng"
+      },
+      "ppp_secret": {
+        "name": "PPP secret"
+      },
+      "kidcontrol_paused": {
+        "name": "Tạm dừng"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "Khởi động lại"
+      }
+    }
+  }
+}

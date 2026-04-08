@@ -1,0 +1,398 @@
+{
+  "config": {
+    "step": {
+      "discovery": {
+        "title": "Добавить MikroTik Router",
+        "description": "Просканируйте локальную сеть для поиска маршрутизаторов MikroTik или введите адрес вручную.",
+        "data": {
+          "scan": "Поиск маршрутизаторов MikroTik в сети"
+        }
+      },
+      "pick_device": {
+        "title": "Найденные маршрутизаторы MikroTik",
+        "description": "Выберите маршрутизатор для настройки или введите данные вручную.",
+        "data": {
+          "router": "Выбрать маршрутизатор"
+        }
+      },
+      "user": {
+        "title": "Настроить MikroTik Extended",
+        "description": "Настройка Home Assistant для интеграции с Mikrotik.",
+        "data": {
+          "name": "Название интеграции",
+          "host": "Адрес хоста",
+          "port": "Порт",
+          "username": "Имя пользователя",
+          "password": "Пароль",
+          "ssl_mode": "Безопасность соединения"
+        },
+        "data_description": {
+          "port": "Порт API RouterOS. Оставьте 0 для использования по умолчанию: 8728 (без SSL) или 8729 (SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Настройка MikroTik Extended (2/4)",
+        "description": "Настроить интеграцию",
+        "data": {
+          "scan_interval": "Интервал сканирования (секунды)",
+          "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (секунды)",
+          "zone": "Зона для отслеживания устройств"
+        },
+        "data_description": {
+          "scan_interval": "Минимум: 10s. По умолчанию: 30s. Меньшие значения увеличивают нагрузку на API RouterOS.",
+          "track_network_hosts_timeout": "Только проводные устройства. Количество секунд, после которых устройство считается офлайн, если не обнаружено в ARP. По умолчанию: 180s.",
+          "zone": "Название зоны Home Assistant, используемой при подключении отслеживаемого устройства. По умолчанию: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Настройка MikroTik Extended (3/4)",
+        "description": "Выберите режим активации сенсоров",
+        "data": {
+          "sensor_preset": "Пресет сенсоров"
+        },
+        "data_description": {
+          "sensor_preset": "Рекомендуемый включает наиболее полезные сенсоры с минимальным количеством сущностей. Полный включает всё — используйте с осторожностью в больших сетях."
+        }
+      },
+      "sensor_select": {
+        "title": "Настройка MikroTik Extended (4/4)",
+        "description": "Включить сенсоры и переключатели",
+        "data": {
+          "sensor_client_captive": "Данные портала авторизации",
+          "sensor_client_traffic": "Сенсоры клиентского трафика",
+          "sensor_containers": "Сенсоры контейнеров",
+          "sensor_environment": "Сенсоры переменных окружения",
+          "sensor_filter": "Переключатели фильтров",
+          "sensor_kidcontrol": "Родительский контроль",
+          "sensor_mangle": "Переключатели Mangle",
+          "sensor_nat": "Переключатели NAT",
+          "sensor_netwatch_tracker": "Сенсоры Netwatch",
+          "sensor_port_tracker": "Сенсоры отслеживания порта",
+          "sensor_port_traffic": "Сенсоры трафика порта",
+          "sensor_ppp": "PPP-пользователи",
+          "sensor_routing_rules": "Переключатели Routing Rules",
+          "sensor_scripts": "Переключатели скриптов",
+          "sensor_simple_queues": "Переключатели простых очередей",
+          "track_network_hosts": "Отслеживание сетевых устройств",
+          "sensor_wireguard": "Сенсоры WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Добавляет статус авторизации хотспота к отслеживаемым устройствам. Полезно только если настроен captive портал (хотспот).",
+          "sensor_client_traffic": "2 сенсора на отслеживаемое устройство (скорость TX/RX). Требуется RouterOS 7 с Kid Control — интеграция автоматически создаёт профиль 'ha-monitoring' на роутере при включении. Сенсоры отображаются только для устройств, активно отслеживаемых Kid Control. Примечание: RouterOS 6 не поддерживается.",
+          "sensor_containers": "Сенсор и переключатель на контейнер для мониторинга и запуска/остановки Docker-контейнеров.",
+          "sensor_environment": "Сенсоры переменных окружения RouterOS.",
+          "sensor_filter": "Переключатель на правило Filter для включения/отключения правил брандмауэра из HA. Внимание: создаёт одну сущность на каждое правило фильтра.",
+          "sensor_kidcontrol": "Переключатели для профилей устройств Kid Control (приостановка/возобновление доступа в интернет).",
+          "sensor_mangle": "Переключатель на правило Mangle для включения/отключения правил маркировки пакетов из HA. Внимание: создаёт одну сущность на каждое правило Mangle.",
+          "sensor_nat": "Переключатель на правило NAT для включения/отключения правил из HA. Внимание: создаёт одну сущность на каждое правило NAT.",
+          "sensor_netwatch_tracker": "Бинарный сенсор на запись Netwatch, показывающий статус доступности.",
+          "sensor_port_tracker": "Бинарный сенсор на порт, показывающий состояние линка (поднят/опущен).",
+          "sensor_port_traffic": "4 сенсора на интерфейс (байты TX/RX и итоги). Внимание: создаёт 4 сущности на интерфейс — отключите если графики трафика не нужны.",
+          "sensor_ppp": "Переключатель на PPP secret (пользователя) для включения/отключения VPN/PPPoE аккаунтов из HA.",
+          "sensor_routing_rules": "Переключатель на правило маршрутизации для включения/отключения правил policy routing из HA. Внимание: создаёт одну сущность на каждое правило маршрутизации.",
+          "sensor_scripts": "Кнопка на скрипт для запуска скриптов RouterOS из HA.",
+          "sensor_simple_queues": "Переключатель на запись Simple Queue для включения/отключения ограничений полосы пропускания из HA. Внимание: создаёт одну сущность на каждое правило очереди.",
+          "track_network_hosts": "Создаёт сущность трекера устройства для каждого устройства, видимого в таблицах ARP/DHCP/wireless. Каждое отслеживаемое устройство создаёт отдельное устройство HA. Внимание: в больших сетях может быть создано сотни устройств и сущностей.",
+          "sensor_wireguard": "Сенсоры на пир WireGuard (последний handshake, передача, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Повторная аутентификация MikroTik Extended",
+        "description": "Введите новые учётные данные для {host}.",
+        "data": {
+          "username": "Имя пользователя",
+          "password": "Пароль"
+        }
+      },
+      "reconfigure": {
+        "title": "Перенастройка MikroTik Extended",
+        "description": "Обновить параметры подключения для этой интеграции.",
+        "data": {
+          "name": "Название интеграции",
+          "host": "Адрес хоста",
+          "port": "Порт",
+          "username": "Имя пользователя",
+          "password": "Пароль",
+          "ssl_mode": "Безопасность соединения"
+        },
+        "data_description": {
+          "port": "Порт API RouterOS. Оставьте 0 для использования по умолчанию: 8728 (без SSL) или 8729 (SSL)."
+        }
+      }
+    },
+    "error": {
+      "name_exists": "Это название уже используется.",
+      "cannot_connect": "Не удалось подключиться.",
+      "ssl_handshake_failure": "Ошибка SSL-соединения.",
+      "connection_timeout": "Истекло время подключения к Mikrotik.",
+      "wrong_login": "Неверное имя пользователя или пароль.",
+      "ssl_verify_failure": "Проверка сертификата не удалась",
+      "no_devices_found": "Маршрутизаторы MikroTik не найдены в этой сети. Введите адрес маршрутизатора вручную."
+    },
+    "abort": {
+      "already_configured": "Устройство уже настроено.",
+      "reauth_successful": "Повторная аутентификация прошла успешно.",
+      "reconfigure_successful": "Перенастройка прошла успешно."
+    }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Интервал сканирования",
+          "track_iface_clients": "Показывать на интерфейсах MAC и IP клиентов",
+          "unit_of_measurement": "Единицы измерения",
+          "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (в секундах)",
+          "zone": "Зона для отслеживания устройств"
+        },
+        "data_description": {
+          "scan_interval": "Минимум: 10s. По умолчанию: 30s. Меньшие значения увеличивают нагрузку на API RouterOS.",
+          "track_network_hosts_timeout": "Только проводные устройства. Количество секунд, после которых устройство считается офлайн, если не обнаружено в ARP. По умолчанию: 180s.",
+          "zone": "Название зоны Home Assistant, используемой при подключении отслеживаемого устройства. По умолчанию: home."
+        },
+        "title": "Параметры MikroTik Extended (1/3)",
+        "description": "Настроить интеграцию"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "Пресет сенсоров"
+        },
+        "data_description": {
+          "sensor_preset": "Выберите пресет для быстрой настройки, какие сенсоры и переключатели включены, или выберите Пользовательский для индивидуальной настройки."
+        },
+        "title": "Параметры MikroTik Extended (2/3)",
+        "description": "Выбрать пресет сенсоров"
+      },
+      "sensor_select": {
+        "data": {
+          "sensor_client_captive": "Данные портала авторизации",
+          "sensor_client_traffic": "Сенсоры клиентского трафика",
+          "sensor_containers": "Сенсоры контейнеров",
+          "sensor_environment": "Сенсоры переменных окружения",
+          "sensor_filter": "Переключатели фильтров",
+          "sensor_kidcontrol": "Родительский контроль",
+          "sensor_mangle": "Переключатели Mangle",
+          "sensor_nat": "Переключатели NAT",
+          "sensor_netwatch_tracker": "Сенсоры Netwatch",
+          "sensor_port_tracker": "Сенсоры отслеживания порта",
+          "sensor_port_traffic": "Сенсоры трафика порта",
+          "sensor_ppp": "PPP-пользователи",
+          "sensor_routing_rules": "Переключатели Routing Rules",
+          "sensor_scripts": "Переключатели скриптов",
+          "sensor_simple_queues": "Переключатели простых очередей",
+          "track_network_hosts": "Отслеживание сетевых устройств",
+          "sensor_wireguard": "Сенсоры WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Добавляет статус авторизации хотспота к отслеживаемым устройствам. Полезно только если настроен captive портал (хотспот).",
+          "sensor_client_traffic": "2 сенсора на отслеживаемое устройство (скорость TX/RX). Требуется RouterOS 7 с Kid Control — интеграция автоматически создаёт профиль 'ha-monitoring' на роутере при включении. Сенсоры отображаются только для устройств, активно отслеживаемых Kid Control. Примечание: RouterOS 6 не поддерживается.",
+          "sensor_containers": "Сенсор и переключатель на контейнер для мониторинга и запуска/остановки Docker-контейнеров.",
+          "sensor_environment": "Сенсоры переменных окружения RouterOS.",
+          "sensor_filter": "Переключатель на правило Filter для включения/отключения правил брандмауэра из HA. Внимание: создаёт одну сущность на каждое правило фильтра.",
+          "sensor_kidcontrol": "Переключатели для профилей устройств Kid Control (приостановка/возобновление доступа в интернет).",
+          "sensor_mangle": "Переключатель на правило Mangle для включения/отключения правил маркировки пакетов из HA. Внимание: создаёт одну сущность на каждое правило Mangle.",
+          "sensor_nat": "Переключатель на правило NAT для включения/отключения правил из HA. Внимание: создаёт одну сущность на каждое правило NAT.",
+          "sensor_netwatch_tracker": "Бинарный сенсор на запись Netwatch, показывающий статус доступности.",
+          "sensor_port_tracker": "Бинарный сенсор на порт, показывающий состояние линка (поднят/опущен).",
+          "sensor_port_traffic": "4 сенсора на интерфейс (байты TX/RX и итоги). Внимание: создаёт 4 сущности на интерфейс — отключите если графики трафика не нужны.",
+          "sensor_ppp": "Переключатель на PPP secret (пользователя) для включения/отключения VPN/PPPoE аккаунтов из HA.",
+          "sensor_routing_rules": "Переключатель на правило маршрутизации для включения/отключения правил policy routing из HA. Внимание: создаёт одну сущность на каждое правило маршрутизации.",
+          "sensor_scripts": "Кнопка на скрипт для запуска скриптов RouterOS из HA.",
+          "sensor_simple_queues": "Переключатель на запись Simple Queue для включения/отключения ограничений полосы пропускания из HA. Внимание: создаёт одну сущность на каждое правило очереди.",
+          "track_network_hosts": "Создаёт сущность трекера устройства для каждого устройства, видимого в таблицах ARP/DHCP/wireless. Каждое отслеживаемое устройство создаёт отдельное устройство HA. Внимание: в больших сетях может быть создано сотни устройств и сущностей.",
+          "sensor_wireguard": "Сенсоры на пир WireGuard (последний handshake, передача, endpoint)."
+        },
+        "title": "Параметры MikroTik Extended (3/3)",
+        "description": "Включить датчики и переключатели"
+      }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Ошибка аутентификации для {host}",
+      "description": "Имя пользователя или пароль для маршрутизатора MikroTik по адресу {host} неверны. Перейдите в **Настройки → Интеграции → MikroTik Router → Повторная аутентификация** для обновления учётных данных."
+    },
+    "ssl_error": {
+      "title": "Ошибка SSL-соединения для {host}",
+      "description": "Не удалось установить безопасное SSL-соединение с маршрутизатором MikroTik по адресу {host}. Перейдите в **Настройки → Интеграции → MikroTik Router → Перенастройка** для изменения параметров SSL или отключения SSL."
+    },
+    "insufficient_permissions": {
+      "title": "Недостаточно прав API для {host}",
+      "description": "Пользователь RouterOS **{username}** на роутере **{host}** не имеет следующих прав: **{missing}**.\n\nНекоторые функции интеграции не будут работать (переключатели, кнопка перезагрузки, автонастройка Kid Control). Чтобы исправить, добавьте недостающие политики в группу пользователя на роутере:\n\n/user/group/set [find name=YOUR_GROUP] policy=read,write,api,reboot,policy,test,sensitive"
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Неверный формат MAC-адреса: {mac}. Ожидаемый формат: AA:BB:CC:DD:EE:FF"
+    },
+    "missing_value": {
+      "message": "A value is required for add or set actions."
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "Без SSL — незашифрованное соединение (по умолчанию, порт 8728)",
+        "ssl": "SSL — зашифрованное, принимает самоподписанные сертификаты (порт 8729)",
+        "ssl_verify": "SSL с проверкой — требуется действительный сертификат, подписанный CA"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": {
+        "name": "Температура"
+      },
+      "system_voltage": {
+        "name": "Напряжение"
+      },
+      "system_cpu_temperature": {
+        "name": "Температура CPU"
+      },
+      "system_switch_temperature": {
+        "name": "Температура коммутатора"
+      },
+      "system_board_temperature1": {
+        "name": "Температура платы"
+      },
+      "system_phy_temperature": {
+        "name": "Температура PHY"
+      },
+      "system_power_consumption": {
+        "name": "Потребление энергии"
+      },
+      "system_poe_out_consumption": {
+        "name": "Выходная мощность PoE"
+      },
+      "system_fan1_speed": {
+        "name": "Скорость вентилятора 1"
+      },
+      "system_fan2_speed": {
+        "name": "Скорость вентилятора 2"
+      },
+      "system_fan3_speed": {
+        "name": "Скорость вентилятора 3"
+      },
+      "system_fan4_speed": {
+        "name": "Скорость вентилятора 4"
+      },
+      "system_psu1_current": {
+        "name": "БП 1 ток"
+      },
+      "system_psu1_voltage": {
+        "name": "БП 1 напряжение"
+      },
+      "system_psu2_current": {
+        "name": "БП 2 ток"
+      },
+      "system_psu2_voltage": {
+        "name": "БП 2 напряжение"
+      },
+      "system_uptime": {
+        "name": "Время работы"
+      },
+      "system_cpu_load": {
+        "name": "Загрузка CPU"
+      },
+      "system_memory_usage": {
+        "name": "Использование памяти"
+      },
+      "system_hdd_usage": {
+        "name": "Использование диска"
+      },
+      "system_clients_wired": {
+        "name": "Проводные клиенты"
+      },
+      "system_clients_wireless": {
+        "name": "Беспроводные клиенты"
+      },
+      "system_captive_authorized": {
+        "name": "Клиенты портала авторизации"
+      },
+      "system_gps_latitude": {
+        "name": "Широта"
+      },
+      "system_gps_longitude": {
+        "name": "Долгота"
+      },
+      "traffic_tx": {
+        "name": "TX"
+      },
+      "traffic_rx": {
+        "name": "RX"
+      },
+      "tx_total": {
+        "name": "TX всего"
+      },
+      "rx_total": {
+        "name": "RX всего"
+      },
+      "client_traffic_tx": {
+        "name": "TX"
+      },
+      "client_traffic_rx": {
+        "name": "RX"
+      },
+      "ip_address": {
+        "name": "IP-адрес"
+      },
+      "cloud_public_address": {
+        "name": "Публичный адрес"
+      },
+      "wireguard_peer_rx": {
+        "name": "RX"
+      },
+      "wireguard_peer_tx": {
+        "name": "TX"
+      },
+      "wireguard_peer_handshake": {
+        "name": "Последний handshake"
+      },
+      "system_device_mode": {
+        "name": "Режим устройства"
+      },
+      "system_packages": {
+        "name": "Пакеты"
+      },
+      "system_dhcp_leases": {
+        "name": "DHCP leases"
+      },
+      "container_status": {
+        "name": "Статус"
+      }
+    },
+    "binary_sensor": {
+      "system_ups": {
+        "name": "ИБП"
+      },
+      "ppp_tracker": {
+        "name": "PPP"
+      },
+      "interface_connection": {
+        "name": "Соединение"
+      },
+      "netwatch": {
+        "name": "Netwatch"
+      },
+      "wireguard_peer": {
+        "name": "Подключён"
+      }
+    },
+    "switch": {
+      "interface_port": {
+        "name": "Порт"
+      },
+      "ppp_secret": {
+        "name": "PPP secret"
+      },
+      "kidcontrol_paused": {
+        "name": "Приостановлен"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "Перезагрузка"
+      }
+    }
+  }
+}

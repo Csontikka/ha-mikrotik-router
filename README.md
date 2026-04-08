@@ -1,6 +1,6 @@
-# Mikrotik Router — Home Assistant Integration
+# MikroTik Extended — Home Assistant Integration
 
-![Mikrotik Router](https://raw.githubusercontent.com/Csontikka/ha-mikrotik-router/master/images/banner.png)
+![MikroTik Extended](https://raw.githubusercontent.com/Csontikka/ha-mikrotik-router/master/images/banner.png)
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Csontikka/ha-mikrotik-router?style=plastic)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=plastic)](https://github.com/hacs/integration)
@@ -119,12 +119,12 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
 ### Actions (Services)
 
-- **Wake-on-LAN** (`mikrotik_router.send_magic_packet`): send a WoL magic packet through the router to wake up a network device.
+- **Wake-on-LAN** (`mikrotik_extended.send_magic_packet`): send a WoL magic packet through the router to wake up a network device.
 
   **Parameters:** `mac` (required), `interface` (required — the router interface to send the packet from, e.g. `bridge`).
 
   ```yaml
-  action: mikrotik_router.send_magic_packet
+  action: mikrotik_extended.send_magic_packet
   data:
     mac: "AA:BB:CC:DD:EE:FF"
     interface: "bridge"
@@ -141,19 +141,19 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
           zone: zone.home
           event: enter
       action:
-        - action: mikrotik_router.send_magic_packet
+        - action: mikrotik_extended.send_magic_packet
           data:
             mac: "AA:BB:CC:DD:EE:FF"
             interface: "bridge"
   ```
 
-- **API Test** (`mikrotik_router.api_test`): diagnostic action for raw RouterOS API queries or coordinator data inspection. Use in **Developer Tools -> Actions** with "Return response" enabled.
+- **API Test** (`mikrotik_extended.api_test`): diagnostic action for raw RouterOS API queries or coordinator data inspection. Use in **Developer Tools -> Actions** with "Return response" enabled.
 
   **Parameters:** `path` (required), `limit` (optional, default 10), `host` (optional), `coordinator_data`* (optional).
 
   ```yaml
   # Query router interfaces
-  action: mikrotik_router.api_test
+  action: mikrotik_extended.api_test
   data:
     path: "/interface"
     limit: 20
@@ -161,7 +161,7 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
   ```yaml
   # Inspect coordinator's processed data
-  action: mikrotik_router.api_test
+  action: mikrotik_extended.api_test
   data:
     path: "interface"
     coordinator_data: true
@@ -169,12 +169,12 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
   > **\*coordinator_data:** When set to `true`, the `path` parameter is treated as a coordinator data key (e.g. `interface`, `dhcp`, `arp`) instead of a RouterOS API path. This returns the integration's internally cached and processed data from the last update cycle — useful for debugging what the integration currently "sees" without making an additional API call to the router.
 
-- **Refresh Data** (`mikrotik_router.refresh_data`): force an immediate data refresh from the router, including all sensors, environment variables, and device trackers. Useful in automations when you need up-to-date values without waiting for the next poll cycle.
+- **Refresh Data** (`mikrotik_extended.refresh_data`): force an immediate data refresh from the router, including all sensors, environment variables, and device trackers. Useful in automations when you need up-to-date values without waiting for the next poll cycle.
 
   **Parameters:** `host` (optional — only refresh a specific router).
 
   ```yaml
-  action: mikrotik_router.refresh_data
+  action: mikrotik_extended.refresh_data
   ```
 
   **Example — refresh after changing a firewall rule:**
@@ -186,21 +186,21 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
         - platform: state
           entity_id: input_boolean.guest_network
       action:
-        - action: mikrotik_router.set_environment
+        - action: mikrotik_extended.set_environment
           data:
             name: "guestEnabled"
             value: "{{ states('input_boolean.guest_network') }}"
         - delay: 3
-        - action: mikrotik_router.refresh_data
+        - action: mikrotik_extended.refresh_data
   ```
 
-- **Set Environment Variable** (`mikrotik_router.set_environment`): create, update, or remove a RouterOS script environment variable. Environment variables are accessible from RouterOS scripts via `:global` and can be used to pass values between Home Assistant and router-side scripts.
+- **Set Environment Variable** (`mikrotik_extended.set_environment`): create, update, or remove a RouterOS script environment variable. Environment variables are accessible from RouterOS scripts via `:global` and can be used to pass values between Home Assistant and router-side scripts.
 
   **Parameters:** `name` (required), `value` (required for set/add), `action` (optional: `set`, `add`, or `remove` — default `set`), `host` (optional).
 
   ```yaml
   # Create or update a variable
-  action: mikrotik_router.set_environment
+  action: mikrotik_extended.set_environment
   data:
     name: "myVar"
     value: "hello"
@@ -209,7 +209,7 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
   ```yaml
   # Remove a variable
-  action: mikrotik_router.set_environment
+  action: mikrotik_extended.set_environment
   data:
     name: "myVar"
     action: "remove"
@@ -234,7 +234,7 @@ automation:
     action:
       - action: switch.turn_on
         target:
-          entity_id: switch.mikrotik_router_wireguard_peer_my_phone
+          entity_id: switch.mikrotik_extended_wireguard_peer_my_phone
 
   - alias: "Disable VPN when arriving home"
     trigger:
@@ -245,7 +245,7 @@ automation:
     action:
       - action: switch.turn_off
         target:
-          entity_id: switch.mikrotik_router_wireguard_peer_my_phone
+          entity_id: switch.mikrotik_extended_wireguard_peer_my_phone
 ```
 
 ### Kids internet schedule with Kid Control
@@ -264,7 +264,7 @@ automation:
     action:
       - action: switch.turn_off
         target:
-          entity_id: switch.mikrotik_router_kidcontrol_kids_paused
+          entity_id: switch.mikrotik_extended_kidcontrol_kids_paused
 
   - alias: "Kids internet on in the morning"
     trigger:
@@ -276,7 +276,7 @@ automation:
     action:
       - action: switch.turn_on
         target:
-          entity_id: switch.mikrotik_router_kidcontrol_kids_paused
+          entity_id: switch.mikrotik_extended_kidcontrol_kids_paused
 ```
 
 ## Feature Availability
@@ -326,7 +326,7 @@ This integration is distributed via [HACS](https://hacs.xyz/) as a custom reposi
 1. Open HACS -> three-dot menu -> **Custom repositories**
 2. URL: `https://github.com/Csontikka/ha-mikrotik-router`
 3. Category: **Integration**
-4. Search and install **Mikrotik Router**
+4. Search and install **MikroTik Extended**
 
 ### Requirements
 
@@ -340,7 +340,7 @@ This integration is distributed via [HACS](https://hacs.xyz/) as a custom reposi
 ### Initial Setup
 
 1. Create a user on your MikroTik router with the required permissions (see above)
-2. In Home Assistant: **Settings -> Devices & Services -> Add Integration -> Mikrotik Router**
+2. In Home Assistant: **Settings -> Devices & Services -> Add Integration -> MikroTik Extended**
 3. Choose whether to **scan the network** for MikroTik routers automatically:
    - **Scan** — the integration scans the local /24 subnet, checks the ARP table for MikroTik devices (by MAC OUI), and listens for MNDP broadcast announcements. Found routers are listed sorted by IP address — select one or choose *Enter manually*. If nothing is found, the manual entry form opens with an info message.
    - **Skip** — go directly to manual entry
@@ -371,7 +371,7 @@ These fields are shown during the initial setup wizard:
 
 ### Configuration Parameters
 
-These options can be changed after setup via **Settings -> Devices & Services -> Mikrotik Router -> Configure**. Changes take effect immediately — no HA restart needed.
+These options can be changed after setup via **Settings -> Devices & Services -> MikroTik Extended -> Configure**. Changes take effect immediately — no HA restart needed.
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -402,7 +402,7 @@ Switching presets takes effect after saving:
 ## Removal
 
 1. **Settings -> Devices & Services**
-2. Find **Mikrotik Router** -> click the three-dot menu -> **Delete**
+2. Find **MikroTik Extended** -> click the three-dot menu -> **Delete**
 3. Confirm removal
 
 When removed, the integration automatically cleans up the `ha-monitoring` Kid Control profile from the router (if it was created for Client Traffic monitoring). No manual cleanup needed on the router side.
@@ -419,7 +419,7 @@ This integration can create many entities depending on the number of interfaces,
 
 ### Disable unused entities
 
-Disable entities you don't actively use: **Settings -> Devices & Services -> Mikrotik Router -> click the device -> find the entity -> toggle it off.** Disabled entities are not polled and generate no history.
+Disable entities you don't actively use: **Settings -> Devices & Services -> MikroTik Extended -> click the device -> find the entity -> toggle it off.** Disabled entities are not polled and generate no history.
 
 ### Large attributes excluded from recorder
 
@@ -452,7 +452,7 @@ recorder:
 Download the integration diagnostics file for bug reports — it includes integration state and the last 1000 debug log entries. Sensitive data (passwords, IPs, MACs) is automatically redacted.
 
 1. **Settings -> Devices & Services**
-2. Find **Mikrotik Router** -> click the integration
+2. Find **MikroTik Extended** -> click the integration
 3. Click the **three-dot menu** -> **Download diagnostics**
 4. Attach the `.json` file to your [GitHub issue](https://github.com/Csontikka/ha-mikrotik-router/issues)
 
@@ -464,7 +464,7 @@ Debug logs are captured automatically in diagnostics. To also see them in the HA
 logger:
   default: info
   logs:
-    custom_components.mikrotik_router: debug
+    custom_components.mikrotik_extended: debug
 ```
 
 ## Support

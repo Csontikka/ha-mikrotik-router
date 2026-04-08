@@ -1,0 +1,398 @@
+{
+  "config": {
+    "step": {
+      "discovery": {
+        "title": "MikroTik Router जोड़ें",
+        "description": "अपने स्थानीय नेटवर्क पर MikroTik राउटर खोजें या पता मैन्युअल रूप से दर्ज करें।",
+        "data": {
+          "scan": "नेटवर्क पर MikroTik राउटर खोजें"
+        }
+      },
+      "pick_device": {
+        "title": "मिले MikroTik राउटर",
+        "description": "कॉन्फ़िगर करने के लिए एक राउटर चुनें या मैन्युअल प्रविष्टि चुनें।",
+        "data": {
+          "router": "राउटर चुनें"
+        }
+      },
+      "user": {
+        "title": "MikroTik Extended सेट करें",
+        "description": "Mikrotik राउटर इन्टीग्रेशन सेट अप करें।",
+        "data": {
+          "name": "इन्टीग्रेशन का नाम",
+          "host": "होस्ट",
+          "port": "पोर्ट",
+          "username": "उपयोगकर्ता नाम",
+          "password": "पासवर्ड",
+          "ssl_mode": "कनेक्शन सुरक्षा"
+        },
+        "data_description": {
+          "port": "RouterOS API पोर्ट। डिफ़ॉल्ट उपयोग करने के लिए 0 छोड़ें: 8728 (SSL नहीं) या 8729 (SSL)।"
+        }
+      },
+      "basic_options": {
+        "title": "MikroTik Extended सेटअप (2/4)",
+        "description": "इंटीग्रेशन को कॉन्फ़िगर करें",
+        "data": {
+          "scan_interval": "स्कैन अन्तराल (सेकन्ड)",
+          "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)",
+          "zone": "डिवाइस ट्रैकर के लिए ज़ोन"
+        },
+        "data_description": {
+          "scan_interval": "न्यूनतम: 10s। डिफ़ॉल्ट: 30s। कम मान RouterOS API लोड बढ़ाते हैं।",
+          "track_network_hosts_timeout": "केवल वायर्ड डिवाइस। ARP में न दिखने पर डिवाइस को ऑफ़लाइन मानने से पहले की सेकंड संख्या। डिफ़ॉल्ट: 180s।",
+          "zone": "ट्रैक किया गया डिवाइस कनेक्ट होने पर उपयोग किया जाने वाला Home Assistant ज़ोन नाम। डिफ़ॉल्ट: home।"
+        }
+      },
+      "sensor_mode": {
+        "title": "MikroTik Extended सेटअप (3/4)",
+        "description": "सेंसर सक्रियण मोड चुनें",
+        "data": {
+          "sensor_preset": "सेंसर प्रीसेट"
+        },
+        "data_description": {
+          "sensor_preset": "अनुशंसित मोड न्यूनतम एंटिटी के साथ सबसे उपयोगी सेंसर सक्षम करता है। पूर्ण मोड सब कुछ सक्षम करता है — बड़े नेटवर्क पर सावधानी से उपयोग करें।"
+        }
+      },
+      "sensor_select": {
+        "title": "MikroTik Extended सेटअप (4/4)",
+        "description": "सेंसर और स्विच को एनेबल करें",
+        "data": {
+          "sensor_client_captive": "कैप्टिव पोर्टल डेटा",
+          "sensor_client_traffic": "क्लाइंट ट्रैफ़िक सेंसर",
+          "sensor_containers": "कंटेनर सेंसर",
+          "sensor_environment": "एनवायरनमेंट वेरिएबल सेंसर",
+          "sensor_filter": "फ़िल्टर स्विच",
+          "sensor_kidcontrol": "बच्चों का नियंत्रण",
+          "sensor_mangle": "Mangle स्विच",
+          "sensor_nat": "NAT स्विच",
+          "sensor_netwatch_tracker": "Netwatch सेंसर",
+          "sensor_port_tracker": "पोर्ट ट्रैकर सेंसर",
+          "sensor_port_traffic": "पोर्ट ट्रैफ़िक सेंसर",
+          "sensor_ppp": "PPP यूज़र",
+          "sensor_routing_rules": "Routing Rules स्विच",
+          "sensor_scripts": "स्क्रिप्ट स्विच",
+          "sensor_simple_queues": "सामान्य कतार स्विच",
+          "track_network_hosts": "नेटवर्क डिवाइस को ट्रैक करें",
+          "sensor_wireguard": "WireGuard peer सेंसर"
+        },
+        "data_description": {
+          "sensor_client_captive": "ट्रैक किए गए डिवाइस में हॉटस्पॉट प्राधिकरण स्थिति जोड़ता है। केवल तभी उपयोगी जब कैप्टिव पोर्टल (हॉटस्पॉट) कॉन्फ़िगर हो।",
+          "sensor_client_traffic": "प्रत्येक ट्रैक किए गए डिवाइस के लिए 2 सेंसर (TX/RX गति)। Kid Control के साथ RouterOS 7 आवश्यक है — सक्षम होने पर इंटीग्रेशन राउटर पर स्वचालित रूप से 'ha-monitoring' प्रोफ़ाइल बनाता है। सेंसर केवल उन डिवाइसों के लिए दिखते हैं जिन्हें Kid Control सक्रिय रूप से ट्रैक करता है। नोट: RouterOS 6 समर्थित नहीं है।",
+          "sensor_containers": "प्रत्येक कंटेनर के लिए एक सेंसर और स्विच जो Docker जैसे कंटेनरों की निगरानी और शुरू/बंद करने की सुविधा देता है।",
+          "sensor_environment": "RouterOS एनवायरनमेंट वेरिएबल के लिए सेंसर।",
+          "sensor_filter": "प्रत्येक Filter नियम के लिए एक स्विच जो HA से फ़ायरवॉल फ़िल्टर नियम सक्षम/अक्षम करता है। चेतावनी: प्रत्येक फ़िल्टर नियम के लिए एक एंटिटी बनती है।",
+          "sensor_kidcontrol": "Kid Control डिवाइस प्रोफ़ाइल के लिए स्विच (इंटरनेट एक्सेस रोकना/फिर शुरू करना)।",
+          "sensor_mangle": "प्रत्येक Mangle नियम के लिए एक स्विच जो HA से पैकेट मार्किंग नियम सक्षम/अक्षम करता है। चेतावनी: प्रत्येक Mangle नियम के लिए एक एंटिटी बनती है।",
+          "sensor_nat": "प्रत्येक NAT नियम के लिए एक स्विच जो HA से नियम सक्षम/अक्षम करता है। चेतावनी: प्रत्येक NAT नियम के लिए एक एंटिटी बनती है।",
+          "sensor_netwatch_tracker": "प्रत्येक Netwatch एंट्री के लिए एक बाइनरी सेंसर जो पहुंच योग्यता स्थिति दिखाता है।",
+          "sensor_port_tracker": "प्रत्येक पोर्ट के लिए एक बाइनरी सेंसर जो लिंक अप/डाउन स्थिति दिखाता है।",
+          "sensor_port_traffic": "प्रत्येक इंटरफ़ेस के लिए 4 सेंसर (TX/RX बाइट और कुल)। चेतावनी: प्रत्येक इंटरफ़ेस के लिए 4 एंटिटी बनती हैं — यदि ट्रैफ़िक ग्राफ़ की आवश्यकता नहीं है तो अक्षम करें।",
+          "sensor_ppp": "प्रत्येक PPP सीक्रेट (उपयोगकर्ता) के लिए एक स्विच जो HA से VPN/PPPoE खाते सक्षम/अक्षम करता है।",
+          "sensor_routing_rules": "प्रत्येक Routing Rule के लिए एक स्विच जो HA से पॉलिसी रूटिंग नियम सक्षम/अक्षम करता है। चेतावनी: प्रत्येक रूटिंग नियम के लिए एक एंटिटी बनती है।",
+          "sensor_scripts": "प्रत्येक स्क्रिप्ट के लिए एक बटन जो HA से RouterOS स्क्रिप्ट ट्रिगर करता है।",
+          "sensor_simple_queues": "प्रत्येक Simple Queue एंट्री के लिए एक स्विच जो HA से बैंडविड्थ सीमाएं सक्षम/अक्षम करता है। चेतावनी: प्रत्येक कतार नियम के लिए एक एंटिटी बनती है।",
+          "track_network_hosts": "ARP/DHCP/वायरलेस टेबल में दिखने वाले प्रत्येक डिवाइस के लिए एक डिवाइस ट्रैकर एंटिटी बनाता है। प्रत्येक ट्रैक किया गया डिवाइस एक अलग HA डिवाइस बनाता है। चेतावनी: बड़े नेटवर्क पर सैकड़ों डिवाइस और एंटिटी बन सकती हैं।",
+          "sensor_wireguard": "प्रत्येक WireGuard peer के लिए सेंसर (अंतिम हैंडशेक, ट्रांसफर, एंडपॉइंट)।"
+        }
+      },
+      "reauth_confirm": {
+        "title": "MikroTik Extended पुनः प्रमाणीकरण",
+        "description": "{host} के लिए नए क्रेडेंशियल दर्ज करें।",
+        "data": {
+          "username": "उपयोगकर्ता नाम",
+          "password": "पासवर्ड"
+        }
+      },
+      "reconfigure": {
+        "title": "MikroTik Extended पुनः कॉन्फ़िगर करें",
+        "description": "इस इंटीग्रेशन के कनेक्शन सेटिंग्स अपडेट करें।",
+        "data": {
+          "name": "इन्टीग्रेशन का नाम",
+          "host": "होस्ट",
+          "port": "पोर्ट",
+          "username": "उपयोगकर्ता नाम",
+          "password": "पासवर्ड",
+          "ssl_mode": "कनेक्शन सुरक्षा"
+        },
+        "data_description": {
+          "port": "RouterOS API पोर्ट। डिफ़ॉल्ट उपयोग करने के लिए 0 छोड़ें: 8728 (SSL नहीं) या 8729 (SSL)।"
+        }
+      }
+    },
+    "error": {
+      "name_exists": "नाम पहले से मौजूद है।",
+      "cannot_connect": "Mikrotik से कनेक्ट नहीं कर सकते।",
+      "ssl_handshake_failure": "SSL हैंडशेक विफल हो गया",
+      "connection_timeout": "Mikrotik कनेक्शन टाइम आउट हो गया।",
+      "wrong_login": "अमान्य उपयोगकर्ता नाम या पासवर्ड।",
+      "ssl_verify_failure": "प्रमाणपत्र सत्यापन विफल",
+      "no_devices_found": "इस नेटवर्क पर कोई MikroTik राउटर नहीं मिला। राउटर का पता मैन्युअल रूप से दर्ज करें।"
+    },
+    "abort": {
+      "already_configured": "डिवाइस पहले से कॉन्फ़िगर है।",
+      "reauth_successful": "पुनः प्रमाणीकरण सफल रहा।",
+      "reconfigure_successful": "पुनः कॉन्फ़िगरेशन सफल रहा।"
+    }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "स्कैन अन्तराल",
+          "track_iface_clients": "क्लाइंट का MAC और IP इन्टरफ़ेस पर दिखाएं",
+          "unit_of_measurement": "माप का युनीट",
+          "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)",
+          "zone": "डिवाइस ट्रैकर के लिए ज़ोन"
+        },
+        "data_description": {
+          "scan_interval": "न्यूनतम: 10s। डिफ़ॉल्ट: 30s। कम मान RouterOS API लोड बढ़ाते हैं।",
+          "track_network_hosts_timeout": "केवल वायर्ड डिवाइस। ARP में न दिखने पर डिवाइस को ऑफ़लाइन मानने से पहले की सेकंड संख्या। डिफ़ॉल्ट: 180s।",
+          "zone": "ट्रैक किया गया डिवाइस कनेक्ट होने पर उपयोग किया जाने वाला Home Assistant ज़ोन नाम। डिफ़ॉल्ट: home।"
+        },
+        "title": "MikroTik Extended के विकल्प (1/3)",
+        "description": "इंटीग्रेशन को कॉन्फ़िगर करें"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "सेंसर प्रीसेट"
+        },
+        "data_description": {
+          "sensor_preset": "कौन से सेंसर और स्विच सक्षम हैं यह जल्दी से कॉन्फ़िगर करने के लिए एक प्रीसेट चुनें, या व्यक्तिगत रूप से कॉन्फ़िगर करने के लिए कस्टम चुनें।"
+        },
+        "title": "MikroTik Extended के विकल्प (2/3)",
+        "description": "सेंसर प्रीसेट चुनें"
+      },
+      "sensor_select": {
+        "data": {
+          "sensor_client_captive": "कैप्टिव पोर्टल डेटा",
+          "sensor_client_traffic": "क्लाइंट ट्रैफ़िक सेंसर",
+          "sensor_containers": "कंटेनर सेंसर",
+          "sensor_environment": "एनवायरनमेंट वेरिएबल सेंसर",
+          "sensor_filter": "फ़िल्टर स्विच",
+          "sensor_kidcontrol": "बच्चों का नियंत्रण",
+          "sensor_mangle": "Mangle स्विच",
+          "sensor_nat": "NAT स्विच",
+          "sensor_netwatch_tracker": "Netwatch सेंसर",
+          "sensor_port_tracker": "पोर्ट ट्रैकर सेंसर",
+          "sensor_port_traffic": "पोर्ट ट्रैफ़िक सेंसर",
+          "sensor_ppp": "PPP यूज़र",
+          "sensor_routing_rules": "Routing Rules स्विच",
+          "sensor_scripts": "स्क्रिप्ट स्विच",
+          "sensor_simple_queues": "सामान्य कतार स्विच",
+          "track_network_hosts": "नेटवर्क डिवाइस को ट्रैक करें",
+          "sensor_wireguard": "WireGuard peer सेंसर"
+        },
+        "data_description": {
+          "sensor_client_captive": "ट्रैक किए गए डिवाइस में हॉटस्पॉट प्राधिकरण स्थिति जोड़ता है। केवल तभी उपयोगी जब कैप्टिव पोर्टल (हॉटस्पॉट) कॉन्फ़िगर हो।",
+          "sensor_client_traffic": "प्रत्येक ट्रैक किए गए डिवाइस के लिए 2 सेंसर (TX/RX गति)। Kid Control के साथ RouterOS 7 आवश्यक है — सक्षम होने पर इंटीग्रेशन राउटर पर स्वचालित रूप से 'ha-monitoring' प्रोफ़ाइल बनाता है। सेंसर केवल उन डिवाइसों के लिए दिखते हैं जिन्हें Kid Control सक्रिय रूप से ट्रैक करता है। नोट: RouterOS 6 समर्थित नहीं है।",
+          "sensor_containers": "प्रत्येक कंटेनर के लिए एक सेंसर और स्विच जो Docker जैसे कंटेनरों की निगरानी और शुरू/बंद करने की सुविधा देता है।",
+          "sensor_environment": "RouterOS एनवायरनमेंट वेरिएबल के लिए सेंसर।",
+          "sensor_filter": "प्रत्येक Filter नियम के लिए एक स्विच जो HA से फ़ायरवॉल फ़िल्टर नियम सक्षम/अक्षम करता है। चेतावनी: प्रत्येक फ़िल्टर नियम के लिए एक एंटिटी बनती है।",
+          "sensor_kidcontrol": "Kid Control डिवाइस प्रोफ़ाइल के लिए स्विच (इंटरनेट एक्सेस रोकना/फिर शुरू करना)।",
+          "sensor_mangle": "प्रत्येक Mangle नियम के लिए एक स्विच जो HA से पैकेट मार्किंग नियम सक्षम/अक्षम करता है। चेतावनी: प्रत्येक Mangle नियम के लिए एक एंटिटी बनती है।",
+          "sensor_nat": "प्रत्येक NAT नियम के लिए एक स्विच जो HA से नियम सक्षम/अक्षम करता है। चेतावनी: प्रत्येक NAT नियम के लिए एक एंटिटी बनती है।",
+          "sensor_netwatch_tracker": "प्रत्येक Netwatch एंट्री के लिए एक बाइनरी सेंसर जो पहुंच योग्यता स्थिति दिखाता है।",
+          "sensor_port_tracker": "प्रत्येक पोर्ट के लिए एक बाइनरी सेंसर जो लिंक अप/डाउन स्थिति दिखाता है।",
+          "sensor_port_traffic": "प्रत्येक इंटरफ़ेस के लिए 4 सेंसर (TX/RX बाइट और कुल)। चेतावनी: प्रत्येक इंटरफ़ेस के लिए 4 एंटिटी बनती हैं — यदि ट्रैफ़िक ग्राफ़ की आवश्यकता नहीं है तो अक्षम करें।",
+          "sensor_ppp": "प्रत्येक PPP सीक्रेट (उपयोगकर्ता) के लिए एक स्विच जो HA से VPN/PPPoE खाते सक्षम/अक्षम करता है।",
+          "sensor_routing_rules": "प्रत्येक Routing Rule के लिए एक स्विच जो HA से पॉलिसी रूटिंग नियम सक्षम/अक्षम करता है। चेतावनी: प्रत्येक रूटिंग नियम के लिए एक एंटिटी बनती है।",
+          "sensor_scripts": "प्रत्येक स्क्रिप्ट के लिए एक बटन जो HA से RouterOS स्क्रिप्ट ट्रिगर करता है।",
+          "sensor_simple_queues": "प्रत्येक Simple Queue एंट्री के लिए एक स्विच जो HA से बैंडविड्थ सीमाएं सक्षम/अक्षम करता है। चेतावनी: प्रत्येक कतार नियम के लिए एक एंटिटी बनती है।",
+          "track_network_hosts": "ARP/DHCP/वायरलेस टेबल में दिखने वाले प्रत्येक डिवाइस के लिए एक डिवाइस ट्रैकर एंटिटी बनाता है। प्रत्येक ट्रैक किया गया डिवाइस एक अलग HA डिवाइस बनाता है। चेतावनी: बड़े नेटवर्क पर सैकड़ों डिवाइस और एंटिटी बन सकती हैं।",
+          "sensor_wireguard": "प्रत्येक WireGuard peer के लिए सेंसर (अंतिम हैंडशेक, ट्रांसफर, एंडपॉइंट)।"
+        },
+        "title": "MikroTik Extended के विकल्प (3/3)",
+        "description": "सेंसर और स्विच को एनेबल करें"
+      }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "{host} के लिए प्रमाणीकरण विफल",
+      "description": "{host} पर MikroTik राउटर का उपयोगकर्ता नाम या पासवर्ड गलत है। अपने क्रेडेंशियल अपडेट करने के लिए **सेटिंग्स → इंटीग्रेशन → MikroTik Router → पुनः प्रमाणीकरण** पर जाएं।"
+    },
+    "ssl_error": {
+      "title": "{host} के लिए SSL कनेक्शन त्रुटि",
+      "description": "{host} पर MikroTik राउटर के साथ सुरक्षित SSL कनेक्शन स्थापित नहीं हो सका। SSL सेटिंग्स बदलने या SSL अक्षम करने के लिए **सेटिंग्स → इंटीग्रेशन → MikroTik Router → पुनः कॉन्फ़िगर** पर जाएं।"
+    },
+    "insufficient_permissions": {
+      "title": "{host} के लिए अपर्याप्त API अनुमतियाँ",
+      "description": "RouterOS उपयोगकर्ता **{username}** राउटर **{host}** पर निम्नलिखित अनुमतियाँ नहीं हैं: **{missing}**।\n\nकुछ इंटीग्रेशन सुविधाएं काम नहीं करेंगी (स्विच, रीबूट बटन, Kid Control स्वचालित सेटअप)। इसे ठीक करने के लिए, राउटर पर उपयोगकर्ता समूह में अनुपस्थित नीतियाँ जोड़ें:\n\n/user/group/set [find name=YOUR_GROUP] policy=read,write,api,reboot,policy,test,sensitive"
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "अमान्य MAC पता प्रारूप: {mac}। अपेक्षित प्रारूप: AA:BB:CC:DD:EE:FF"
+    },
+    "missing_value": {
+      "message": "A value is required for add or set actions."
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "SSL नहीं — अनएन्क्रिप्टेड कनेक्शन (डिफ़ॉल्ट, पोर्ट 8728)",
+        "ssl": "SSL — एन्क्रिप्टेड, स्व-हस्ताक्षरित प्रमाणपत्र स्वीकार करता है (पोर्ट 8729)",
+        "ssl_verify": "SSL सत्यापन के साथ — वैध CA-हस्ताक्षरित प्रमाणपत्र आवश्यक"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": {
+        "name": "तापमान"
+      },
+      "system_voltage": {
+        "name": "वोल्टेज"
+      },
+      "system_cpu_temperature": {
+        "name": "CPU तापमान"
+      },
+      "system_switch_temperature": {
+        "name": "स्विच तापमान"
+      },
+      "system_board_temperature1": {
+        "name": "बोर्ड तापमान"
+      },
+      "system_phy_temperature": {
+        "name": "PHY तापमान"
+      },
+      "system_power_consumption": {
+        "name": "बिजली की खपत"
+      },
+      "system_poe_out_consumption": {
+        "name": "PoE आउटपुट खपत"
+      },
+      "system_fan1_speed": {
+        "name": "पंखा 1 गति"
+      },
+      "system_fan2_speed": {
+        "name": "पंखा 2 गति"
+      },
+      "system_fan3_speed": {
+        "name": "पंखा 3 गति"
+      },
+      "system_fan4_speed": {
+        "name": "पंखा 4 गति"
+      },
+      "system_psu1_current": {
+        "name": "पावर सप्लाई 1 करंट"
+      },
+      "system_psu1_voltage": {
+        "name": "पावर सप्लाई 1 वोल्टेज"
+      },
+      "system_psu2_current": {
+        "name": "पावर सप्लाई 2 करंट"
+      },
+      "system_psu2_voltage": {
+        "name": "पावर सप्लाई 2 वोल्टेज"
+      },
+      "system_uptime": {
+        "name": "अपटाइम"
+      },
+      "system_cpu_load": {
+        "name": "CPU लोड"
+      },
+      "system_memory_usage": {
+        "name": "मेमोरी उपयोग"
+      },
+      "system_hdd_usage": {
+        "name": "डिस्क उपयोग"
+      },
+      "system_clients_wired": {
+        "name": "वायर्ड क्लाइंट"
+      },
+      "system_clients_wireless": {
+        "name": "वायरलेस क्लाइंट"
+      },
+      "system_captive_authorized": {
+        "name": "कैप्टिव पोर्टल क्लाइंट"
+      },
+      "system_gps_latitude": {
+        "name": "अक्षांश"
+      },
+      "system_gps_longitude": {
+        "name": "देशांतर"
+      },
+      "traffic_tx": {
+        "name": "TX"
+      },
+      "traffic_rx": {
+        "name": "RX"
+      },
+      "tx_total": {
+        "name": "TX कुल"
+      },
+      "rx_total": {
+        "name": "RX कुल"
+      },
+      "client_traffic_tx": {
+        "name": "TX"
+      },
+      "client_traffic_rx": {
+        "name": "RX"
+      },
+      "ip_address": {
+        "name": "IP पता"
+      },
+      "cloud_public_address": {
+        "name": "सार्वजनिक पता"
+      },
+      "wireguard_peer_rx": {
+        "name": "RX"
+      },
+      "wireguard_peer_tx": {
+        "name": "TX"
+      },
+      "wireguard_peer_handshake": {
+        "name": "अंतिम हैंडशेक"
+      },
+      "system_device_mode": {
+        "name": "डिवाइस मोड"
+      },
+      "system_packages": {
+        "name": "पैकेज"
+      },
+      "system_dhcp_leases": {
+        "name": "DHCP leases"
+      },
+      "container_status": {
+        "name": "स्थिति"
+      }
+    },
+    "binary_sensor": {
+      "system_ups": {
+        "name": "UPS"
+      },
+      "ppp_tracker": {
+        "name": "PPP"
+      },
+      "interface_connection": {
+        "name": "कनेक्शन"
+      },
+      "netwatch": {
+        "name": "Netwatch"
+      },
+      "wireguard_peer": {
+        "name": "जुड़ा हुआ"
+      }
+    },
+    "switch": {
+      "interface_port": {
+        "name": "पोर्ट"
+      },
+      "ppp_secret": {
+        "name": "PPP secret"
+      },
+      "kidcontrol_paused": {
+        "name": "रोका गया"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "पुनः आरंभ"
+      }
+    }
+  }
+}

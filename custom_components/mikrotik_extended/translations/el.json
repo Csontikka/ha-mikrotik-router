@@ -1,0 +1,398 @@
+{
+  "config": {
+    "step": {
+      "discovery": {
+        "title": "Προσθήκη MikroTik Router",
+        "description": "Σαρώστε το τοπικό σας δίκτυο για δρομολογητές MikroTik ή εισάγετε τη διεύθυνση χειροκίνητα.",
+        "data": {
+          "scan": "Σάρωση δικτύου για δρομολογητές MikroTik"
+        }
+      },
+      "pick_device": {
+        "title": "Βρέθηκαν δρομολογητές MikroTik",
+        "description": "Επιλέξτε έναν δρομολογητή για ρύθμιση ή επιλέξτε χειροκίνητη εισαγωγή.",
+        "data": {
+          "router": "Επιλογή δρομολογητή"
+        }
+      },
+      "user": {
+        "title": "Ρύθμιση του MikroTik Extended",
+        "description": "Ενσωμάτωση εγκατάστασης MikroTik Extended.",
+        "data": {
+          "name": "Όνομα ενσωμάτωσης",
+          "host": "Εξυπηρετητής",
+          "port": "Θύρα",
+          "username": "Όνομα χρήστη",
+          "password": "Κωδικός πρόσβασης",
+          "ssl_mode": "Ασφάλεια σύνδεσης"
+        },
+        "data_description": {
+          "port": "Θύρα RouterOS API. Αφήστε στο 0 για χρήση της προεπιλογής: 8728 (χωρίς SSL) ή 8729 (με SSL)."
+        }
+      },
+      "basic_options": {
+        "title": "Ρύθμιση MikroTik Extended (2/4)",
+        "description": "Διαμόρφωση ενσωμάτωσης",
+        "data": {
+          "scan_interval": "Διάστημα σάρωσης (δευτερόλεπτα)",
+          "track_network_hosts_timeout": "Χρονικό όριο ανίχνευσης συσκευών δικτύου (δευτερόλεπτα)",
+          "zone": "Ζώνη για παρακολούθηση συσκευής"
+        },
+        "data_description": {
+          "scan_interval": "Ελάχιστο: 10s. Προεπιλογή: 30s. Χαμηλότερες τιμές αυξάνουν το φόρτο του RouterOS API.",
+          "track_network_hosts_timeout": "Μόνο ενσύρματες συσκευές. Δευτερόλεπτα πριν θεωρηθεί μια συσκευή εκτός σύνδεσης αν δεν εμφανίζεται στο ARP. Προεπιλογή: 180s.",
+          "zone": "Όνομα ζώνης Home Assistant για χρήση όταν μια παρακολουθούμενη συσκευή συνδέεται. Προεπιλογή: home."
+        }
+      },
+      "sensor_mode": {
+        "title": "Ρύθμιση MikroTik Extended (3/4)",
+        "description": "Επιλέξτε τρόπο ενεργοποίησης αισθητήρων",
+        "data": {
+          "sensor_preset": "Προεπιλογή αισθητήρων"
+        },
+        "data_description": {
+          "sensor_preset": "Η επιλογή Προτεινόμενο ενεργοποιεί τους πιο χρήσιμους αισθητήρες με ελάχιστο αριθμό οντοτήτων. Η επιλογή Πλήρες ενεργοποιεί τα πάντα — χρησιμοποιείτε με προσοχή σε μεγάλα δίκτυα."
+        }
+      },
+      "sensor_select": {
+        "title": "Ρύθμιση MikroTik Extended (4/4)",
+        "description": "Ενεργοποίηση αισθητήρων και διακοπτών",
+        "data": {
+          "sensor_client_captive": "Δεδομένα captive portal",
+          "sensor_client_traffic": "Αισθητήρες κίνησης πελατών",
+          "sensor_containers": "Αισθητήρες container",
+          "sensor_environment": "Αισθητήρες μεταβλητών περιβάλλοντος",
+          "sensor_filter": "Διακόπτες φίλτρου",
+          "sensor_kidcontrol": "Γονικός έλεγχος",
+          "sensor_mangle": "Διακόπτες Mangle",
+          "sensor_nat": "Διακόπτες NAT",
+          "sensor_netwatch_tracker": "Αισθητήρες Netwatch",
+          "sensor_port_tracker": "Αισθητήρες παρακολούθησης θυρών",
+          "sensor_port_traffic": "Αισθητήρες κίνησης θυρών",
+          "sensor_ppp": "Χρήστες PPP",
+          "sensor_routing_rules": "Διακόπτες Routing Rules",
+          "sensor_scripts": "Διακόπτες σεναρίων",
+          "sensor_simple_queues": "Διακόπτες απλών ουρών",
+          "track_network_hosts": "Ανίχνευση των συσκευών δικτύου",
+          "sensor_wireguard": "Αισθητήρες WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Προσθέτει την κατάσταση εξουσιοδότησης hotspot στις παρακολουθούμενες συσκευές. Χρήσιμο μόνο αν έχει ρυθμιστεί captive portal (hotspot).",
+          "sensor_client_traffic": "2 αισθητήρες ανά παρακολουθούμενη συσκευή (ταχύτητα TX/RX). Απαιτεί RouterOS 7 με Kid Control — η ενσωμάτωση δημιουργεί αυτόματα το προφίλ 'ha-monitoring' στον δρομολογητή όταν ενεργοποιείται. Οι αισθητήρες εμφανίζονται μόνο για συσκευές που παρακολουθεί ενεργά το Kid Control. Σημείωση: RouterOS 6 δεν υποστηρίζεται.",
+          "sensor_containers": "Αισθητήρας και διακόπτης ανά container για παρακολούθηση και εκκίνηση/διακοπή containers τύπου Docker.",
+          "sensor_environment": "Αισθητήρες για μεταβλητές περιβάλλοντος RouterOS.",
+          "sensor_filter": "Διακόπτης ανά κανόνα Filter για ενεργοποίηση/απενεργοποίηση κανόνων τείχους προστασίας από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα φίλτρου.",
+          "sensor_kidcontrol": "Διακόπτες για προφίλ συσκευών Kid Control (παύση/συνέχεια πρόσβασης στο διαδίκτυο).",
+          "sensor_mangle": "Διακόπτης ανά κανόνα Mangle για ενεργοποίηση/απενεργοποίηση κανόνων σήμανσης πακέτων από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα Mangle.",
+          "sensor_nat": "Διακόπτης ανά κανόνα NAT για ενεργοποίηση/απενεργοποίηση κανόνων από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα NAT.",
+          "sensor_netwatch_tracker": "Δυαδικός αισθητήρας ανά καταχώρηση Netwatch που εμφανίζει κατάσταση προσβασιμότητας.",
+          "sensor_port_tracker": "Δυαδικός αισθητήρας ανά θύρα που εμφανίζει κατάσταση σύνδεσης (ενεργή/ανενεργή).",
+          "sensor_port_traffic": "4 αισθητήρες ανά διεπαφή (bytes TX/RX και σύνολα). Προειδοποίηση: δημιουργεί 4 οντότητες ανά διεπαφή — απενεργοποιήστε αν δεν χρειάζονται γραφήματα κίνησης.",
+          "sensor_ppp": "Διακόπτης ανά PPP secret (χρήστη) για ενεργοποίηση/απενεργοποίηση λογαριασμών VPN/PPPoE από το HA.",
+          "sensor_routing_rules": "Διακόπτης ανά Routing Rule για ενεργοποίηση/απενεργοποίηση κανόνων δρομολόγησης πολιτικής από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα δρομολόγησης.",
+          "sensor_scripts": "Κουμπί ανά script για εκτέλεση scripts RouterOS από το HA.",
+          "sensor_simple_queues": "Διακόπτης ανά καταχώρηση Simple Queue για ενεργοποίηση/απενεργοποίηση ορίων εύρους ζώνης από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα ουράς.",
+          "track_network_hosts": "Δημιουργεί οντότητα παρακολούθησης συσκευής για κάθε συσκευή που εμφανίζεται στους πίνακες ARP/DHCP/ασύρματης. Κάθε παρακολουθούμενη συσκευή δημιουργεί ξεχωριστή συσκευή HA. Προειδοποίηση: σε μεγάλα δίκτυα μπορεί να δημιουργηθούν εκατοντάδες συσκευές και οντότητες.",
+          "sensor_wireguard": "Αισθητήρες ανά WireGuard peer (τελευταία χειραψία, μεταφορά, endpoint)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Επαναπιστοποίηση MikroTik Extended",
+        "description": "Εισάγετε νέα διαπιστευτήρια για {host}.",
+        "data": {
+          "username": "Όνομα χρήστη",
+          "password": "Κωδικός πρόσβασης"
+        }
+      },
+      "reconfigure": {
+        "title": "Επαναρύθμιση MikroTik Extended",
+        "description": "Ενημέρωση ρυθμίσεων σύνδεσης για αυτήν την ενσωμάτωση.",
+        "data": {
+          "name": "Όνομα ενσωμάτωσης",
+          "host": "Εξυπηρετητής",
+          "port": "Θύρα",
+          "username": "Όνομα χρήστη",
+          "password": "Κωδικός πρόσβασης",
+          "ssl_mode": "Ασφάλεια σύνδεσης"
+        },
+        "data_description": {
+          "port": "Θύρα RouterOS API. Αφήστε στο 0 για χρήση της προεπιλογής: 8728 (χωρίς SSL) ή 8729 (με SSL)."
+        }
+      }
+    },
+    "error": {
+      "name_exists": "Το όνομα υπάρχει ήδη.",
+      "cannot_connect": "Αδυναμία σύνδεσης στον Mikrotik.",
+      "ssl_handshake_failure": "Αποτυχία χειραψίας SSL",
+      "connection_timeout": "Λήξη χρονικού ορίου σύνδεσης με Mikrotik.",
+      "wrong_login": "Το όνομα χρήστη και ο κωδικός πρόσβασης δεν είναι έγκυρα.",
+      "ssl_verify_failure": "Αποτυχία επαλήθευσης πιστοποιητικού",
+      "no_devices_found": "Δεν βρέθηκαν δρομολογητές MikroTik σε αυτό το δίκτυο. Εισάγετε τη διεύθυνση του δρομολογητή χειροκίνητα."
+    },
+    "abort": {
+      "already_configured": "Η συσκευή είναι ήδη ρυθμισμένη.",
+      "reauth_successful": "Η επαναπιστοποίηση ήταν επιτυχής.",
+      "reconfigure_successful": "Η επαναρύθμιση ήταν επιτυχής."
+    }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Διάστημα σάρωσης",
+          "track_iface_clients": "Προβολή IP και MAC πελάτη στη διεπαφή",
+          "unit_of_measurement": "Μονάδα μέτρησης",
+          "track_network_hosts_timeout": "Χρονικό όριο ανίχνευσης συσκευών δικτύου (δευτερόλεπτα)",
+          "zone": "Ζώνη για παρακολούθηση συσκευής"
+        },
+        "data_description": {
+          "scan_interval": "Ελάχιστο: 10s. Προεπιλογή: 30s. Χαμηλότερες τιμές αυξάνουν το φόρτο του RouterOS API.",
+          "track_network_hosts_timeout": "Μόνο ενσύρματες συσκευές. Δευτερόλεπτα πριν θεωρηθεί μια συσκευή εκτός σύνδεσης αν δεν εμφανίζεται στο ARP. Προεπιλογή: 180s.",
+          "zone": "Όνομα ζώνης Home Assistant για χρήση όταν μια παρακολουθούμενη συσκευή συνδέεται. Προεπιλογή: home."
+        },
+        "title": "Επιλογές MikroTik Extended (1/3)",
+        "description": "Διαμόρφωση ενσωμάτωσης"
+      },
+      "sensor_mode": {
+        "data": {
+          "sensor_preset": "Προεπιλογή αισθητήρων"
+        },
+        "data_description": {
+          "sensor_preset": "Επιλέξτε μια προεπιλογή για γρήγορη ρύθμιση των ενεργοποιημένων αισθητήρων και διακοπτών, ή επιλέξτε Προσαρμοσμένο για μεμονωμένη ρύθμιση."
+        },
+        "title": "Επιλογές MikroTik Extended (2/3)",
+        "description": "Επιλογή προεπιλογής αισθητήρων"
+      },
+      "sensor_select": {
+        "data": {
+          "sensor_client_captive": "Δεδομένα captive portal",
+          "sensor_client_traffic": "Αισθητήρες κίνησης πελατών",
+          "sensor_containers": "Αισθητήρες container",
+          "sensor_environment": "Αισθητήρες μεταβλητών περιβάλλοντος",
+          "sensor_filter": "Διακόπτες φίλτρου",
+          "sensor_kidcontrol": "Γονικός έλεγχος",
+          "sensor_mangle": "Διακόπτες Mangle",
+          "sensor_nat": "Διακόπτες NAT",
+          "sensor_netwatch_tracker": "Αισθητήρες Netwatch",
+          "sensor_port_tracker": "Αισθητήρες παρακολούθησης θυρών",
+          "sensor_port_traffic": "Αισθητήρες κίνησης θυρών",
+          "sensor_ppp": "Χρήστες PPP",
+          "sensor_routing_rules": "Διακόπτες Routing Rules",
+          "sensor_scripts": "Διακόπτες σεναρίων",
+          "sensor_simple_queues": "Διακόπτες απλών ουρών",
+          "track_network_hosts": "Ανίχνευση των συσκευών δικτύου",
+          "sensor_wireguard": "Αισθητήρες WireGuard peer"
+        },
+        "data_description": {
+          "sensor_client_captive": "Προσθέτει την κατάσταση εξουσιοδότησης hotspot στις παρακολουθούμενες συσκευές. Χρήσιμο μόνο αν έχει ρυθμιστεί captive portal (hotspot).",
+          "sensor_client_traffic": "2 αισθητήρες ανά παρακολουθούμενη συσκευή (ταχύτητα TX/RX). Απαιτεί RouterOS 7 με Kid Control — η ενσωμάτωση δημιουργεί αυτόματα το προφίλ 'ha-monitoring' στον δρομολογητή όταν ενεργοποιείται. Οι αισθητήρες εμφανίζονται μόνο για συσκευές που παρακολουθεί ενεργά το Kid Control. Σημείωση: RouterOS 6 δεν υποστηρίζεται.",
+          "sensor_containers": "Αισθητήρας και διακόπτης ανά container για παρακολούθηση και εκκίνηση/διακοπή containers τύπου Docker.",
+          "sensor_environment": "Αισθητήρες για μεταβλητές περιβάλλοντος RouterOS.",
+          "sensor_filter": "Διακόπτης ανά κανόνα Filter για ενεργοποίηση/απενεργοποίηση κανόνων τείχους προστασίας από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα φίλτρου.",
+          "sensor_kidcontrol": "Διακόπτες για προφίλ συσκευών Kid Control (παύση/συνέχεια πρόσβασης στο διαδίκτυο).",
+          "sensor_mangle": "Διακόπτης ανά κανόνα Mangle για ενεργοποίηση/απενεργοποίηση κανόνων σήμανσης πακέτων από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα Mangle.",
+          "sensor_nat": "Διακόπτης ανά κανόνα NAT για ενεργοποίηση/απενεργοποίηση κανόνων από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα NAT.",
+          "sensor_netwatch_tracker": "Δυαδικός αισθητήρας ανά καταχώρηση Netwatch που εμφανίζει κατάσταση προσβασιμότητας.",
+          "sensor_port_tracker": "Δυαδικός αισθητήρας ανά θύρα που εμφανίζει κατάσταση σύνδεσης (ενεργή/ανενεργή).",
+          "sensor_port_traffic": "4 αισθητήρες ανά διεπαφή (bytes TX/RX και σύνολα). Προειδοποίηση: δημιουργεί 4 οντότητες ανά διεπαφή — απενεργοποιήστε αν δεν χρειάζονται γραφήματα κίνησης.",
+          "sensor_ppp": "Διακόπτης ανά PPP secret (χρήστη) για ενεργοποίηση/απενεργοποίηση λογαριασμών VPN/PPPoE από το HA.",
+          "sensor_routing_rules": "Διακόπτης ανά Routing Rule για ενεργοποίηση/απενεργοποίηση κανόνων δρομολόγησης πολιτικής από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα δρομολόγησης.",
+          "sensor_scripts": "Κουμπί ανά script για εκτέλεση scripts RouterOS από το HA.",
+          "sensor_simple_queues": "Διακόπτης ανά καταχώρηση Simple Queue για ενεργοποίηση/απενεργοποίηση ορίων εύρους ζώνης από το HA. Προειδοποίηση: δημιουργεί μία οντότητα ανά κανόνα ουράς.",
+          "track_network_hosts": "Δημιουργεί οντότητα παρακολούθησης συσκευής για κάθε συσκευή που εμφανίζεται στους πίνακες ARP/DHCP/ασύρματης. Κάθε παρακολουθούμενη συσκευή δημιουργεί ξεχωριστή συσκευή HA. Προειδοποίηση: σε μεγάλα δίκτυα μπορεί να δημιουργηθούν εκατοντάδες συσκευές και οντότητες.",
+          "sensor_wireguard": "Αισθητήρες ανά WireGuard peer (τελευταία χειραψία, μεταφορά, endpoint)."
+        },
+        "title": "Επιλογές MikroTik Extended (3/3)",
+        "description": "Ενεργοποίηση αισθητήρων και διακοπτών"
+      }
+    }
+  },
+  "issues": {
+    "wrong_credentials": {
+      "title": "Αποτυχία πιστοποίησης για {host}",
+      "description": "Το όνομα χρήστη ή ο κωδικός πρόσβασης για τον δρομολογητή MikroTik στο {host} είναι λανθασμένα. Μεταβείτε στις **Ρυθμίσεις → Ενσωματώσεις → MikroTik Router → Επαναπιστοποίηση** για να ενημερώσετε τα διαπιστευτήριά σας."
+    },
+    "ssl_error": {
+      "title": "Σφάλμα σύνδεσης SSL για {host}",
+      "description": "Δεν ήταν δυνατή η δημιουργία ασφαλούς σύνδεσης SSL με τον δρομολογητή MikroTik στο {host}. Μεταβείτε στις **Ρυθμίσεις → Ενσωματώσεις → MikroTik Router → Επαναρύθμιση** για να αλλάξετε τις ρυθμίσεις SSL ή να απενεργοποιήσετε το SSL."
+    },
+    "insufficient_permissions": {
+      "title": "Ανεπαρκή δικαιώματα API για {host}",
+      "description": "Ο χρήστης RouterOS **{username}** στον δρομολογητή **{host}** δεν έχει τα παρακάτω δικαιώματα: **{missing}**.\n\nΟρισμένες λειτουργίες ενσωμάτωσης δεν θα λειτουργήσουν (διακόπτες, κουμπί επανεκκίνησης, αυτόματη ρύθμιση Kid Control). Για να το διορθώσετε, προσθέστε τις ελλείπουσες πολιτικές στην ομάδα χρήστη στον δρομολογητή:\n\n/user/group/set [find name=YOUR_GROUP] policy=read,write,api,reboot,policy,test,sensitive"
+    }
+  },
+  "exceptions": {
+    "invalid_mac": {
+      "message": "Μη έγκυρη μορφή διεύθυνσης MAC: {mac}. Αναμενόμενη μορφή: AA:BB:CC:DD:EE:FF"
+    },
+    "missing_value": {
+      "message": "A value is required for add or set actions."
+    }
+  },
+  "selector": {
+    "ssl_mode": {
+      "options": {
+        "none": "Χωρίς SSL — μη κρυπτογραφημένη σύνδεση (προεπιλογή, θύρα 8728)",
+        "ssl": "SSL — κρυπτογραφημένη, αποδέχεται αυτο-υπογεγραμμένα πιστοποιητικά (θύρα 8729)",
+        "ssl_verify": "SSL με επαλήθευση — απαιτεί έγκυρο πιστοποιητικό υπογεγραμμένο από CA"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "system_temperature": {
+        "name": "Θερμοκρασία"
+      },
+      "system_voltage": {
+        "name": "Τάση"
+      },
+      "system_cpu_temperature": {
+        "name": "Θερμοκρασία CPU"
+      },
+      "system_switch_temperature": {
+        "name": "Θερμοκρασία switch"
+      },
+      "system_board_temperature1": {
+        "name": "Θερμοκρασία πλακέτας"
+      },
+      "system_phy_temperature": {
+        "name": "Θερμοκρασία PHY"
+      },
+      "system_power_consumption": {
+        "name": "Κατανάλωση ενέργειας"
+      },
+      "system_poe_out_consumption": {
+        "name": "Κατανάλωση PoE εξόδου"
+      },
+      "system_fan1_speed": {
+        "name": "Ταχύτητα ανεμιστήρα 1"
+      },
+      "system_fan2_speed": {
+        "name": "Ταχύτητα ανεμιστήρα 2"
+      },
+      "system_fan3_speed": {
+        "name": "Ταχύτητα ανεμιστήρα 3"
+      },
+      "system_fan4_speed": {
+        "name": "Ταχύτητα ανεμιστήρα 4"
+      },
+      "system_psu1_current": {
+        "name": "Τροφοδοτικό 1 ρεύμα"
+      },
+      "system_psu1_voltage": {
+        "name": "Τροφοδοτικό 1 τάση"
+      },
+      "system_psu2_current": {
+        "name": "Τροφοδοτικό 2 ρεύμα"
+      },
+      "system_psu2_voltage": {
+        "name": "Τροφοδοτικό 2 τάση"
+      },
+      "system_uptime": {
+        "name": "Χρόνος λειτουργίας"
+      },
+      "system_cpu_load": {
+        "name": "Φόρτος CPU"
+      },
+      "system_memory_usage": {
+        "name": "Χρήση μνήμης"
+      },
+      "system_hdd_usage": {
+        "name": "Χρήση δίσκου"
+      },
+      "system_clients_wired": {
+        "name": "Ενσύρματοι πελάτες"
+      },
+      "system_clients_wireless": {
+        "name": "Ασύρματοι πελάτες"
+      },
+      "system_captive_authorized": {
+        "name": "Πελάτες captive portal"
+      },
+      "system_gps_latitude": {
+        "name": "Γεωγραφικό πλάτος"
+      },
+      "system_gps_longitude": {
+        "name": "Γεωγραφικό μήκος"
+      },
+      "traffic_tx": {
+        "name": "TX"
+      },
+      "traffic_rx": {
+        "name": "RX"
+      },
+      "tx_total": {
+        "name": "TX σύνολο"
+      },
+      "rx_total": {
+        "name": "RX σύνολο"
+      },
+      "client_traffic_tx": {
+        "name": "TX"
+      },
+      "client_traffic_rx": {
+        "name": "RX"
+      },
+      "ip_address": {
+        "name": "Διεύθυνση IP"
+      },
+      "cloud_public_address": {
+        "name": "Δημόσια διεύθυνση"
+      },
+      "wireguard_peer_rx": {
+        "name": "RX"
+      },
+      "wireguard_peer_tx": {
+        "name": "TX"
+      },
+      "wireguard_peer_handshake": {
+        "name": "Τελευταία χειραψία"
+      },
+      "system_device_mode": {
+        "name": "Λειτουργία συσκευής"
+      },
+      "system_packages": {
+        "name": "Πακέτα"
+      },
+      "system_dhcp_leases": {
+        "name": "DHCP leases"
+      },
+      "container_status": {
+        "name": "Κατάσταση"
+      }
+    },
+    "binary_sensor": {
+      "system_ups": {
+        "name": "UPS"
+      },
+      "ppp_tracker": {
+        "name": "PPP"
+      },
+      "interface_connection": {
+        "name": "Σύνδεση"
+      },
+      "netwatch": {
+        "name": "Netwatch"
+      },
+      "wireguard_peer": {
+        "name": "Συνδεδεμένο"
+      }
+    },
+    "switch": {
+      "interface_port": {
+        "name": "Θύρα"
+      },
+      "ppp_secret": {
+        "name": "PPP secret"
+      },
+      "kidcontrol_paused": {
+        "name": "Σε παύση"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "Επανεκκίνηση"
+      }
+    }
+  }
+}
