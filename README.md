@@ -283,8 +283,16 @@ This integration is distributed via [HACS](https://hacs.xyz/) as a custom reposi
    - **Scan** — the integration scans the local /24 subnet, checks the ARP table for MikroTik devices (by MAC OUI), and listens for MNDP broadcast announcements. Found routers are listed sorted by IP address — select one or choose *Enter manually*. If nothing is found, the manual entry form opens with an info message.
    - **Skip** — go directly to manual entry
    > **Tip:** Router names appear in the list if SNMP or MNDP is enabled on the router. For SNMP, enable it with community string `public` (`/snmp set enabled=yes`). For MNDP, ensure neighbor discovery is active on the interface facing HA (`/ip neighbor discovery-settings set discover-interface-list=all`).
+
+   ![Router Discovery](docs/assets/images/screenshots/setup_pick_device.png)
+
 4. Fill in the connection details (see parameters below)
+
+   ![Connection Setup](docs/assets/images/screenshots/setup_connection.png)
+
 5. Choose a sensor preset and finish setup
+
+   ![Sensor Preset](docs/assets/images/screenshots/setup_sensor_preset.png)
 
 ### Installation Parameters
 
