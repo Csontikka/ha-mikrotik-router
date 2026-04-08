@@ -343,6 +343,38 @@ If the integration cannot connect to the router during removal, the cleanup is s
 /ip/kid-control/remove [find name=ha-monitoring]
 ```
 
+## Performance & Database Tips
+
+This integration can create many entities depending on the number of interfaces, firewall rules, and tracked devices on your router.
+
+### Disable unused entities
+
+Disable entities you don't actively use: **Settings -> Devices & Services -> Mikrotik Router -> click the device -> find the entity -> toggle it off.** Disabled entities are not polled and generate no history.
+
+### Large attributes excluded from recorder
+
+Some sensors carry detailed list attributes that are only useful in real-time (not historically):
+
+- **DHCP leases** — `leases` (full lease list)
+- **Wired clients** — `wired_clients_list` (connected client details)
+- **Wireless clients** — `wireless_clients_list` (connected client details)
+
+These attributes are automatically excluded from the recorder database using `_unrecorded_attributes`. You can still see them in real-time on your dashboard, in templates, and in automations — they just don't accumulate in the database. The numeric state values (counts) are recorded normally.
+
+### Exclude high-frequency sensors from recorder
+
+Traffic counters and other rapidly changing sensors can accumulate a lot of history. If you only need current values, exclude them from the recorder in `configuration.yaml`:
+
+```yaml
+recorder:
+  exclude:
+    entity_globs:
+      - sensor.mikrotik_*_tx
+      - sensor.mikrotik_*_rx
+      - sensor.mikrotik_*_tx_total
+      - sensor.mikrotik_*_rx_total
+```
+
 ## Troubleshooting
 
 ### Diagnostics Export
