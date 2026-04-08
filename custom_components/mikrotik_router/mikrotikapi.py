@@ -422,10 +422,7 @@ class MikrotikAPI:
             # Variable doesn't exist — create via one-shot scheduler
             escaped = str(value).replace("\\", "\\\\").replace('"', '\\"')
             sched_name = "_ha_env_set"
-            on_event = (
-                f':global {name} "{escaped}"; '
-                f'/system/scheduler/remove [find name={sched_name}]'
-            )
+            on_event = f':global {name} "{escaped}"; /system/scheduler/remove [find name={sched_name}]'
             try:
                 sched = self._connection.path("/system/scheduler")
                 tuple(sched("add", name=sched_name, **{"on-event": on_event, "interval": "1s"}))

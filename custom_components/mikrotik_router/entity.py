@@ -183,9 +183,7 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
     """Define entity"""
 
     _attr_has_entity_name = True
-    _unrecorded_attributes = frozenset(
-        {"leases", "wired_clients_list", "wireless_clients_list"}
-    )
+    _unrecorded_attributes = frozenset({"leases", "wired_clients_list", "wireless_clients_list"})
 
     def __init__(
         self,

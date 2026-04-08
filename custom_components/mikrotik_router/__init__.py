@@ -200,11 +200,14 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
             if action == "remove":
                 success = await hass.async_add_executor_job(
-                    coordinator.api.remove_env_variable, name,
+                    coordinator.api.remove_env_variable,
+                    name,
                 )
             else:  # add or set
                 success = await hass.async_add_executor_job(
-                    coordinator.api.set_env_variable, name, value,
+                    coordinator.api.set_env_variable,
+                    name,
+                    value,
                 )
 
             if not success:
