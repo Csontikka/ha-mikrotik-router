@@ -1,0 +1,86 @@
+name: Translation Check
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "custom_components/mikrotik_extended/translations/**"
+  pull_request:
+    branches: [master]
+    paths:
+      - "custom_components/mikrotik_extended/translations/**"
+
+jobs:
+  check:
+    name: Check translation completeness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify all translations have the same keys as en.json
+        run: |
+          python3 << 'PYTHON_SCRIPT'
+          import json
+          import sys
+          import os
+          import glob
+
+          TRANSLATIONS_DIR = "custom_components/mikrotik_extended/translations"
+          REFERENCE = os.path.join(TRANSLATIONS_DIR, "en.json")
+
+          def get_all_keys(obj, prefix=""):
+              """Recursively extract all keys from a nested dict."""
+              keys = set()
+              if isinstance(obj, dict):
+                  for k, v in obj.items():
+                      full_key = f"{prefix}.{k}" if prefix else k
+                      keys.add(full_key)
+                      keys.update(get_all_keys(v, full_key))
+              return keys
+
+          with open(REFERENCE) as f:
+              en_data = json.load(f)
+
+          en_keys = get_all_keys(en_data)
+          print(f"Reference (en.json): {len(en_keys)} keys\n")
+
+          files = sorted(glob.glob(os.path.join(TRANSLATIONS_DIR, "*.json")))
+          errors = 0
+
+          for filepath in files:
+              lang = os.path.basename(filepath)
+              if lang == "en.json":
+                  continue
+
+              with open(filepath) as f:
+                  try:
+                      data = json.load(f)
+                  except json.JSONDecodeError as e:
+                      print(f"::error file={filepath}::{lang}: Invalid JSON — {e}")
+                      errors += 1
+                      continue
+
+              lang_keys = get_all_keys(data)
+              missing = en_keys - lang_keys
+              extra = lang_keys - en_keys
+
+              if missing:
+                  for key in sorted(missing):
+                      print(f"::error file={filepath}::{lang}: missing key '{key}'")
+                  errors += len(missing)
+
+              if extra:
+                  for key in sorted(extra):
+                      print(f"::warning file={filepath}::{lang}: extra key '{key}' (not in en.json)")
+
+              status = "✅" if not missing else f"❌ {len(missing)} missing"
+              extra_info = f" (+{len(extra)} extra)" if extra else ""
+              print(f"  {lang}: {len(lang_keys)}/{len(en_keys)} keys — {status}{extra_info}")
+
+          print("")
+          if errors:
+              print(f"❌ {errors} translation issue(s) found!")
+              sys.exit(1)
+
+          print(f"✅ All {len(files) - 1} translations are complete")
+          PYTHON_SCRIPT

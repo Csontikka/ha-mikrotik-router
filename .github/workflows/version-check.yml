@@ -1,0 +1,31 @@
+name: Version Check
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  validate:
+    name: Validate version matches tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check manifest.json version vs git tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          MANIFEST_VERSION=$(python3 -c "import json; print(json.load(open('custom_components/mikrotik_extended/manifest.json'))['version'])")
+
+          echo "Git tag version:      $TAG"
+          echo "Manifest version:     $MANIFEST_VERSION"
+
+          if [ "$TAG" != "$MANIFEST_VERSION" ]; then
+            echo ""
+            echo "::error::Version mismatch! Tag 'v$TAG' does not match manifest.json version '$MANIFEST_VERSION'"
+            echo "Update manifest.json version to '$TAG' before tagging."
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ Versions match: v$TAG"

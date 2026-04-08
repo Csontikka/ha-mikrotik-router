@@ -1,0 +1,134 @@
+name: Sensitive Data Check
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  scan:
+    name: Scan for secrets & sensitive data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get changed files
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          else
+            FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git ls-files)
+          fi
+          echo "files<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$FILES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Check for blocked files
+        run: |
+          set -euo pipefail
+
+          CONFIG=".github/sensitive-patterns.yml"
+          if [ ! -f "$CONFIG" ]; then
+            echo "::error::Config file $CONFIG not found"
+            exit 1
+          fi
+
+          # Extract blocked_files patterns from YAML (one glob per line after "- ")
+          PATTERNS=$(awk '/^blocked_files:/{found=1; next} /^[a-z]/{found=0} found && /^\s*-\s*"/{gsub(/^\s*-\s*"|"\s*$/,""); print}' "$CONFIG")
+
+          FOUND=0
+          CHANGED="${{ steps.changed.outputs.files }}"
+
+          while IFS= read -r pattern; do
+            [ -z "$pattern" ] && continue
+            # Match changed files against the glob pattern
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              if echo "$CHANGED" | grep -qF "$file"; then
+                echo "::error file=$file::Blocked file detected: '$file' matches pattern '$pattern'"
+                FOUND=1
+              fi
+            done < <(git ls-files "$pattern" 2>/dev/null)
+          done <<< "$PATTERNS"
+
+          if [ "$FOUND" -eq 1 ]; then
+            echo ""
+            echo "❌ Blocked files found! Remove them or update .github/sensitive-patterns.yml"
+            exit 1
+          fi
+          echo "✅ No blocked files found"
+
+      - name: Scan content for secrets
+        env:
+          CHANGED_FILES: ${{ steps.changed.outputs.files }}
+        run: |
+          python3 << 'PYTHON_SCRIPT'
+          import yaml
+          import re
+          import sys
+          import os
+          import fnmatch
+
+          with open(".github/sensitive-patterns.yml") as f:
+              config = yaml.safe_load(f)
+
+          changed_files = os.environ.get("CHANGED_FILES", "").strip().split("\n")
+          changed_files = [f for f in changed_files if f.strip()]
+
+          rules = config.get("blocked_content", [])
+          if not rules:
+              print("✅ No content rules defined")
+              sys.exit(0)
+
+          found = 0
+          for rule in rules:
+              name = rule.get("name", "unnamed")
+              pattern = rule.get("pattern", "")
+              allow_list = rule.get("allow", [])
+              exclude_files = rule.get("exclude_files", [])
+
+              if not pattern:
+                  continue
+
+              regex = re.compile(pattern)
+
+              for filepath in changed_files:
+                  if not filepath or not os.path.isfile(filepath):
+                      continue
+
+                  # Check exclude_files globs
+                  excluded = False
+                  for exc in exclude_files:
+                      if fnmatch.fnmatch(filepath, exc):
+                          excluded = True
+                          break
+                  if excluded:
+                      continue
+
+                  # Skip binary files
+                  try:
+                      with open(filepath, "r", encoding="utf-8", errors="ignore") as fh:
+                          lines = fh.readlines()
+                  except Exception:
+                      continue
+
+                  for line_num, line in enumerate(lines, 1):
+                      for match in regex.finditer(line):
+                          matched_text = match.group(0)
+                          # Check allow list (exact match)
+                          if matched_text in allow_list:
+                              continue
+                          preview = matched_text[:60]
+                          print(f"::error file={filepath},line={line_num}::{name}: found '{preview}' in {filepath}:{line_num}")
+                          found += 1
+
+          if found:
+              print(f"\n❌ {found} sensitive content match(es) found!")
+              sys.exit(1)
+
+          print("✅ No sensitive content found")
+          PYTHON_SCRIPT

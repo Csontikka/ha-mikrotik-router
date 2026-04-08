@@ -1,0 +1,66 @@
+# Sensitive Data Scanner Configuration
+# Add patterns here to block files or content from being committed.
+
+# ─── Blocked file patterns (globs) ───────────────────────────────────
+# Files matching these patterns will be flagged if they appear in a commit.
+blocked_files:
+  # Environment & secrets
+  - ".env*"
+  - "secrets.yaml"
+  - "credentials.json"
+
+  # Certificates & keys
+  - "*.pem"
+  - "*.key"
+  - "*.p12"
+  - "*.pfx"
+  - "*.crt"
+
+  # IDE / tool config that may contain paths or tokens
+  - ".claude/**"
+  - ".omc/**"
+
+  # Dev utility scripts (may contain credentials, IPs, tokens)
+  - "deploy.py"
+  - "create_repo.py"
+  - "check_*.py"
+  - "setup_*.py"
+  - "screenshot_*.py"
+  - "mask_*.py"
+
+# ─── Blocked content patterns (regex) ────────────────────────────────
+# File contents are scanned for these patterns.
+# Use 'allow' to whitelist known-safe matches (exact full match).
+# Use 'exclude_files' to skip scanning in specific file globs.
+blocked_content:
+  - name: "Private IPv4 address"
+    pattern: '\b(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})\b'
+    allow:
+      - "192.168.1.1"     # Generic example IP used in docs
+      - "192.168.88.1"    # Default MikroTik IP used in docs/tests
+    exclude_files:
+      - "tests/**"         # Test fixtures may use example IPs
+
+  - name: "Home Assistant long-lived token (JWT)"
+    pattern: 'eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}'
+
+  - name: "Generic API key/token assignment"
+    pattern: '(?i)(api[_-]?key|api[_-]?token|auth[_-]?token|secret[_-]?key)\s*[:=]\s*["\x27][A-Za-z0-9_\-/.]{16,}["\x27]'
+    exclude_files:
+      - "tests/**"
+
+  - name: "GitHub token"
+    pattern: '(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9_]{36,}'
+
+  - name: "SonarCloud/SonarQube token"
+    pattern: 'sqp_[A-Za-z0-9]{40,}'
+
+  - name: "Generic password assignment"
+    pattern: '(?i)(password|passwd|pwd)\s*[:=]\s*["\x27][^"\x27]{4,}["\x27]'
+    exclude_files:
+      - "tests/**"
+
+  - name: "Bearer token in header"
+    pattern: '(?i)bearer\s+[A-Za-z0-9_\-/.]{20,}'
+    exclude_files:
+      - "tests/**"

@@ -1,0 +1,32 @@
+# Configuration for the auto-labeler workflow.
+# Maps labels to file glob patterns.
+
+integration:
+  - changed-files:
+      - any-glob-to-any-file: "custom_components/mikrotik_extended/**"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: "tests/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "README.md"
+          - "images/**"
+          - "docs/**"
+          - "LICENSE"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+translations:
+  - changed-files:
+      - any-glob-to-any-file: "custom_components/mikrotik_extended/translations/**"
+
+config-flow:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "custom_components/mikrotik_extended/config_flow.py"
+          - "custom_components/mikrotik_extended/strings.json"
