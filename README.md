@@ -416,6 +416,14 @@ If the integration cannot connect to the router during removal, the cleanup is s
 /ip/kid-control/remove [find name=ha-monitoring]
 ```
 
+## Supported languages
+
+Available in 26 languages:
+
+<p>
+<img src="https://flagcdn.com/20x15/gb.png" width="20" title="English" alt="English"> <img src="https://flagcdn.com/20x15/sa.png" width="20" title="Arabic" alt="Arabic"> <img src="https://flagcdn.com/20x15/cz.png" width="20" title="Czech" alt="Czech"> <img src="https://flagcdn.com/20x15/de.png" width="20" title="German" alt="German"> <img src="https://flagcdn.com/20x15/gr.png" width="20" title="Greek" alt="Greek"> <img src="https://flagcdn.com/20x15/es.png" width="20" title="Spanish" alt="Spanish"> <img src="https://flagcdn.com/20x15/fr.png" width="20" title="French" alt="French"> <img src="https://flagcdn.com/20x15/in.png" width="20" title="Hindi" alt="Hindi"> <img src="https://flagcdn.com/20x15/hu.png" width="20" title="Hungarian" alt="Hungarian"> <img src="https://flagcdn.com/20x15/is.png" width="20" title="Icelandic" alt="Icelandic"> <img src="https://flagcdn.com/20x15/it.png" width="20" title="Italian" alt="Italian"> <img src="https://flagcdn.com/20x15/jp.png" width="20" title="Japanese" alt="Japanese"> <img src="https://flagcdn.com/20x15/kr.png" width="20" title="Korean" alt="Korean"> <img src="https://flagcdn.com/20x15/lv.png" width="20" title="Latvian" alt="Latvian"> <img src="https://flagcdn.com/20x15/nl.png" width="20" title="Dutch" alt="Dutch"> <img src="https://flagcdn.com/20x15/no.png" width="20" title="Norwegian" alt="Norwegian"> <img src="https://flagcdn.com/20x15/pl.png" width="20" title="Polish" alt="Polish"> <img src="https://flagcdn.com/20x15/pt.png" width="20" title="Portuguese" alt="Portuguese"> <img src="https://flagcdn.com/20x15/br.png" width="20" title="Portuguese (BR)" alt="Portuguese (BR)"> <img src="https://flagcdn.com/20x15/ru.png" width="20" title="Russian" alt="Russian"> <img src="https://flagcdn.com/20x15/sk.png" width="20" title="Slovak" alt="Slovak"> <img src="https://flagcdn.com/20x15/tr.png" width="20" title="Turkish" alt="Turkish"> <img src="https://flagcdn.com/20x15/ua.png" width="20" title="Ukrainian" alt="Ukrainian"> <img src="https://flagcdn.com/20x15/vn.png" width="20" title="Vietnamese" alt="Vietnamese"> <img src="https://flagcdn.com/20x15/cn.png" width="20" title="Chinese" alt="Chinese">
+</p>
+
 ## Performance & Database Tips
 
 This integration can create many entities depending on the number of interfaces, firewall rules, and tracked devices on your router.
