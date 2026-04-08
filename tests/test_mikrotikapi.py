@@ -1,8 +1,7 @@
 """Tests for MikrotikAPI class."""
-from unittest.mock import patch, MagicMock, PropertyMock
-from time import time
 
-import pytest
+from time import time
+from unittest.mock import MagicMock, patch
 
 from custom_components.mikrotik_extended.mikrotikapi import MikrotikAPI
 
@@ -228,9 +227,7 @@ class TestSetValue:
 
     def test_set_value_success(self):
         mock_path = MagicMock()
-        mock_path.__iter__ = MagicMock(
-            return_value=iter([{".id": "*1", "name": "eth0"}])
-        )
+        mock_path.__iter__ = MagicMock(return_value=iter([{".id": "*1", "name": "eth0"}]))
         mock_path.update = MagicMock()
         self.api._connection.path.return_value = mock_path
         result = self.api.set_value("/interface", "name", "eth0", "disabled", True)
@@ -239,9 +236,7 @@ class TestSetValue:
 
     def test_set_value_not_found(self):
         mock_path = MagicMock()
-        mock_path.__iter__ = MagicMock(
-            return_value=iter([{".id": "*1", "name": "eth0"}])
-        )
+        mock_path.__iter__ = MagicMock(return_value=iter([{".id": "*1", "name": "eth0"}]))
         self.api._connection.path.return_value = mock_path
         result = self.api.set_value("/interface", "name", "eth99", "disabled", True)
         assert result is False
@@ -261,9 +256,7 @@ class TestExecute:
 
     def test_execute_success(self):
         mock_path = MagicMock()
-        mock_path.__iter__ = MagicMock(
-            return_value=iter([{".id": "*1", "name": "script1"}])
-        )
+        mock_path.__iter__ = MagicMock(return_value=iter([{".id": "*1", "name": "script1"}]))
         mock_path.return_value = iter([])
         self.api._connection.path.return_value = mock_path
         result = self.api.execute("/system/script", "run", "name", "script1")
@@ -271,9 +264,7 @@ class TestExecute:
 
     def test_execute_not_found(self):
         mock_path = MagicMock()
-        mock_path.__iter__ = MagicMock(
-            return_value=iter([{".id": "*1", "name": "script1"}])
-        )
+        mock_path.__iter__ = MagicMock(return_value=iter([{".id": "*1", "name": "script1"}]))
         self.api._connection.path.return_value = mock_path
         result = self.api.execute("/system/script", "run", "name", "nonexistent")
         assert result is False

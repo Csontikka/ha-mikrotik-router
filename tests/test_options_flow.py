@@ -1,15 +1,13 @@
 """Tests for Mikrotik Router options flow."""
-from unittest.mock import patch, MagicMock, AsyncMock
 
-import pytest
 from homeassistant.const import (
     CONF_HOST,
-    CONF_USERNAME,
+    CONF_NAME,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_SSL,
+    CONF_USERNAME,
     CONF_VERIFY_SSL,
-    CONF_NAME,
     CONF_ZONE,
     STATE_HOME,
 )
@@ -17,26 +15,26 @@ from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.mikrotik_extended.const import (
-    DOMAIN,
     CONF_SCAN_INTERVAL,
-    CONF_TRACK_HOSTS_TIMEOUT,
-    CONF_SENSOR_PORT_TRACKER,
-    CONF_SENSOR_NAT,
-    CONF_SENSOR_MANGLE,
-    CONF_SENSOR_FILTER,
-    CONF_SENSOR_WIREGUARD,
-    CONF_SENSOR_CONTAINERS,
-    CONF_SENSOR_PPP,
-    CONF_SENSOR_KIDCONTROL,
-    CONF_SENSOR_SCRIPTS,
-    CONF_SENSOR_ENVIRONMENT,
-    CONF_SENSOR_NETWATCH_TRACKER,
-    CONF_SENSOR_PORT_TRAFFIC,
-    CONF_SENSOR_CLIENT_TRAFFIC,
     CONF_SENSOR_CLIENT_CAPTIVE,
-    CONF_SENSOR_SIMPLE_QUEUES,
+    CONF_SENSOR_CLIENT_TRAFFIC,
+    CONF_SENSOR_CONTAINERS,
+    CONF_SENSOR_ENVIRONMENT,
+    CONF_SENSOR_FILTER,
+    CONF_SENSOR_KIDCONTROL,
+    CONF_SENSOR_MANGLE,
+    CONF_SENSOR_NAT,
+    CONF_SENSOR_NETWATCH_TRACKER,
+    CONF_SENSOR_PORT_TRACKER,
+    CONF_SENSOR_PORT_TRAFFIC,
+    CONF_SENSOR_PPP,
     CONF_SENSOR_ROUTING_RULES,
+    CONF_SENSOR_SCRIPTS,
+    CONF_SENSOR_SIMPLE_QUEUES,
+    CONF_SENSOR_WIREGUARD,
     CONF_TRACK_HOSTS,
+    CONF_TRACK_HOSTS_TIMEOUT,
+    DOMAIN,
 )
 
 ENTRY_DATA = {
@@ -120,16 +118,12 @@ async def test_options_flow_updates_scan_interval(hass):
     assert result["step_id"] == "sensor_mode"
 
     # Step 2: sensor_mode — choose custom
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"sensor_preset": "custom"}
-    )
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"sensor_preset": "custom"})
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "sensor_select"
 
     # Step 3: sensor_select — save
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], SENSOR_SELECT_INPUT
-    )
+    result = await hass.config_entries.options.async_configure(result["flow_id"], SENSOR_SELECT_INPUT)
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
     assert entry.options[CONF_SCAN_INTERVAL] == 60
@@ -159,16 +153,12 @@ async def test_options_flow_sensor_toggle(hass):
     )
 
     # sensor_mode — choose custom
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"sensor_preset": "custom"}
-    )
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"sensor_preset": "custom"})
 
     disabled_sensors = {k: False for k in SENSOR_SELECT_INPUT}
     disabled_sensors[CONF_SENSOR_PORT_TRACKER] = True  # keep at least one
 
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], disabled_sensors
-    )
+    result = await hass.config_entries.options.async_configure(result["flow_id"], disabled_sensors)
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert entry.options[CONF_SENSOR_NAT] is False
     assert entry.options[CONF_SENSOR_FILTER] is False

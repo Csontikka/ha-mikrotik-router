@@ -1,15 +1,15 @@
 """Tests for Mikrotik Router integration setup and teardown."""
-from unittest.mock import patch, MagicMock, AsyncMock
 
-import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
+
 from homeassistant.const import (
     CONF_HOST,
-    CONF_USERNAME,
+    CONF_NAME,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_SSL,
+    CONF_USERNAME,
     CONF_VERIFY_SSL,
-    CONF_NAME,
 )
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -66,9 +66,7 @@ async def test_setup_entry_sets_runtime_data(hass):
             "custom_components.mikrotik_extended.MikrotikTrackerCoordinator",
             return_value=mock_tracker,
         ),
-        patch.object(
-            hass.config_entries, "async_forward_entry_setups", return_value=True
-        ),
+        patch.object(hass.config_entries, "async_forward_entry_setups", return_value=True),
     ):
         result = await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
@@ -113,12 +111,8 @@ async def test_unload_entry(hass):
             "custom_components.mikrotik_extended.MikrotikTrackerCoordinator",
             return_value=mock_tracker,
         ),
-        patch.object(
-            hass.config_entries, "async_forward_entry_setups", return_value=True
-        ),
-        patch.object(
-            hass.config_entries, "async_unload_platforms", return_value=True
-        ),
+        patch.object(hass.config_entries, "async_forward_entry_setups", return_value=True),
+        patch.object(hass.config_entries, "async_unload_platforms", return_value=True),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()

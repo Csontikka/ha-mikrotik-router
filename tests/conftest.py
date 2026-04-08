@@ -1,4 +1,5 @@
 """Fixtures for Mikrotik Router tests."""
+
 import pytest
 
 

@@ -1,17 +1,16 @@
 """Tests for the _skip_sensor filter function in entity.py."""
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
-
-from custom_components.mikrotik_extended.entity import _skip_sensor
 from custom_components.mikrotik_extended.const import (
-    CONF_SENSOR_PORT_TRAFFIC,
-    CONF_SENSOR_PORT_TRACKER,
     CONF_SENSOR_NETWATCH_TRACKER,
+    CONF_SENSOR_PORT_TRACKER,
+    CONF_SENSOR_PORT_TRAFFIC,
     CONF_TRACK_HOSTS,
 )
+from custom_components.mikrotik_extended.entity import _skip_sensor
 
 
 def _make_config_entry(**options):
@@ -31,6 +30,7 @@ def _make_desc(func="SomeFunc", data_path="interface", data_attribute="enabled")
 # ---------------------------------------------------------------------------
 # MikrotikInterfaceTrafficSensor skips
 # ---------------------------------------------------------------------------
+
 
 class TestSkipTrafficSensor:
     def test_skip_when_traffic_disabled(self):
@@ -62,6 +62,7 @@ class TestSkipTrafficSensor:
 # client_traffic skips
 # ---------------------------------------------------------------------------
 
+
 class TestSkipClientTraffic:
     def test_skip_when_unavailable(self):
         entry = _make_config_entry()
@@ -92,6 +93,7 @@ class TestSkipClientTraffic:
 # MikrotikPortBinarySensor skips
 # ---------------------------------------------------------------------------
 
+
 class TestSkipPortBinarySensor:
     def test_skip_wlan_type(self):
         entry = _make_config_entry(**{CONF_SENSOR_PORT_TRACKER: True})
@@ -116,6 +118,7 @@ class TestSkipPortBinarySensor:
 # Netwatch skips
 # ---------------------------------------------------------------------------
 
+
 class TestSkipNetwatch:
     def test_skip_when_netwatch_disabled(self):
         entry = _make_config_entry(**{CONF_SENSOR_NETWATCH_TRACKER: False})
@@ -134,6 +137,7 @@ class TestSkipNetwatch:
 # MikrotikHostDeviceTracker skips
 # ---------------------------------------------------------------------------
 
+
 class TestSkipHostTracker:
     def test_skip_when_host_tracking_disabled(self):
         entry = _make_config_entry(**{CONF_TRACK_HOSTS: False})
@@ -151,6 +155,7 @@ class TestSkipHostTracker:
 # ---------------------------------------------------------------------------
 # Default — no skip
 # ---------------------------------------------------------------------------
+
 
 class TestNoSkip:
     def test_unknown_func_not_skipped(self):

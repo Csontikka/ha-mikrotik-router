@@ -1,19 +1,20 @@
 """Tests for MikrotikCoordinator and MikrotikTrackerCoordinator."""
+
 from __future__ import annotations
 
-from enum import Enum
 from datetime import datetime
-from unittest.mock import patch, MagicMock, AsyncMock, call
+from enum import StrEnum
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.const import (
     CONF_HOST,
-    CONF_USERNAME,
+    CONF_NAME,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_SSL,
+    CONF_USERNAME,
     CONF_VERIFY_SSL,
-    CONF_NAME,
 )
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed
@@ -23,7 +24,7 @@ from custom_components.mikrotik_extended.const import DOMAIN
 
 
 # Provide IssueSeverity fallback for test environment
-class _FakeIssueSeverity(str, Enum):
+class _FakeIssueSeverity(StrEnum):
     ERROR = "error"
     WARNING = "warning"
     CRITICAL = "critical"
@@ -66,9 +67,7 @@ def _make_coordinator(hass):
     entry = _make_config_entry()
     entry.add_to_hass(hass)
 
-    with patch(
-        "custom_components.mikrotik_extended.coordinator.MikrotikAPI"
-    ) as MockAPI:
+    with patch("custom_components.mikrotik_extended.coordinator.MikrotikAPI") as MockAPI:
         mock_api = MagicMock()
         MockAPI.return_value = mock_api
         with patch(
@@ -86,6 +85,7 @@ def _make_coordinator(hass):
 # ---------------------------------------------------------------------------
 # _get_stale_counters
 # ---------------------------------------------------------------------------
+
 
 class TestGetStaleCounters:
     def test_creates_empty_dict_for_new_key(self, hass):
@@ -120,6 +120,7 @@ class TestGetStaleCounters:
 # _async_update_data — connection / reconnect flow
 # ---------------------------------------------------------------------------
 
+
 class TestAsyncUpdateDataConnection:
     async def _run_update(self, coordinator):
         """Invoke _async_update_data directly."""
@@ -137,17 +138,44 @@ class TestAsyncUpdateDataConnection:
                     setattr(coordinator, attr, noop_sync)
         # Explicitly cover the ones called via async_add_executor_job
         for name in [
-            "get_access", "get_firmware_update", "get_system_resource",
-            "get_capabilities", "get_system_routerboard", "get_script",
-            "get_dhcp_network", "get_dns", "get_system_health",
-            "get_dhcp_client", "get_interface", "get_ip_address", "get_cloud",
-            "get_capsman_hosts", "get_wireless", "get_wireless_hosts",
-            "get_bridge", "get_arp", "get_dhcp", "process_interface_client",
-            "get_nat", "get_kidcontrol", "get_mangle", "get_routing_rules",
-            "get_wireguard_peers", "get_containers", "get_device_mode",
-            "get_packages", "get_filter", "get_netwatch", "get_ppp",
-            "sync_kid_control_monitoring_profile", "process_kid_control_devices",
-            "get_captive", "get_queue", "get_environment", "get_ups", "get_gps",
+            "get_access",
+            "get_firmware_update",
+            "get_system_resource",
+            "get_capabilities",
+            "get_system_routerboard",
+            "get_script",
+            "get_dhcp_network",
+            "get_dns",
+            "get_system_health",
+            "get_dhcp_client",
+            "get_interface",
+            "get_ip_address",
+            "get_cloud",
+            "get_capsman_hosts",
+            "get_wireless",
+            "get_wireless_hosts",
+            "get_bridge",
+            "get_arp",
+            "get_dhcp",
+            "process_interface_client",
+            "get_nat",
+            "get_kidcontrol",
+            "get_mangle",
+            "get_routing_rules",
+            "get_wireguard_peers",
+            "get_containers",
+            "get_device_mode",
+            "get_packages",
+            "get_filter",
+            "get_netwatch",
+            "get_ppp",
+            "sync_kid_control_monitoring_profile",
+            "process_kid_control_devices",
+            "get_captive",
+            "get_queue",
+            "get_environment",
+            "get_ups",
+            "get_gps",
         ]:
             setattr(coordinator, name, MagicMock(return_value=None))
 
@@ -207,12 +235,18 @@ class TestAsyncUpdateDataConnection:
 # _async_update_data — repair issues
 # ---------------------------------------------------------------------------
 
+
 class TestRepairIssues:
     def _stub_all_get_methods(self, coordinator):
         for name in [
-            "get_access", "get_firmware_update", "get_system_resource",
-            "get_capabilities", "get_system_routerboard", "get_script",
-            "get_dhcp_network", "get_dns",
+            "get_access",
+            "get_firmware_update",
+            "get_system_resource",
+            "get_capabilities",
+            "get_system_routerboard",
+            "get_script",
+            "get_dhcp_network",
+            "get_dns",
         ]:
             setattr(coordinator, name, MagicMock(return_value=None))
         coordinator.async_get_host_hass = AsyncMock(return_value=None)
@@ -221,6 +255,7 @@ class TestRepairIssues:
     def _patch_severity_and_issues(self, mock_create=None, mock_delete=None):
         """Context manager that patches IssueSeverity + create/delete issue."""
         import contextlib
+
         @contextlib.contextmanager
         def _ctx():
             with (
@@ -229,6 +264,7 @@ class TestRepairIssues:
                 patch("custom_components.mikrotik_extended.coordinator.async_delete_issue", mock_delete),
             ):
                 yield
+
         return _ctx()
 
     async def test_wrong_login_creates_repair_issue(self, hass):
@@ -242,9 +278,8 @@ class TestRepairIssues:
 
         mock_create = MagicMock()
 
-        with self._patch_severity_and_issues(mock_create, MagicMock()):
-            with pytest.raises(ConfigEntryAuthFailed):
-                await coordinator._async_update_data()
+        with self._patch_severity_and_issues(mock_create, MagicMock()), pytest.raises(ConfigEntryAuthFailed):
+            await coordinator._async_update_data()
 
         mock_create.assert_called_once()
         assert mock_create.call_args[0][2] == "wrong_credentials"
@@ -260,9 +295,8 @@ class TestRepairIssues:
 
         mock_create = MagicMock()
 
-        with self._patch_severity_and_issues(mock_create, MagicMock()):
-            with pytest.raises(UpdateFailed):
-                await coordinator._async_update_data()
+        with self._patch_severity_and_issues(mock_create, MagicMock()), pytest.raises(UpdateFailed):
+            await coordinator._async_update_data()
 
         mock_create.assert_called_once()
         assert mock_create.call_args[0][2] == "ssl_error"
@@ -278,9 +312,8 @@ class TestRepairIssues:
 
         mock_create = MagicMock()
 
-        with self._patch_severity_and_issues(mock_create, MagicMock()):
-            with pytest.raises(UpdateFailed):
-                await coordinator._async_update_data()
+        with self._patch_severity_and_issues(mock_create, MagicMock()), pytest.raises(UpdateFailed):
+            await coordinator._async_update_data()
 
         assert mock_create.call_args[0][2] == "ssl_error"
 
@@ -297,9 +330,9 @@ class TestRepairIssues:
             patch("custom_components.mikrotik_extended.coordinator.IssueSeverity", None),
             patch("custom_components.mikrotik_extended.coordinator.async_create_issue", None),
             patch("custom_components.mikrotik_extended.coordinator.async_delete_issue", None),
+            pytest.raises(ConfigEntryAuthFailed),
         ):
-            with pytest.raises(ConfigEntryAuthFailed):
-                await coordinator._async_update_data()
+            await coordinator._async_update_data()
 
     async def test_repair_issues_deleted_on_successful_reconnect(self, hass):
         """async_delete_issue called for both issue keys after successful reconnect."""
@@ -313,9 +346,8 @@ class TestRepairIssues:
 
         mock_delete = MagicMock()
 
-        with self._patch_severity_and_issues(MagicMock(), mock_delete):
-            with patch("custom_components.mikrotik_extended.coordinator.async_dispatcher_send"):
-                await coordinator._async_update_data()
+        with self._patch_severity_and_issues(MagicMock(), mock_delete), patch("custom_components.mikrotik_extended.coordinator.async_dispatcher_send"):
+            await coordinator._async_update_data()
 
         deleted_issue_ids = [c[0][2] for c in mock_delete.call_args_list]
         assert "wrong_credentials" in deleted_issue_ids
@@ -330,9 +362,8 @@ class TestRepairIssues:
         coordinator.api.connected.return_value = False
         coordinator.api.error = "wrong_login"
 
-        with self._patch_severity_and_issues(MagicMock(), MagicMock()):
-            with pytest.raises(ConfigEntryAuthFailed):
-                await coordinator._async_update_data()
+        with self._patch_severity_and_issues(MagicMock(), MagicMock()), pytest.raises(ConfigEntryAuthFailed):
+            await coordinator._async_update_data()
 
     async def test_non_wrong_login_error_does_not_trigger_reauth(self, hass):
         """async_start_reauth NOT called for non-auth errors."""
@@ -346,8 +377,7 @@ class TestRepairIssues:
         mock_reauth = MagicMock()
         coordinator.config_entry.async_start_reauth = mock_reauth
 
-        with self._patch_severity_and_issues(MagicMock(), MagicMock()):
-            with pytest.raises(UpdateFailed):
-                await coordinator._async_update_data()
+        with self._patch_severity_and_issues(MagicMock(), MagicMock()), pytest.raises(UpdateFailed):
+            await coordinator._async_update_data()
 
         mock_reauth.assert_not_called()

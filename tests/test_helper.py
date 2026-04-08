@@ -1,4 +1,5 @@
 """Tests for helper functions."""
+
 from custom_components.mikrotik_extended.helper import format_attribute, format_value
 
 

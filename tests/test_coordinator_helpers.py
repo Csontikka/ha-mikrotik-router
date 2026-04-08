@@ -1,20 +1,18 @@
 """Tests for coordinator helper functions and computation methods."""
+
 from __future__ import annotations
 
 import re
-from unittest.mock import MagicMock, patch
-
-import pytest
 
 from custom_components.mikrotik_extended.coordinator import (
     _parse_duration_seconds,
     is_valid_ip,
 )
 
-
 # ---------------------------------------------------------------------------
 # _parse_duration_seconds
 # ---------------------------------------------------------------------------
+
 
 class TestParseDurationSeconds:
     def test_simple_seconds(self):
@@ -60,6 +58,7 @@ class TestParseDurationSeconds:
 # is_valid_ip
 # ---------------------------------------------------------------------------
 
+
 class TestIsValidIp:
     def test_valid_ipv4(self):
         assert is_valid_ip("192.168.1.1") is True
@@ -92,6 +91,7 @@ class TestIsValidIp:
 # ---------------------------------------------------------------------------
 # Memory/HDD usage calculation logic (tested via dict manipulation)
 # ---------------------------------------------------------------------------
+
 
 class TestResourceCalculations:
     """Test the memory and HDD usage calculation logic from get_system_resource."""
@@ -140,6 +140,7 @@ class TestResourceCalculations:
 # Firmware version parsing logic
 # ---------------------------------------------------------------------------
 
+
 class TestFirmwareVersionParsing:
     """Test the firmware version parsing logic from get_firmware_update."""
 
@@ -176,6 +177,7 @@ class TestFirmwareVersionParsing:
 # ---------------------------------------------------------------------------
 # Traffic rate calculation logic
 # ---------------------------------------------------------------------------
+
 
 class TestTrafficRateCalculation:
     """Test the interface traffic rate calculation logic from get_interface."""
@@ -216,6 +218,7 @@ class TestTrafficRateCalculation:
 # ---------------------------------------------------------------------------
 # Duplicate rule dedup logic
 # ---------------------------------------------------------------------------
+
 
 class TestDuplicateRuleDedup:
     """Test the duplicate rule dedup pattern used in NAT/mangle/filter."""

@@ -667,9 +667,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                             translation_placeholders={"host": self.host},
                         )
                 if self.api.error == "wrong_login":
-                    raise ConfigEntryAuthFailed(
-                        f"Invalid credentials for {self.host}"
-                    )
+                    raise ConfigEntryAuthFailed(f"Invalid credentials for {self.host}")
                 raise UpdateFailed("Mikrotik Disconnected")
 
             if self.api.connected():
@@ -798,9 +796,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if not self.api.connected():
             if self.api.error == "wrong_login":
-                raise ConfigEntryAuthFailed(
-                    f"Invalid credentials for {self.host}"
-                )
+                raise ConfigEntryAuthFailed(f"Invalid credentials for {self.host}")
             raise UpdateFailed("Mikrotik Disconnected")
 
         _cycle_s = (datetime.now() - _cycle_start).total_seconds()

@@ -1,19 +1,16 @@
 """Tests for apiparser functions."""
-import pytest
+
 from custom_components.mikrotik_extended.apiparser import (
+    can_skip,
     from_entry,
     from_entry_bool,
-    parse_api,
-    get_uid,
     generate_keymap,
     matches_only,
-    can_skip,
-    fill_defaults,
-    fill_ensure_vals,
+    parse_api,
 )
 
-
 # ---- from_entry ----
+
 
 class TestFromEntry:
     def test_simple_key(self):
@@ -55,6 +52,7 @@ class TestFromEntry:
 
 
 # ---- from_entry_bool ----
+
 
 class TestFromEntryBool:
     def test_true_value(self):
@@ -107,6 +105,7 @@ class TestFromEntryBool:
 
 
 # ---- parse_api ----
+
 
 class TestParseApi:
     def test_empty_source_returns_data(self):
@@ -226,6 +225,7 @@ class TestParseApi:
 
 # ---- prune_stale ----
 
+
 class TestPruneStale:
     def test_stale_not_pruned_before_3_polls(self):
         """Items missing from source should survive 2 polls."""
@@ -235,18 +235,24 @@ class TestPruneStale:
         # Poll 1: only *1 seen
         source = [{"name": "eth0", ".id": "*1"}]
         data = parse_api(
-            data=data, source=source, key=".id",
+            data=data,
+            source=source,
+            key=".id",
             vals=[{"name": "name", "source": "name"}],
-            prune_stale=True, stale_counters=counters,
+            prune_stale=True,
+            stale_counters=counters,
         )
         assert "*2" in data
         assert counters["*2"] == 1
 
         # Poll 2: only *1 seen again
         data = parse_api(
-            data=data, source=source, key=".id",
+            data=data,
+            source=source,
+            key=".id",
             vals=[{"name": "name", "source": "name"}],
-            prune_stale=True, stale_counters=counters,
+            prune_stale=True,
+            stale_counters=counters,
         )
         assert "*2" in data
         assert counters["*2"] == 2
@@ -259,9 +265,12 @@ class TestPruneStale:
 
         for _ in range(3):
             data = parse_api(
-                data=data, source=source, key=".id",
+                data=data,
+                source=source,
+                key=".id",
                 vals=[{"name": "name", "source": "name"}],
-                prune_stale=True, stale_counters=counters,
+                prune_stale=True,
+                stale_counters=counters,
             )
 
         assert "*1" in data
@@ -276,9 +285,12 @@ class TestPruneStale:
         # Poll 1: only *1
         source1 = [{"name": "eth0", ".id": "*1"}]
         data = parse_api(
-            data=data, source=source1, key=".id",
+            data=data,
+            source=source1,
+            key=".id",
             vals=[{"name": "name", "source": "name"}],
-            prune_stale=True, stale_counters=counters,
+            prune_stale=True,
+            stale_counters=counters,
         )
         assert counters["*2"] == 1
 
@@ -288,9 +300,12 @@ class TestPruneStale:
             {"name": "eth1", ".id": "*2"},
         ]
         data = parse_api(
-            data=data, source=source2, key=".id",
+            data=data,
+            source=source2,
+            key=".id",
             vals=[{"name": "name", "source": "name"}],
-            prune_stale=True, stale_counters=counters,
+            prune_stale=True,
+            stale_counters=counters,
         )
         assert "*2" not in counters
 
@@ -301,7 +316,9 @@ class TestPruneStale:
 
         for _ in range(5):
             data = parse_api(
-                data=data, source=source, key=".id",
+                data=data,
+                source=source,
+                key=".id",
                 vals=[{"name": "name", "source": "name"}],
             )
 
@@ -314,9 +331,12 @@ class TestPruneStale:
 
         for _ in range(5):
             data = parse_api(
-                data=data, source=source, key=".id",
+                data=data,
+                source=source,
+                key=".id",
                 vals=[{"name": "name", "source": "name"}],
-                prune_stale=True, stale_counters=None,
+                prune_stale=True,
+                stale_counters=None,
             )
 
         assert "*2" in data
@@ -328,14 +348,17 @@ class TestPruneStale:
         source = [{"cpu": "60"}]
 
         data = parse_api(
-            data=data, source=source,
+            data=data,
+            source=source,
             vals=[{"name": "cpu", "source": "cpu"}],
-            prune_stale=True, stale_counters=counters,
+            prune_stale=True,
+            stale_counters=counters,
         )
         assert "cpu" in data
 
 
 # ---- matches_only / can_skip ----
+
 
 class TestFilters:
     def test_matches_only_all_match(self):
@@ -371,6 +394,7 @@ class TestFilters:
 
 
 # ---- generate_keymap ----
+
 
 class TestGenerateKeymap:
     def test_generates_reverse_map(self):

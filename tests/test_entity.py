@@ -1,17 +1,18 @@
 """Tests for MikrotikEntity base class."""
+
 from __future__ import annotations
 
+import contextlib
 from unittest.mock import MagicMock, patch
 
-import pytest
 from homeassistant.const import (
     CONF_HOST,
-    CONF_USERNAME,
+    CONF_NAME,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_SSL,
+    CONF_USERNAME,
     CONF_VERIFY_SSL,
-    CONF_NAME,
 )
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -103,6 +104,7 @@ def _make_entity(coordinator, entity_description, uid=None):
 # Construction
 # ---------------------------------------------------------------------------
 
+
 class TestMikrotikEntityConstruction:
     def test_flat_entity_sets_data_from_path(self, hass):
         """Entity without uid stores path-level dict in _data."""
@@ -136,6 +138,7 @@ class TestMikrotikEntityConstruction:
 # _handle_coordinator_update
 # ---------------------------------------------------------------------------
 
+
 class TestHandleCoordinatorUpdate:
     def test_updates_data_when_path_and_uid_present(self, hass):
         """_handle_coordinator_update refreshes _data when uid is in path_data."""
@@ -144,9 +147,7 @@ class TestHandleCoordinatorUpdate:
             data_reference="name",
             data_name="name",
         )
-        coord = _make_coordinator(
-            hass, data={"interface": {"ether1": {"name": "ether1", "running": True}}}
-        )
+        coord = _make_coordinator(hass, data={"interface": {"ether1": {"name": "ether1", "running": True}}})
         entity = _make_entity(coord, desc, uid="ether1")
         assert entity._data["running"] is True
 
@@ -155,15 +156,14 @@ class TestHandleCoordinatorUpdate:
 
         # Call _handle_coordinator_update — patch super to avoid HA internals
         from custom_components.mikrotik_extended.entity import MikrotikEntity
+
         with patch.object(MikrotikEntity, "_handle_coordinator_update", entity._handle_coordinator_update.__func__):
             # Call the actual implementation directly
             pass
 
         # Just call it directly, catching the super() call
-        try:
+        with contextlib.suppress(Exception):
             entity._handle_coordinator_update()
-        except Exception:
-            pass
 
         assert entity._data["running"] is False
 
@@ -180,10 +180,8 @@ class TestHandleCoordinatorUpdate:
         original_data = dict(entity._data)
         coord.data = {}  # Remove the path
 
-        try:
+        with contextlib.suppress(Exception):
             entity._handle_coordinator_update()
-        except Exception:
-            pass
 
         # _data should not have changed
         assert entity._data == original_data
@@ -195,18 +193,14 @@ class TestHandleCoordinatorUpdate:
             data_reference="name",
             data_name="name",
         )
-        coord = _make_coordinator(
-            hass, data={"interface": {"ether1": {"name": "ether1"}}}
-        )
+        coord = _make_coordinator(hass, data={"interface": {"ether1": {"name": "ether1"}}})
         entity = _make_entity(coord, desc, uid="ether1")
 
         original_data = dict(entity._data)
         coord.data = {"interface": {}}  # uid gone
 
-        try:
+        with contextlib.suppress(Exception):
             entity._handle_coordinator_update()
-        except Exception:
-            pass
 
         assert entity._data == original_data
 
@@ -218,10 +212,8 @@ class TestHandleCoordinatorUpdate:
 
         coord.data = {"resource": {"cpu-load": 99}}
 
-        try:
+        with contextlib.suppress(Exception):
             entity._handle_coordinator_update()
-        except Exception:
-            pass
 
         assert entity._data["cpu-load"] == 99
 
@@ -243,6 +235,7 @@ class TestHandleCoordinatorUpdate:
 # custom_name property
 # ---------------------------------------------------------------------------
 
+
 class TestCustomName:
     def test_returns_entity_description_name_for_flat_entity(self, hass):
         desc = _make_entity_description(name="Uptime", data_path="resource")
@@ -257,9 +250,7 @@ class TestCustomName:
             data_path="nat",
             data_name_comment=True,
         )
-        coord = _make_coordinator(
-            hass, data={"nat": {"comment": "MyRule"}}
-        )
+        coord = _make_coordinator(hass, data={"nat": {"comment": "MyRule"}})
         entity = _make_entity(coord, desc, uid=None)
         assert entity.custom_name == "MyRule Rule"
 
@@ -269,9 +260,7 @@ class TestCustomName:
             data_path="nat",
             data_name_comment=True,
         )
-        coord = _make_coordinator(
-            hass, data={"nat": {"comment": "JustComment"}}
-        )
+        coord = _make_coordinator(hass, data={"nat": {"comment": "JustComment"}})
         entity = _make_entity(coord, desc, uid=None)
         assert entity.custom_name == "JustComment"
 
@@ -293,9 +282,7 @@ class TestCustomName:
             data_reference="name",
             data_name="name",
         )
-        coord = _make_coordinator(
-            hass, data={"interface": {"ether1": {"name": "ether1"}}}
-        )
+        coord = _make_coordinator(hass, data={"interface": {"ether1": {"name": "ether1"}}})
         entity = _make_entity(coord, desc, uid="ether1")
         assert entity.custom_name == "Status"
 
@@ -318,6 +305,7 @@ class TestCustomName:
 # ---------------------------------------------------------------------------
 # unique_id property
 # ---------------------------------------------------------------------------
+
 
 class TestUniqueId:
     def test_unique_id_without_uid(self, hass):
