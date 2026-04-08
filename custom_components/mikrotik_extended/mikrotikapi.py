@@ -88,6 +88,7 @@ class MikrotikAPI:
     # ---------------------------
     def close(self):
         """Gracefully close the API connection without logging errors."""
+        self.connection_error_reported = True
         if self._connection:
             try:
                 self._connection.close()
