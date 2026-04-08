@@ -168,6 +168,54 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
   > **\*coordinator_data:** When set to `true`, the `path` parameter is treated as a coordinator data key (e.g. `interface`, `dhcp`, `arp`) instead of a RouterOS API path. This returns the integration's internally cached and processed data from the last update cycle — useful for debugging what the integration currently "sees" without making an additional API call to the router.
 
+- **Refresh Data** (`mikrotik_router.refresh_data`): force an immediate data refresh from the router, including all sensors, environment variables, and device trackers. Useful in automations when you need up-to-date values without waiting for the next poll cycle.
+
+  **Parameters:** `host` (optional — only refresh a specific router).
+
+  ```yaml
+  action: mikrotik_router.refresh_data
+  ```
+
+  **Example — refresh after changing a firewall rule:**
+
+  ```yaml
+  automation:
+    - alias: "Refresh after guest network toggle"
+      trigger:
+        - platform: state
+          entity_id: input_boolean.guest_network
+      action:
+        - action: mikrotik_router.set_environment
+          data:
+            name: "guestEnabled"
+            value: "{{ states('input_boolean.guest_network') }}"
+        - delay: 3
+        - action: mikrotik_router.refresh_data
+  ```
+
+- **Set Environment Variable** (`mikrotik_router.set_environment`): create, update, or remove a RouterOS script environment variable. Environment variables are accessible from RouterOS scripts via `:global` and can be used to pass values between Home Assistant and router-side scripts.
+
+  **Parameters:** `name` (required), `value` (required for set/add), `action` (optional: `set`, `add`, or `remove` — default `set`), `host` (optional).
+
+  ```yaml
+  # Create or update a variable
+  action: mikrotik_router.set_environment
+  data:
+    name: "myVar"
+    value: "hello"
+    action: "set"
+  ```
+
+  ```yaml
+  # Remove a variable
+  action: mikrotik_router.set_environment
+  data:
+    name: "myVar"
+    action: "remove"
+  ```
+
+  > **Note:** Creating a new variable takes ~2 seconds (uses a one-shot RouterOS scheduler internally). Updating an existing variable is instant. The variable is accessible from RouterOS scripts via `:global myVar; :put $myVar`.
+
 ## Feature Availability
 
 | Feature | RouterOS 7+ | RouterOS 6* | Optional |
@@ -196,6 +244,8 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 | Firmware updates | ✓ | ✓ | No |
 | Wake-on-LAN service | ✓ | ✓ | No |
 | API Test service | ✓ | ✓ | No |
+| Refresh Data service | ✓ | ✓ | No |
+| Set Environment service | ✓ | ✓ | No |
 | Reboot button | ✓ | ✓ | No |
 | Multi-router support | ✓ | ✓ | No |
 

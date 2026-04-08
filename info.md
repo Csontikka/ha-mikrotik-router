@@ -24,7 +24,9 @@ Monitor and control your Mikrotik device from Home Assistant.
  * Device Mode and Packages diagnostic sensors
  * Check and update RouterOS and RouterBOARD firmware
  * Execute scripts
- * View environment variables
+ * View and manage environment variables (set, create, remove)
+ * Force immediate data refresh service
+ * Wake-on-LAN service
  * Configurable update interval
  * Configurable traffic unit (bps, Kbps, Mbps, B/s, KB/s, MB/s)
  * Supports monitoring of multiple mikrotik devices simultaneously
