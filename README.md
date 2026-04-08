@@ -245,7 +245,7 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 | Wake-on-LAN service | ✓ | ✓ | No |
 | API Test service | ✓ | ✓ | No |
 | Refresh Data service | ✓ | ✓ | No |
-| Set Environment service | ✓ | ✓ | No |
+| Set Environment service | ✓ | ? | No |
 | Reboot button | ✓ | ✓ | No |
 | Multi-router support | ✓ | ✓ | No |
 
