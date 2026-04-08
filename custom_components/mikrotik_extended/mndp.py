@@ -228,7 +228,7 @@ async def _listen_mndp_broadcast(
     broadcast_addrs: list[str] = ["255.255.255.255"]
     try:
         _tmp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        _tmp.connect(("8.8.8.8", 80))
+        _tmp.connect(("8.8.8.8", 80))  # NOSONAR — no data sent, used to determine local IP
         local_ip = _tmp.getsockname()[0]
         _tmp.close()
         parts = local_ip.split(".")
@@ -276,7 +276,7 @@ async def _populate_arp_table() -> None:
     """Send pings across the local subnet to populate the ARP table."""
     try:
         _tmp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        _tmp.connect(("8.8.8.8", 80))
+        _tmp.connect(("8.8.8.8", 80))  # NOSONAR — no data sent, used to determine local IP
         local_ip = _tmp.getsockname()[0]
         _tmp.close()
     except OSError:
