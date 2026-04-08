@@ -260,7 +260,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         if api.error == "wrong_login":
             raise ConfigEntryAuthFailed(f"Invalid credentials for {host}")
         raise ConfigEntryNotReady(f"Cannot connect to {host}")
-    api.disconnect()
+    api.close()
 
     coordinator = MikrotikCoordinator(hass, config_entry)
     await coordinator.async_config_entry_first_refresh()
@@ -291,6 +291,12 @@ async def async_reload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 # ---------------------------
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
+
+    # Suppress disconnect error logs before platform unload cancels the coordinator
+    if hasattr(config_entry, "runtime_data") and config_entry.runtime_data:
+        coordinator = config_entry.runtime_data.data_coordinator
+        if coordinator and coordinator.api:
+            coordinator.api.connection_error_reported = True
 
     unload_ok = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
 

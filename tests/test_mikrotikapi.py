@@ -24,7 +24,7 @@ class TestMikrotikAPIInit:
         api = MikrotikAPI("192.168.88.1", "admin", "pass")
         assert api.connected() is False
         assert api.error is None
-        assert api.connection_error_reported is False
+        assert api.connection_error_reported is True  # suppressed until first successful connect
 
 
 class TestErrorToStrings:

@@ -51,7 +51,8 @@ class MikrotikAPI:
         self._connection_epoch = 0
         self._connection_retry_sec = 58
         self.error = None
-        self.connection_error_reported = False
+        self.connection_error_reported = True  # suppress first disconnect after startup
+        self._first_connect = True
         self.disable_health = False
 
         # Default ports
@@ -109,9 +110,9 @@ class MikrotikAPI:
 
         if not self.connection_error_reported:
             if location == "unknown":
-                _LOGGER.error("Mikrotik %s connection closed", self._host)
+                _LOGGER.debug("Mikrotik %s connection closed", self._host)
             else:
-                _LOGGER.error("Mikrotik %s error while %s : %s", self._host, location, error)
+                _LOGGER.warning("Mikrotik %s error while %s : %s", self._host, location, error)
 
             self.connection_error_reported = True
 
@@ -158,11 +159,10 @@ class MikrotikAPI:
                 self._connection = None
                 return False
             else:
-                if self.connection_error_reported:
+                if self.connection_error_reported and not self._first_connect:
                     _LOGGER.warning("Mikrotik Reconnected to %s", self._host)
-                    self.connection_error_reported = False
-                else:
-                    _LOGGER.debug("Mikrotik Connected to %s", self._host)
+                self.connection_error_reported = False
+                self._first_connect = False
 
                 self._connected = True
                 self._reconnected = True
