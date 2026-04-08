@@ -217,6 +217,90 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
   > **Note:** Creating a new variable takes ~2 seconds (uses a one-shot RouterOS scheduler internally). Updating an existing variable is instant. The variable is accessible from RouterOS scripts via `:global myVar; :put $myVar`.
 
+## Automation Examples
+
+### Alert on new network device
+
+Get notified when a new device appears on your network — useful for security monitoring.
+
+```yaml
+automation:
+  - alias: "Alert on new network device"
+    trigger:
+      - platform: state
+        entity_id: sensor.mikrotik_router_dhcp_leases
+    condition:
+      - condition: template
+        value_template: >
+          {{ trigger.to_state.state | int > trigger.from_state.state | int }}
+    action:
+      - action: notify.mobile_app
+        data:
+          title: "New device on network"
+          message: >
+            DHCP lease count: {{ trigger.from_state.state }} → {{ trigger.to_state.state }}
+```
+
+### Auto-enable WireGuard VPN when leaving home
+
+Automatically enable your WireGuard VPN peer when you leave the house, and disable it when you return.
+
+```yaml
+automation:
+  - alias: "Enable VPN when leaving home"
+    trigger:
+      - platform: zone
+        entity_id: person.me
+        zone: zone.home
+        event: leave
+    action:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.mikrotik_router_wireguard_peer_my_phone
+
+  - alias: "Disable VPN when arriving home"
+    trigger:
+      - platform: zone
+        entity_id: person.me
+        zone: zone.home
+        event: enter
+    action:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.mikrotik_router_wireguard_peer_my_phone
+```
+
+### Kids internet schedule with Kid Control
+
+Automatically pause internet access for children on school nights.
+
+```yaml
+automation:
+  - alias: "Kids internet off on school nights"
+    trigger:
+      - platform: time
+        at: "21:00:00"
+    condition:
+      - condition: time
+        weekday: [mon, tue, wed, thu, sun]
+    action:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.mikrotik_router_kidcontrol_kids_paused
+
+  - alias: "Kids internet on in the morning"
+    trigger:
+      - platform: time
+        at: "07:00:00"
+    condition:
+      - condition: time
+        weekday: [mon, tue, wed, thu, fri]
+    action:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.mikrotik_router_kidcontrol_kids_paused
+```
+
 ## Feature Availability
 
 | Feature | RouterOS 7+ | RouterOS 6* | Optional |
