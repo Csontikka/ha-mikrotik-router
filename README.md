@@ -219,28 +219,6 @@ Update RouterOS and RouterBoard firmware directly from Home Assistant.
 
 ## Automation Examples
 
-### Alert on new network device
-
-Get notified when a new device appears on your network — useful for security monitoring.
-
-```yaml
-automation:
-  - alias: "Alert on new network device"
-    trigger:
-      - platform: state
-        entity_id: sensor.mikrotik_router_dhcp_leases
-    condition:
-      - condition: template
-        value_template: >
-          {{ trigger.to_state.state | int > trigger.from_state.state | int }}
-    action:
-      - action: notify.mobile_app
-        data:
-          title: "New device on network"
-          message: >
-            DHCP lease count: {{ trigger.from_state.state }} → {{ trigger.to_state.state }}
-```
-
 ### Auto-enable WireGuard VPN when leaving home
 
 Automatically enable your WireGuard VPN peer when you leave the house, and disable it when you return.
