@@ -992,23 +992,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         )
 
         if self.option_sensor_port_traffic:
-            for uid, vals in self.ds["interface"].items():
-                current_tx = vals["tx-current"]
-                previous_tx = vals["tx-previous"] or current_tx
-
-                delta_tx = max(0, current_tx - previous_tx)
-                self.ds["interface"][uid]["tx"] = round(delta_tx / self.option_scan_interval.seconds)
-                self.ds["interface"][uid]["tx-previous"] = current_tx
-
-                current_rx = vals["rx-current"]
-                previous_rx = vals["rx-previous"] or current_rx
-
-                delta_rx = max(0, current_rx - previous_rx)
-                self.ds["interface"][uid]["rx"] = round(delta_rx / self.option_scan_interval.seconds)
-                self.ds["interface"][uid]["rx-previous"] = current_rx
-
-                self.ds["interface"][uid]["tx-total"] = current_tx
-                self.ds["interface"][uid]["rx-total"] = current_rx
+            self._compute_interface_traffic_deltas()
 
         self.ds["interface"] = parse_api(
             data=self.ds["interface"],
@@ -1032,86 +1016,109 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
         )
 
-        # Udpate virtual interfaces
+        bonding = self._post_process_interfaces()
+        if bonding:
+            self._load_bonding_slaves()
+
+    def _compute_interface_traffic_deltas(self) -> None:
+        """Convert rx/tx byte counters into per-interval rates."""
+        interval_seconds = self.option_scan_interval.seconds
+        for uid, vals in self.ds["interface"].items():
+            entry = self.ds["interface"][uid]
+
+            current_tx = vals["tx-current"]
+            previous_tx = vals["tx-previous"] or current_tx
+            entry["tx"] = round(max(0, current_tx - previous_tx) / interval_seconds)
+            entry["tx-previous"] = current_tx
+
+            current_rx = vals["rx-current"]
+            previous_rx = vals["rx-previous"] or current_rx
+            entry["rx"] = round(max(0, current_rx - previous_rx) / interval_seconds)
+            entry["rx-previous"] = current_rx
+
+            entry["tx-total"] = current_tx
+            entry["rx-total"] = current_rx
+
+    def _post_process_interfaces(self) -> bool:
+        """Stringify comments, fix virtual iface names, and fetch ether monitor data."""
         bonding = False
         for uid, vals in self.ds["interface"].items():
-            if self.ds["interface"][uid]["type"] == "bond":
+            entry = self.ds["interface"][uid]
+            if entry["type"] == "bond":
                 bonding = True
 
-            self.ds["interface"][uid]["comment"] = str(self.ds["interface"][uid]["comment"])
+            entry["comment"] = str(entry["comment"])
 
             if vals["default-name"] == "":
-                self.ds["interface"][uid]["default-name"] = vals["name"]
-                self.ds["interface"][uid]["port-mac-address"] = f"{vals['port-mac-address']}-{vals['name']}"
+                entry["default-name"] = vals["name"]
+                entry["port-mac-address"] = f"{vals['port-mac-address']}-{vals['name']}"
 
-            if self.ds["interface"][uid]["type"] == "ether":
-                if "sfp-shutdown-temperature" in vals and vals["sfp-shutdown-temperature"] != "":
-                    self.ds["interface"] = parse_api(
-                        data=self.ds["interface"],
-                        source=self.api.query(
-                            PATH_INTERFACE_ETHERNET,
-                            command="monitor",
-                            args={".id": vals[".id"], "once": True},
-                        ),
-                        key_search="name",
-                        vals=[
-                            {"name": "status", "default": "unknown"},
-                            {"name": "auto-negotiation", "default": "unknown"},
-                            {"name": "advertising", "default": "unknown"},
-                            {"name": "link-partner-advertising", "default": "unknown"},
-                            {"name": "sfp-temperature", "default": 0},
-                            {"name": "sfp-supply-voltage", "default": "unknown"},
-                            {"name": "sfp-module-present", "default": "unknown"},
-                            {"name": "sfp-tx-bias-current", "default": "unknown"},
-                            {"name": "sfp-tx-power", "default": "unknown"},
-                            {"name": "sfp-rx-power", "default": "unknown"},
-                            {"name": "sfp-rx-loss", "default": "unknown"},
-                            {"name": "sfp-tx-fault", "default": "unknown"},
-                            {"name": "sfp-type", "default": "unknown"},
-                            {"name": "sfp-connector-type", "default": "unknown"},
-                            {"name": "sfp-vendor-name", "default": "unknown"},
-                            {"name": "sfp-vendor-part-number", "default": "unknown"},
-                            {"name": "sfp-vendor-revision", "default": "unknown"},
-                            {"name": "sfp-vendor-serial", "default": "unknown"},
-                            {"name": "sfp-manufacturing-date", "default": "unknown"},
-                            {"name": "eeprom-checksum", "default": "unknown"},
-                        ],
-                    )
-                else:
-                    self.ds["interface"] = parse_api(
-                        data=self.ds["interface"],
-                        source=self.api.query(
-                            PATH_INTERFACE_ETHERNET,
-                            command="monitor",
-                            args={".id": vals[".id"], "once": True},
-                        ),
-                        key_search="name",
-                        vals=[
-                            {"name": "status", "default": "unknown"},
-                            {"name": "rate", "default": "unknown"},
-                            {"name": "full-duplex", "default": "unknown"},
-                            {"name": "auto-negotiation", "default": "unknown"},
-                        ],
-                    )
+            if entry["type"] == "ether":
+                self._fetch_ether_monitor(vals)
+        return bonding
 
-        if bonding:
-            self.ds["bonding"] = parse_api(
-                data={},
-                source=self.api.query("/interface/bonding"),
-                key="name",
-                vals=[
-                    {"name": "name"},
-                    {"name": "mac-address"},
-                    {"name": "slaves"},
-                    {"name": "mode"},
-                ],
-            )
+    def _fetch_ether_monitor(self, vals) -> None:
+        """Run /interface/ethernet monitor once for the given ether iface."""
+        if "sfp-shutdown-temperature" in vals and vals["sfp-shutdown-temperature"] != "":
+            monitor_vals = [
+                {"name": "status", "default": "unknown"},
+                {"name": "auto-negotiation", "default": "unknown"},
+                {"name": "advertising", "default": "unknown"},
+                {"name": "link-partner-advertising", "default": "unknown"},
+                {"name": "sfp-temperature", "default": 0},
+                {"name": "sfp-supply-voltage", "default": "unknown"},
+                {"name": "sfp-module-present", "default": "unknown"},
+                {"name": "sfp-tx-bias-current", "default": "unknown"},
+                {"name": "sfp-tx-power", "default": "unknown"},
+                {"name": "sfp-rx-power", "default": "unknown"},
+                {"name": "sfp-rx-loss", "default": "unknown"},
+                {"name": "sfp-tx-fault", "default": "unknown"},
+                {"name": "sfp-type", "default": "unknown"},
+                {"name": "sfp-connector-type", "default": "unknown"},
+                {"name": "sfp-vendor-name", "default": "unknown"},
+                {"name": "sfp-vendor-part-number", "default": "unknown"},
+                {"name": "sfp-vendor-revision", "default": "unknown"},
+                {"name": "sfp-vendor-serial", "default": "unknown"},
+                {"name": "sfp-manufacturing-date", "default": "unknown"},
+                {"name": "eeprom-checksum", "default": "unknown"},
+            ]
+        else:
+            monitor_vals = [
+                {"name": "status", "default": "unknown"},
+                {"name": "rate", "default": "unknown"},
+                {"name": "full-duplex", "default": "unknown"},
+                {"name": "auto-negotiation", "default": "unknown"},
+            ]
+        self.ds["interface"] = parse_api(
+            data=self.ds["interface"],
+            source=self.api.query(
+                PATH_INTERFACE_ETHERNET,
+                command="monitor",
+                args={".id": vals[".id"], "once": True},
+            ),
+            key_search="name",
+            vals=monitor_vals,
+        )
 
-            self.ds["bonding_slaves"] = {}
-            for uid, vals in self.ds["bonding"].items():
-                for tmp in vals["slaves"].split(","):
-                    self.ds["bonding_slaves"][tmp] = vals
-                    self.ds["bonding_slaves"][tmp]["master"] = uid
+    def _load_bonding_slaves(self) -> None:
+        """Populate ds['bonding'] / ds['bonding_slaves'] when a bond iface exists."""
+        self.ds["bonding"] = parse_api(
+            data={},
+            source=self.api.query("/interface/bonding"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "mac-address"},
+                {"name": "slaves"},
+                {"name": "mode"},
+            ],
+        )
+
+        self.ds["bonding_slaves"] = {}
+        for uid, vals in self.ds["bonding"].items():
+            for tmp in vals["slaves"].split(","):
+                self.ds["bonding_slaves"][tmp] = vals
+                self.ds["bonding_slaves"][tmp]["master"] = uid
 
     # ---------------------------
     #   get_bridge
@@ -1151,30 +1158,36 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             return
 
         for uid, vals in self.ds["interface"].items():
-            self.ds["interface"][uid]["client-ip-address"] = ""
-            self.ds["interface"][uid]["client-mac-address"] = ""
-            for _arp_uid, arp_vals in self.ds["arp"].items():
-                if arp_vals["interface"] != vals["name"] and not (vals["name"] in self.ds["bonding_slaves"] and self.ds["bonding_slaves"][vals["name"]]["master"] == arp_vals["interface"]):
-                    continue
+            self._resolve_interface_client(uid, vals)
 
-                if self.ds["interface"][uid]["client-ip-address"] == "":
-                    self.ds["interface"][uid]["client-ip-address"] = arp_vals["address"]
-                else:
-                    self.ds["interface"][uid]["client-ip-address"] = "multiple"
+    def _arp_belongs_to_iface(self, iface_name: str, arp_vals) -> bool:
+        """Return True if the arp entry matches iface or its bonding master."""
+        if arp_vals["interface"] == iface_name:
+            return True
+        bonding_slaves = self.ds["bonding_slaves"]
+        return iface_name in bonding_slaves and bonding_slaves[iface_name]["master"] == arp_vals["interface"]
 
-                if self.ds["interface"][uid]["client-mac-address"] == "":
-                    self.ds["interface"][uid]["client-mac-address"] = arp_vals["mac-address"]
-                else:
-                    self.ds["interface"][uid]["client-mac-address"] = "multiple"
+    def _resolve_interface_client(self, uid, vals) -> None:
+        """Populate client-ip/client-mac for interface ``uid`` based on arp + dhcp-client."""
+        entry = self.ds["interface"][uid]
+        entry["client-ip-address"] = ""
+        entry["client-mac-address"] = ""
+        for _arp_uid, arp_vals in self.ds["arp"].items():
+            if not self._arp_belongs_to_iface(vals["name"], arp_vals):
+                continue
 
-            if self.ds["interface"][uid]["client-ip-address"] == "":
-                if self.ds["interface"][uid]["name"] in self.ds["dhcp-client"]:
-                    self.ds["interface"][uid]["client-ip-address"] = self.ds["dhcp-client"][self.ds["interface"][uid]["name"]]["address"]
-                else:
-                    self.ds["interface"][uid]["client-ip-address"] = "none"
+            entry["client-ip-address"] = "multiple" if entry["client-ip-address"] else arp_vals["address"]
+            entry["client-mac-address"] = "multiple" if entry["client-mac-address"] else arp_vals["mac-address"]
 
-            if self.ds["interface"][uid]["client-mac-address"] == "":
-                self.ds["interface"][uid]["client-mac-address"] = "none"
+        if entry["client-ip-address"] == "":
+            dhcp_client = self.ds["dhcp-client"]
+            if entry["name"] in dhcp_client:
+                entry["client-ip-address"] = dhcp_client[entry["name"]]["address"]
+            else:
+                entry["client-ip-address"] = "none"
+
+        if entry["client-mac-address"] == "":
+            entry["client-mac-address"] = "none"
 
     # ---------------------------
     #   get_nat
@@ -2215,35 +2228,49 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         dhcpserver_query = False
         for uid in self.ds["dhcp"]:
-            self.ds["dhcp"][uid]["comment"] = str(self.ds["dhcp"][uid]["comment"])
+            dhcpserver_query = self._process_dhcp_entry(uid, dhcpserver_query)
 
-            # is_valid_ip
-            if self.ds["dhcp"][uid]["address"] != "unknown":
-                if not is_valid_ip(self.ds["dhcp"][uid]["address"]):
-                    self.ds["dhcp"][uid]["address"] = "unknown"
+        self._build_dhcp_lease_summary()
 
-                if self.ds["dhcp"][uid]["active-address"] not in [
-                    self.ds["dhcp"][uid]["address"],
-                    "unknown",
-                ]:
-                    self.ds["dhcp"][uid]["address"] = self.ds["dhcp"][uid]["active-address"]
+    def _reconcile_dhcp_addresses(self, entry) -> None:
+        """Validate address / active-address / mac-address pairs on a DHCP entry."""
+        if entry["address"] == "unknown":
+            return
+        if not is_valid_ip(entry["address"]):
+            entry["address"] = "unknown"
 
-                if self.ds["dhcp"][uid]["mac-address"] != self.ds["dhcp"][uid]["active-mac-address"] != "unknown":
-                    self.ds["dhcp"][uid]["mac-address"] = self.ds["dhcp"][uid]["active-mac-address"]
+        if entry["active-address"] not in [entry["address"], "unknown"]:
+            entry["address"] = entry["active-address"]
 
-            if not dhcpserver_query and self.ds["dhcp"][uid]["server"] not in self.ds["dhcp-server"]:
-                self.get_dhcp_server()
-                dhcpserver_query = True
+        if entry["mac-address"] != entry["active-mac-address"] != "unknown":
+            entry["mac-address"] = entry["active-mac-address"]
 
-            if self.ds["dhcp"][uid]["server"] in self.ds["dhcp-server"]:
-                self.ds["dhcp"][uid]["interface"] = self.ds["dhcp-server"][self.ds["dhcp"][uid]["server"]]["interface"]
-            elif uid in self.ds["arp"]:
-                if self.ds["arp"][uid]["bridge"] != "unknown":
-                    self.ds["dhcp"][uid]["interface"] = self.ds["arp"][uid]["bridge"]
-                else:
-                    self.ds["dhcp"][uid]["interface"] = self.ds["arp"][uid]["interface"]
+    def _resolve_dhcp_interface(self, uid, entry) -> None:
+        """Resolve DHCP entry interface from dhcp-server or arp data."""
+        dhcp_server = self.ds["dhcp-server"]
+        if entry["server"] in dhcp_server:
+            entry["interface"] = dhcp_server[entry["server"]]["interface"]
+            return
+        arp = self.ds["arp"]
+        if uid in arp:
+            entry["interface"] = arp[uid]["bridge"] if arp[uid]["bridge"] != "unknown" else arp[uid]["interface"]
 
-        # Build DHCP lease summary for sensor
+    def _process_dhcp_entry(self, uid, dhcpserver_query) -> bool:
+        """Normalize a single DHCP entry. Returns updated ``dhcpserver_query`` flag."""
+        entry = self.ds["dhcp"][uid]
+        entry["comment"] = str(entry["comment"])
+
+        self._reconcile_dhcp_addresses(entry)
+
+        if not dhcpserver_query and entry["server"] not in self.ds["dhcp-server"]:
+            self.get_dhcp_server()
+            dhcpserver_query = True
+
+        self._resolve_dhcp_interface(uid, entry)
+        return dhcpserver_query
+
+    def _build_dhcp_lease_summary(self) -> None:
+        """Summarize current DHCP leases into the ``dhcp_leases`` sensor shape."""
         total = len(self.ds["dhcp"])
         bound = 0
         leases = []
