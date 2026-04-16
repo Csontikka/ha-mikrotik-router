@@ -39,12 +39,7 @@ rules:
   log-when-unavailable: done
   parallel-updates: done
   reauthentication-flow: done
-  test-coverage:
-    status: todo
-    comment: |
-      Current overall coverage is 36.5%. Rule requires >95%.
-      Platforms sensor/switch/binary_sensor/button/device_tracker/diagnostics
-      are at 0% and need unit tests.
+  test-coverage: done
 
   # Gold
   devices: done
