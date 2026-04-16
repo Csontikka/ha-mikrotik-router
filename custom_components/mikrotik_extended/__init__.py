@@ -71,7 +71,7 @@ CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 # ---------------------------
 #   async_setup
 # ---------------------------
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+async def async_setup(hass: HomeAssistant, _config: dict) -> bool:
     """Register global actions (services) once at integration load time."""
 
     async def async_send_magic_packet(call) -> None:
@@ -348,7 +348,11 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 # ---------------------------
 #   async_remove_config_entry_device
 # ---------------------------
-async def async_remove_config_entry_device(hass, config_entry: ConfigEntry, device_entry: device_registry.DeviceEntry) -> bool:
+async def async_remove_config_entry_device(
+    _hass: HomeAssistant,
+    _config_entry: ConfigEntry,
+    _device_entry: device_registry.DeviceEntry,
+) -> bool:
     """Remove a config entry from a device."""
     return True
 

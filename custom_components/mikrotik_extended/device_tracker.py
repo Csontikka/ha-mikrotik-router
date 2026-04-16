@@ -58,7 +58,7 @@ async def async_add_entities(hass: HomeAssistant, config_entry: ConfigEntry, dis
         if coordinator.data is None:
             return
 
-        async def async_check_exist(obj, coordinator, uid: None) -> None:
+        async def async_check_exist(obj, uid: str | None = None) -> None:
             """Check entity exists."""
             entity_registry = er.async_get(hass)
             entry_id = config_entry.entry_id
@@ -84,7 +84,7 @@ async def async_add_entities(hass: HomeAssistant, config_entry: ConfigEntry, dis
                 if func is None:
                     continue
                 obj = func(coordinator, entity_description)
-                await async_check_exist(obj, coordinator, None)
+                await async_check_exist(obj)
             else:
                 if isinstance(data, (dict, list)):
                     for uid in data:
@@ -94,7 +94,7 @@ async def async_add_entities(hass: HomeAssistant, config_entry: ConfigEntry, dis
                         if func is None:
                             continue
                         obj = func(coordinator, entity_description, uid)
-                        await async_check_exist(obj, coordinator, uid)
+                        await async_check_exist(obj, uid)
 
     await async_update_controller(config_entry.runtime_data.tracker_coordinator)
 
