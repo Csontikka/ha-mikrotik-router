@@ -193,7 +193,7 @@ async def _snmp_sysname(loop: asyncio.AbstractEventLoop, ip: str) -> str | None:
         sock.sendto(_SNMP_SYSNAME_GET, (ip, _SNMP_PORT))
         data = await asyncio.wait_for(loop.sock_recv(sock, 1024), timeout=_SNMP_TIMEOUT)
         return _parse_snmp_sysname(data)
-    except (TimeoutError, OSError):
+    except OSError:
         return None
     finally:
         sock.close()
@@ -213,7 +213,7 @@ async def _mndp_unicast(loop: asyncio.AbstractEventLoop, ip: str, timeout: float
     try:
         data = await asyncio.wait_for(loop.sock_recv(sock, 4096), timeout=timeout)
         return _parse_mndp(data)
-    except (TimeoutError, OSError):
+    except OSError:
         return None
     finally:
         sock.close()
