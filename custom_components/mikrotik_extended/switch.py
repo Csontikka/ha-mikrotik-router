@@ -26,6 +26,9 @@ from .switch_types import (
 
 _LOGGER = getLogger(__name__)
 
+CAPSMAN_MANAGED = "managed by CAPsMAN"
+LOG_WRITE_ACCESS_BLOCKED = "Mikrotik %s switch operation blocked: user lacks write access"
+
 
 # ---------------------------
 #   async_setup_entry
@@ -81,7 +84,7 @@ class MikrotikSwitch(MikrotikEntity, SwitchEntity, RestoreEntity):
     async def async_turn_on(self) -> None:
         """Turn on the switch."""
         if "write" not in self.coordinator.data["access"]:
-            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
+            _LOGGER.warning(LOG_WRITE_ACCESS_BLOCKED, self.coordinator.host)
             return
 
         path = self.entity_description.data_switch_path
@@ -94,7 +97,7 @@ class MikrotikSwitch(MikrotikEntity, SwitchEntity, RestoreEntity):
     async def async_turn_off(self) -> None:
         """Turn off the switch."""
         if "write" not in self.coordinator.data["access"]:
-            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
+            _LOGGER.warning(LOG_WRITE_ACCESS_BLOCKED, self.coordinator.host)
             return
 
         path = self.entity_description.data_switch_path
@@ -153,9 +156,9 @@ class MikrotikPortSwitch(MikrotikSwitch):
 
         path = self.entity_description.data_switch_path
         param = self.entity_description.data_reference
-        if self._data["about"] == "managed by CAPsMAN":
+        if self._data["about"] == CAPSMAN_MANAGED:
             _LOGGER.error("Unable to enable %s, managed by CAPsMAN", self._data[param])
-            return "managed by CAPsMAN"
+            return CAPSMAN_MANAGED
         if "-" in self._data["port-mac-address"]:
             param = "name"
         value = self._data[self.entity_description.data_reference]
@@ -176,9 +179,9 @@ class MikrotikPortSwitch(MikrotikSwitch):
 
         path = self.entity_description.data_switch_path
         param = self.entity_description.data_reference
-        if self._data["about"] == "managed by CAPsMAN":
+        if self._data["about"] == CAPSMAN_MANAGED:
             _LOGGER.error("Unable to disable %s, managed by CAPsMAN", self._data[param])
-            return "managed by CAPsMAN"
+            return CAPSMAN_MANAGED
         if "-" in self._data["port-mac-address"]:
             param = "name"
         value = self._data[self.entity_description.data_reference]
@@ -458,7 +461,7 @@ class MikrotikWireguardPeerSwitch(MikrotikSwitch):
     async def async_turn_on(self) -> None:
         """Enable the WireGuard peer."""
         if "write" not in self.coordinator.data["access"]:
-            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
+            _LOGGER.warning(LOG_WRITE_ACCESS_BLOCKED, self.coordinator.host)
             return
         path = self.entity_description.data_switch_path
         param = ".id"
@@ -470,7 +473,7 @@ class MikrotikWireguardPeerSwitch(MikrotikSwitch):
     async def async_turn_off(self) -> None:
         """Disable the WireGuard peer."""
         if "write" not in self.coordinator.data["access"]:
-            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
+            _LOGGER.warning(LOG_WRITE_ACCESS_BLOCKED, self.coordinator.host)
             return
         path = self.entity_description.data_switch_path
         param = ".id"

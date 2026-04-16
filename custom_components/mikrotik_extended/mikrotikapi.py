@@ -16,6 +16,8 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+SCRIPT_ENVIRONMENT_PATH = "/system/script/environment"
+
 
 # ---------------------------
 #   MikrotikAPI
@@ -414,7 +416,7 @@ class MikrotikAPI:
         with self.lock:
             # Check if variable already exists
             try:
-                env = self._connection.path("/system/script/environment")
+                env = self._connection.path(SCRIPT_ENVIRONMENT_PATH)
                 entries = list(env)
                 entry_id = None
                 for e in entries:
@@ -451,7 +453,7 @@ class MikrotikAPI:
         # Verify the variable was created
         with self.lock:
             try:
-                env2 = self._connection.path("/system/script/environment")
+                env2 = self._connection.path(SCRIPT_ENVIRONMENT_PATH)
                 for e in env2:
                     if e.get("name") == name:
                         return True
@@ -481,7 +483,7 @@ class MikrotikAPI:
 
         with self.lock:
             try:
-                env = self._connection.path("/system/script/environment")
+                env = self._connection.path(SCRIPT_ENVIRONMENT_PATH)
                 entries = list(env)
                 for e in entries:
                     if e.get("name") == name:
