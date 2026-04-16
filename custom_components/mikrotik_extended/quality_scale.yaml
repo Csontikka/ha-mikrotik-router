@@ -3,13 +3,21 @@ rules:
   action-setup: done
   appropriate-polling: done
   brands:
-    status: todo
+    status: done
     comment: |
-      Logo and brand assets need to be submitted to the home-assistant/brands
-      repository as a separate pull request.
+      Brand assets (icon.png, logo.png, brand/) ship inside the integration
+      folder. Per the HA 2026.3+ policy custom integrations provide their own
+      brand assets directly, and the home-assistant/brands repository no longer
+      accepts submissions for custom components.
+      See: https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api
   common-modules: done
   config-flow: done
-  config-flow-test-coverage: done
+  config-flow-test-coverage:
+    status: todo
+    comment: |
+      Current config_flow.py coverage is 84%. Rule requires 100%.
+      Missing: reauth_confirm edge paths, reconfigure branch, custom
+      sensor_select step.
   dependency-transparency: done
   docs-actions: done
   docs-high-level-description: done
@@ -36,19 +44,34 @@ rules:
   log-when-unavailable: done
   parallel-updates: done
   reauthentication-flow: done
-  test-coverage: done
+  test-coverage:
+    status: todo
+    comment: |
+      Current overall coverage is 36.5%. Rule requires >95%.
+      Platforms sensor/switch/binary_sensor/button/device_tracker/diagnostics
+      are at 0% and need unit tests.
 
   # Gold
   devices: done
   diagnostics: done
-  discovery: done
-  discovery-update-info: done
+  discovery:
+    status: exempt
+    comment: |
+      Integration talks to the router over the RouterOS API (librouteros).
+      MikroTik uses the proprietary MNDP discovery protocol, which is not a
+      standard Home Assistant discovery source (zeroconf/ssdp/dhcp/bluetooth).
+      A user-initiated MNDP scan is offered inside the config flow.
+  discovery-update-info:
+    status: exempt
+    comment: |
+      No standard HA discovery is declared (see `discovery`), so there is no
+      re-discovery event that could update an existing entry.
   docs-data-update: todo
-  docs-examples: todo
+  docs-examples: done
   docs-known-limitations: todo
-  docs-supported-devices: todo
-  docs-supported-functions: todo
-  docs-troubleshooting: todo
+  docs-supported-devices: done
+  docs-supported-functions: done
+  docs-troubleshooting: done
   docs-use-cases: todo
   dynamic-devices: done
   entity-category: done
