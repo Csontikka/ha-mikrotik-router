@@ -203,7 +203,7 @@ def _make_set_environment(hass: HomeAssistant):
 # ---------------------------
 #   async_setup
 # ---------------------------
-async def async_setup(hass: HomeAssistant, _config: dict) -> bool:
+async def async_setup(hass: HomeAssistant, _config: dict) -> bool:  # NOSONAR — HA contract requires async
     """Register global actions (services) once at integration load time."""
     hass.services.async_register(
         DOMAIN,
@@ -355,7 +355,7 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 # ---------------------------
 #   async_remove_config_entry_device
 # ---------------------------
-async def async_remove_config_entry_device(
+async def async_remove_config_entry_device(  # NOSONAR — HA contract requires async
     _hass: HomeAssistant,
     _config_entry: ConfigEntry,
     _device_entry: device_registry.DeviceEntry,
@@ -367,7 +367,7 @@ async def async_remove_config_entry_device(
 # ---------------------------
 #   async_migrate_entry
 # ---------------------------
-async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry):
+async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry):  # NOSONAR — HA contract requires async
     _LOGGER.debug(
         "Migrating configuration from version %s.%s",
         config_entry.version,

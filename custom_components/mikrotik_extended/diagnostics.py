@@ -12,7 +12,7 @@ from . import _LOG_BUFFER
 from .const import TO_REDACT
 
 
-async def async_get_config_entry_diagnostics(_hass: HomeAssistant, config_entry: ConfigEntry) -> dict[str, Any]:
+async def async_get_config_entry_diagnostics(_hass: HomeAssistant, config_entry: ConfigEntry) -> dict[str, Any]:  # NOSONAR — HA contract requires async
     """Return diagnostics for a config entry."""
     data_coordinator = config_entry.runtime_data.data_coordinator
     tracker_coordinator = config_entry.runtime_data.tracker_coordinator
