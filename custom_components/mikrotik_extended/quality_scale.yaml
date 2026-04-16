@@ -12,12 +12,7 @@ rules:
       See: https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api
   common-modules: done
   config-flow: done
-  config-flow-test-coverage:
-    status: todo
-    comment: |
-      Current config_flow.py coverage is 84%. Rule requires 100%.
-      Missing: reauth_confirm edge paths, reconfigure branch, custom
-      sensor_select step.
+  config-flow-test-coverage: done
   dependency-transparency: done
   docs-actions: done
   docs-high-level-description: done
