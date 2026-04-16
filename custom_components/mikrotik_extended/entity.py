@@ -103,6 +103,41 @@ def _skip_sensor(config_entry, entity_description, data, uid) -> bool:
 # ---------------------------
 #   async_add_entities
 # ---------------------------
+def _build_unique_id(entry_id, obj, uid) -> str:
+    if uid:
+        return f"{entry_id}-{obj.entity_description.key}-{slugify(str(obj._data[obj.entity_description.data_reference]).lower())}"
+    return f"{entry_id}-{obj.entity_description.key}"
+
+
+async def _try_re_enable_entity(platform, entity_registry, entity, entity_id, obj, config_entry) -> None:
+    """Re-enable a previously disabled integration entity when its option flips on."""
+    if entity.disabled_by != er.RegistryEntryDisabler.INTEGRATION:
+        return
+    enable_on = getattr(obj.entity_description, "enable_on_option", None)
+    if enable_on and config_entry.options.get(enable_on, False):
+        _LOGGER.debug("Re-enabling entity %s", entity_id)
+        entity_registry.async_update_entity(entity_id, disabled_by=None)
+        await platform.async_add_entities([obj])
+
+
+def _cleanup_orphans(hass, platform, config_entry) -> None:
+    """Remove orphaned entities and empty devices for this config entry."""
+    entity_registry = er.async_get(hass)
+    for entry in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
+        if entry.domain == platform.domain and entry.entity_id not in platform.entities:
+            if entry.disabled:
+                continue
+            _LOGGER.debug("Removing orphaned entity %s", entry.entity_id)
+            entity_registry.async_remove(entry.entity_id)
+
+    device_registry = dr.async_get(hass)
+    for device_entry in dr.async_entries_for_config_entry(device_registry, config_entry.entry_id):
+        device_entities = er.async_entries_for_device(entity_registry, device_entry.id, include_disabled_entities=True)
+        if not device_entities:
+            _LOGGER.debug("Removing empty device %s", device_entry.name)
+            device_registry.async_remove_device(device_entry.id)
+
+
 async def async_add_entities(hass: HomeAssistant, config_entry: ConfigEntry, dispatcher: dict[str, Callable]):
     """Add entities."""
     platform = ep.async_get_current_platform()
@@ -112,73 +147,55 @@ async def async_add_entities(hass: HomeAssistant, config_entry: ConfigEntry, dis
     for service in services:
         platform.async_register_entity_service(service[0], service[1], service[2])
 
+    async def async_check_exist(obj, uid: str | None = None) -> None:
+        """Check entity exists and add or re-enable as appropriate."""
+        entity_registry = er.async_get(hass)
+        unique_id = _build_unique_id(config_entry.entry_id, obj, uid)
+        entity_id = entity_registry.async_get_entity_id(platform.domain, DOMAIN, unique_id)
+        entity = entity_registry.async_get(entity_id)
+        if entity is None or ((entity_id not in platform.entities) and (entity.disabled is False)):
+            _LOGGER.debug("Add entity %s", entity_id)
+            await platform.async_add_entities([obj])
+        elif entity is not None:
+            await _try_re_enable_entity(platform, entity_registry, entity, entity_id, obj, config_entry)
+
+    async def _process_singleton(coordinator, entity_description, data) -> None:
+        if data.get(entity_description.data_attribute) is None:
+            return
+        func = dispatcher.get(entity_description.func)
+        if func is None:
+            return
+        obj = func(coordinator, entity_description)
+        await async_check_exist(obj)
+
+    async def _process_keyed(coordinator, entity_description, data) -> None:
+        if not isinstance(data, (dict, list)):
+            return
+        for uid in data:
+            if _skip_sensor(config_entry, entity_description, data, uid):
+                continue
+            func = dispatcher.get(entity_description.func)
+            if func is None:
+                continue
+            obj = func(coordinator, entity_description, uid)
+            await async_check_exist(obj, uid)
+
     @callback
     async def async_update_controller(coordinator):
         """Update the values of the controller."""
         if coordinator.data is None:
             return
 
-        async def async_check_exist(obj, uid: str | None = None) -> None:
-            """Check entity exists."""
-            entity_registry = er.async_get(hass)
-            entry_id = config_entry.entry_id
-            if uid:
-                unique_id = f"{entry_id}-{obj.entity_description.key}-{slugify(str(obj._data[obj.entity_description.data_reference]).lower())}"
-            else:
-                unique_id = f"{entry_id}-{obj.entity_description.key}"
-
-            entity_id = entity_registry.async_get_entity_id(platform.domain, DOMAIN, unique_id)
-            entity = entity_registry.async_get(entity_id)
-            if entity is None or ((entity_id not in platform.entities) and (entity.disabled is False)):
-                _LOGGER.debug("Add entity %s", entity_id)
-                await platform.async_add_entities([obj])
-            elif entity is not None and entity.disabled_by == er.RegistryEntryDisabler.INTEGRATION:
-                enable_on = getattr(obj.entity_description, "enable_on_option", None)
-                if enable_on and config_entry.options.get(enable_on, False):
-                    _LOGGER.debug("Re-enabling entity %s", entity_id)
-                    entity_registry.async_update_entity(entity_id, disabled_by=None)
-                    await platform.async_add_entities([obj])
-
         for entity_description in descriptions:
             data = coordinator.data.get(entity_description.data_path)
             if data is None:
                 continue
             if not entity_description.data_reference:
-                if data.get(entity_description.data_attribute) is None:
-                    continue
-                func = dispatcher.get(entity_description.func)
-                if func is None:
-                    continue
-                obj = func(coordinator, entity_description)
-                await async_check_exist(obj)
+                await _process_singleton(coordinator, entity_description, data)
             else:
-                if isinstance(data, (dict, list)):
-                    for uid in data:
-                        if _skip_sensor(config_entry, entity_description, data, uid):
-                            continue
-                        func = dispatcher.get(entity_description.func)
-                        if func is None:
-                            continue
-                        obj = func(coordinator, entity_description, uid)
-                        await async_check_exist(obj, uid)
+                await _process_keyed(coordinator, entity_description, data)
 
-        # Remove orphaned entities that are no longer provided by this platform
-        # Skip disabled entities — they are not loaded into platform.entities
-        entity_registry = er.async_get(hass)
-        for entry in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
-            if entry.domain == platform.domain and entry.entity_id not in platform.entities:
-                if entry.disabled:
-                    continue
-                _LOGGER.debug("Removing orphaned entity %s", entry.entity_id)
-                entity_registry.async_remove(entry.entity_id)
-
-        # Remove devices belonging to this config entry that have no remaining entities
-        device_registry = dr.async_get(hass)
-        for device_entry in dr.async_entries_for_config_entry(device_registry, config_entry.entry_id):
-            device_entities = er.async_entries_for_device(entity_registry, device_entry.id, include_disabled_entities=True)
-            if not device_entities:
-                _LOGGER.debug("Removing empty device %s", device_entry.name)
-                device_registry.async_remove_device(device_entry.id)
+        _cleanup_orphans(hass, platform, config_entry)
 
     await async_update_controller(config_entry.runtime_data.data_coordinator)
 
