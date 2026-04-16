@@ -195,6 +195,28 @@ class MikrotikAPI:
     # ---------------------------
     #   query
     # ---------------------------
+    def _materialize_list(self, response, path):
+        """Convert the API generator into a list; returns (response, missing_sentinel).
+
+        Returns ``(response, False)`` on success, ``(None, True)`` when the API path
+        is unavailable on this RouterOS version, and ``(None, False)`` on a hard
+        error (connection has already been torn down by the caller).
+        """
+        try:
+            response = list(response)
+            _LOGGER.debug("API query %s returned %d entries", path, len(response) if response else 0)
+            _LOGGER.debug("API query %s raw response: %s", path, response)
+            return response, False
+        except Exception as e:
+            if path == "/system/health" and "no such command prefix" in str(e):
+                self.disable_health = True
+                return None, True
+            if "no such command prefix" in str(e):
+                _LOGGER.debug("Mikrotik %s path %s not available: %s", self._host, path, e)
+                return None, True
+            self.disconnect(f"building list for path {path}", e)
+            return None, False
+
     def query(self, path, command=None, args=None, return_list=True) -> Optional(list):
         """Retrieve data from Mikrotik API."""
         """Returns generator object, unless return_list passed as True"""
@@ -216,20 +238,8 @@ class MikrotikAPI:
                 return None
 
             if response and return_list and not command:
-                try:
-                    response = list(response)
-                    _LOGGER.debug("API query %s returned %d entries", path, len(response) if response else 0)
-                    _LOGGER.debug("API query %s raw response: %s", path, response)
-                except Exception as e:
-                    if path == "/system/health" and "no such command prefix" in str(e):
-                        self.disable_health = True
-                        return None
-
-                    if "no such command prefix" in str(e):
-                        _LOGGER.debug("Mikrotik %s path %s not available: %s", self._host, path, e)
-                        return None
-
-                    self.disconnect(f"building list for path {path}", e)
+                response, _missing = self._materialize_list(response, path)
+                if response is None:
                     return None
 
             elif response and command:
@@ -408,6 +418,53 @@ class MikrotikAPI:
     # ---------------------------
     #   set_env_variable
     # ---------------------------
+    def _find_env_entry_id(self, env, name):
+        """Return the ``.id`` of the env variable named ``name`` or ``None``."""
+        for e in list(env):
+            if e.get("name") == name:
+                return e[".id"]
+        return None
+
+    def _update_env_entry(self, env, entry_id, value) -> bool:
+        try:
+            env.update(**{".id": entry_id, "value": str(value)})
+        except Exception as e:
+            self.disconnect("set_env_variable", e)
+            return False
+        return True
+
+    def _schedule_env_create(self, name, value, sched_name) -> bool:
+        escaped = str(value).replace("\\", "\\\\").replace('"', '\\"')
+        on_event = f':global {name} "{escaped}"; /system/scheduler/remove [find name={sched_name}]'
+        try:
+            sched = self._connection.path("/system/scheduler")
+            tuple(sched("add", name=sched_name, **{"on-event": on_event, "interval": "1s"}))
+        except Exception as e:
+            self.disconnect("set_env_variable", e)
+            return False
+        return True
+
+    def _verify_env_created(self, name) -> bool | None:
+        """Return True if env var ``name`` exists, False on API failure, None if absent."""
+        try:
+            env2 = self._connection.path(SCRIPT_ENVIRONMENT_PATH)
+            for e in env2:
+                if e.get("name") == name:
+                    return True
+        except Exception as e:
+            self.disconnect("set_env_variable", e)
+            return False
+        return None
+
+    def _cleanup_scheduler(self, sched_name) -> None:
+        try:
+            sched2 = self._connection.path("/system/scheduler")
+            for s in sched2:
+                if s.get("name") == sched_name:
+                    sched2.remove(s[".id"])
+        except Exception:
+            pass
+
     def set_env_variable(self, name, value) -> bool:
         """Create or update a RouterOS script environment variable."""
         if not self.connection_check():
@@ -417,34 +474,17 @@ class MikrotikAPI:
             # Check if variable already exists
             try:
                 env = self._connection.path(SCRIPT_ENVIRONMENT_PATH)
-                entries = list(env)
-                entry_id = None
-                for e in entries:
-                    if e.get("name") == name:
-                        entry_id = e[".id"]
-                        break
+                entry_id = self._find_env_entry_id(env, name)
             except Exception as e:
                 self.disconnect("set_env_variable", e)
                 return False
 
             if entry_id:
-                # Update existing variable directly via API
-                try:
-                    env.update(**{".id": entry_id, "value": str(value)})
-                except Exception as e:
-                    self.disconnect("set_env_variable", e)
-                    return False
-                return True
+                return self._update_env_entry(env, entry_id, value)
 
             # Variable doesn't exist — create via one-shot scheduler
-            escaped = str(value).replace("\\", "\\\\").replace('"', '\\"')
             sched_name = "_ha_env_set"
-            on_event = f':global {name} "{escaped}"; /system/scheduler/remove [find name={sched_name}]'
-            try:
-                sched = self._connection.path("/system/scheduler")
-                tuple(sched("add", name=sched_name, **{"on-event": on_event, "interval": "1s"}))
-            except Exception as e:
-                self.disconnect("set_env_variable", e)
+            if not self._schedule_env_create(name, value, sched_name):
                 return False
 
         # Wait for scheduler to execute (runs within 1s)
@@ -452,23 +492,13 @@ class MikrotikAPI:
 
         # Verify the variable was created
         with self.lock:
-            try:
-                env2 = self._connection.path(SCRIPT_ENVIRONMENT_PATH)
-                for e in env2:
-                    if e.get("name") == name:
-                        return True
-            except Exception as e:
-                self.disconnect("set_env_variable", e)
+            verified = self._verify_env_created(name)
+            if verified is True:
+                return True
+            if verified is False:
                 return False
-
             # Clean up scheduler if it didn't self-delete
-            try:
-                sched2 = self._connection.path("/system/scheduler")
-                for s in sched2:
-                    if s.get("name") == sched_name:
-                        sched2.remove(s[".id"])
-            except Exception:
-                pass
+            self._cleanup_scheduler(sched_name)
 
         _LOGGER.error("Mikrotik %s env variable %s not created by scheduler", self._host, name)
         return False
