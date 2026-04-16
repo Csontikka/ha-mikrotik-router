@@ -96,6 +96,63 @@ PATH_IP_KID_CONTROL = "/ip/kid-control"
 PPP_NOT_CONNECTED = "not connected"
 
 
+def _parse_uptime_str(uptime_str: str) -> int:
+    """Parse a RouterOS uptime string like ``1w2d3h4m5s`` into seconds."""
+    multipliers = {"w": 604800, "d": 86400, "h": 3600, "m": 60, "s": 1}
+    total = 0
+    current = ""
+    for char in uptime_str:
+        if char.isdigit():
+            current += char
+        elif char in multipliers and current:
+            total += int(current) * multipliers[char]
+            current = ""
+    return total
+
+
+def _should_update_uptime(current, uptime_tm) -> bool:
+    """Decide whether to refresh the stored uptime timestamp."""
+    if not current:
+        return True
+    uptime_old = datetime.timestamp(current)
+    return uptime_tm > uptime_old + 10
+
+
+def _percent_usage(total, free):
+    """Return percent-used for a total/free pair, or 'unknown' when total<=0."""
+    if total > 0:
+        return round(((total - free) / total) * 100)
+    return "unknown"
+
+
+def _package_enabled(packages: dict, name: str) -> bool:
+    """Return True when ``name`` is present and enabled in the packages dict."""
+    return name in packages and packages[name]["enabled"]
+
+
+def _split_queue_fields(entry: dict, vals: dict) -> None:
+    """Populate upload/download split fields on a queue entry in place."""
+    entry["comment"] = str(entry["comment"])
+    if "uniq-id" not in entry:
+        entry["uniq-id"] = entry["name"]
+
+    _bps_split_pair = [
+        ("max-limit", "upload-max-limit", "download-max-limit"),
+        ("rate", "upload-rate", "download-rate"),
+        ("limit-at", "upload-limit-at", "download-limit-at"),
+        ("burst-limit", "upload-burst-limit", "download-burst-limit"),
+        ("burst-threshold", "upload-burst-threshold", "download-burst-threshold"),
+    ]
+    for source_key, up_key, down_key in _bps_split_pair:
+        up_bps, down_bps = [int(x) for x in vals[source_key].split("/")]
+        entry[up_key] = f"{up_bps} bps"
+        entry[down_key] = f"{down_bps} bps"
+
+    upload_burst_time, download_burst_time = vals["burst-time"].split("/")
+    entry["upload-burst-time"] = upload_burst_time
+    entry["download-burst-time"] = download_burst_time
+
+
 def _parse_duration_seconds(s: str) -> int:
     """Parse a MikroTik duration string like '3m45s' into total seconds."""
     if not s or s.lower() in ("never", ""):
@@ -186,6 +243,41 @@ class MikrotikTrackerCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     #   _async_update_data
     # ---------------------------
+    @staticmethod
+    def _fill_host_defaults(host: dict) -> None:
+        """Populate missing default fields on a host entry."""
+        defaults = {
+            "address": "unknown",
+            "mac-address": "unknown",
+            "interface": "unknown",
+            "host-name": "unknown",
+            "last-seen": False,
+            "available": False,
+        }
+        for key, default in defaults.items():
+            if key not in host:
+                host[key] = default
+
+    def _should_ping_host(self, host) -> bool:
+        """Return True if the host should be arp-pinged this refresh."""
+        return self.coordinator.host_tracking_initialized and host["source"] not in ["capsman", "wireless"] and host["address"] not in ["unknown", ""] and host["interface"] not in ["unknown", ""]
+
+    async def _ping_host(self, uid: str) -> None:
+        """Run an arp_ping for host ``uid`` and update its ``available`` flag."""
+        host = self.coordinator.ds["host"][uid]
+        tmp_interface = host["interface"]
+        arp = self.coordinator.ds["arp"]
+        if uid in arp and arp[uid]["bridge"] != "":
+            tmp_interface = arp[uid]["bridge"]
+
+        _LOGGER.debug("Ping host: %s", host["address"])
+
+        host["available"] = await self.hass.async_add_executor_job(
+            self.api.arp_ping,
+            host["address"],
+            tmp_interface,
+        )
+
     async def _async_update_data(self):
         """Trigger update by timer"""
         if not self.coordinator.option_track_network_hosts:
@@ -196,42 +288,13 @@ class MikrotikTrackerCoordinator(DataUpdateCoordinator[None]):
 
         for uid in list(self.coordinator.ds["host"]):
             if not self.coordinator.host_tracking_initialized:
-                # Add missing default values
-                for key, default in zip(
-                    [
-                        "address",
-                        "mac-address",
-                        "interface",
-                        "host-name",
-                        "last-seen",
-                        "available",
-                    ],
-                    ["unknown", "unknown", "unknown", "unknown", False, False],
-                    strict=False,
-                ):
-                    if key not in self.coordinator.ds["host"][uid]:
-                        self.coordinator.ds["host"][uid][key] = default
+                self._fill_host_defaults(self.coordinator.ds["host"][uid])
 
             # Check host availability — skip on first refresh to avoid blocking
             # initial setup when there are many tracked hosts (each arp_ping takes
             # ~300 ms; sequentially over 100 hosts exceeds HA's 30-second limit).
-            if (
-                self.coordinator.host_tracking_initialized
-                and self.coordinator.ds["host"][uid]["source"] not in ["capsman", "wireless"]
-                and self.coordinator.ds["host"][uid]["address"] not in ["unknown", ""]
-                and self.coordinator.ds["host"][uid]["interface"] not in ["unknown", ""]
-            ):
-                tmp_interface = self.coordinator.ds["host"][uid]["interface"]
-                if uid in self.coordinator.ds["arp"] and self.coordinator.ds["arp"][uid]["bridge"] != "":
-                    tmp_interface = self.coordinator.ds["arp"][uid]["bridge"]
-
-                _LOGGER.debug("Ping host: %s", self.coordinator.ds["host"][uid]["address"])
-
-                self.coordinator.ds["host"][uid]["available"] = await self.hass.async_add_executor_job(
-                    self.api.arp_ping,
-                    self.coordinator.ds["host"][uid]["address"],
-                    tmp_interface,
-                )
+            if self._should_ping_host(self.coordinator.ds["host"][uid]):
+                await self._ping_host(uid)
 
             # Update last seen
             if self.coordinator.ds["host"][uid]["available"]:
@@ -549,71 +612,82 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         )
 
         if 0 < self.major_fw_version >= 7:
-            self.support_ppp = True
-            self.support_wireless = True
-            if "wifiwave2" in packages and packages["wifiwave2"]["enabled"]:
-                self.support_capsman = False
-                self._wifimodule = "wifiwave2"
+            self._detect_v7_wifi(packages)
 
-            elif (
-                ("wifi" in packages and packages["wifi"]["enabled"])
-                or ("wifi-qcom" in packages and packages["wifi-qcom"]["enabled"])
-                or ("wifi-qcom-ac" in packages and packages["wifi-qcom-ac"]["enabled"])
-                or (self.major_fw_version == 7 and self.minor_fw_version >= 13)
-                or self.major_fw_version > 7
-            ):
-                self.support_capsman = False
-                self._wifimodule = "wifi"
-
-            else:
-                self.support_capsman = True
-                self.support_wireless = bool(self.minor_fw_version < 13)
-
-            _LOGGER.debug(
-                "Mikrotik %s wifi module=%s",
-                self.host,
-                self._wifimodule,
-            )
-
-        if "ups" in packages and packages["ups"]["enabled"]:
+        if _package_enabled(packages, "ups"):
             self.support_ups = True
 
-        if "gps" in packages and packages["gps"]["enabled"]:
+        if _package_enabled(packages, "gps"):
             self.support_gps = True
 
         # WireGuard is built-in from RouterOS v7
-        if self.major_fw_version >= 7 or ("wireguard" in packages and packages["wireguard"]["enabled"]):
+        if self.major_fw_version >= 7 or _package_enabled(packages, "wireguard"):
             self.support_wireguard = True
 
         # Container support available from RouterOS v7
         if self.major_fw_version >= 7:
             self.support_containers = True
 
+    def _detect_v7_wifi(self, packages) -> None:
+        """Resolve wifi module and CAPsMAN/wireless flags on RouterOS v7."""
+        self.support_ppp = True
+        self.support_wireless = True
+        if _package_enabled(packages, "wifiwave2"):
+            self.support_capsman = False
+            self._wifimodule = "wifiwave2"
+        elif self._has_v7_wifi_module(packages):
+            self.support_capsman = False
+            self._wifimodule = "wifi"
+        else:
+            self.support_capsman = True
+            self.support_wireless = bool(self.minor_fw_version < 13)
+
+        _LOGGER.debug(
+            "Mikrotik %s wifi module=%s",
+            self.host,
+            self._wifimodule,
+        )
+
+    def _has_v7_wifi_module(self, packages) -> bool:
+        """Return True when any v7 ``wifi``/``wifi-qcom*`` package is usable."""
+        return (
+            _package_enabled(packages, "wifi")
+            or _package_enabled(packages, "wifi-qcom")
+            or _package_enabled(packages, "wifi-qcom-ac")
+            or (self.major_fw_version == 7 and self.minor_fw_version >= 13)
+            or self.major_fw_version > 7
+        )
+
     # ---------------------------
     #   async_get_host_hass
     # ---------------------------
+    def _mac_from_host_entity(self, entity) -> str | None:
+        """Extract the MAC from a device_tracker entity's unique_id."""
+        parts = entity.unique_id.split("-")
+        if len(parts) < 3 or parts[1] != "host":
+            return None
+
+        if parts[0] == self.config_entry.entry_id:
+            mac = parts[2].replace("_", ":").upper()
+        elif parts[0] == self.name.lower() and ":" in parts[2]:
+            mac = parts[2].upper()
+        else:
+            return None
+
+        return mac if len(mac) == 17 else None
+
     async def async_get_host_hass(self):
         """Get host data from HA entity registry"""
         registry = entity_registry.async_get(self.hass)
         for entity in registry.entities.values():
-            if entity.config_entry_id == self.config_entry.entry_id and entity.entity_id.startswith("device_tracker."):
-                parts = entity.unique_id.split("-")
-                if len(parts) < 3 or parts[1] != "host":
-                    continue
-
-                # New format: {entry_id}-host-{mac_slug} (underscores instead of colons)
-                if parts[0] == self.config_entry.entry_id:
-                    mac = parts[2].replace("_", ":").upper()
-                # Old format: {name}-host-{mac_with_colons}
-                elif parts[0] == self.name.lower() and ":" in parts[2]:
-                    mac = parts[2].upper()
-                else:
-                    continue
-
-                if len(mac) != 17:
-                    continue
-
-                self.ds["host_hass"][mac] = entity.original_name
+            if entity.config_entry_id != self.config_entry.entry_id:
+                continue
+            if not entity.entity_id.startswith("device_tracker."):
+                continue
+            mac = self._mac_from_host_entity(entity)
+            if mac is None:
+                continue
+            self.ds["host_hass"][mac] = entity.original_name
 
     # ---------------------------
     #   _async_update_data
@@ -1816,39 +1890,15 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
         )
 
-        tmp_uptime = 0
-        _uptime_multipliers = {"w": 604800, "d": 86400, "h": 3600, "m": 60, "s": 1}
-        _current = ""
-        for _char in self.ds["resource"]["uptime_str"]:
-            if _char.isdigit():
-                _current += _char
-            elif _char in _uptime_multipliers and _current:
-                tmp_uptime += int(_current) * _uptime_multipliers[_char]
-                _current = ""
-
+        tmp_uptime = _parse_uptime_str(self.ds["resource"]["uptime_str"])
         self.ds["resource"]["uptime_epoch"] = tmp_uptime
         now = datetime.now().replace(microsecond=0)
         uptime_tm = datetime.timestamp(now - timedelta(seconds=tmp_uptime))
-        update_uptime = False
-        if not self.ds["resource"]["uptime"]:
-            update_uptime = True
-        else:
-            uptime_old = datetime.timestamp(self.ds["resource"]["uptime"])
-            if uptime_tm > uptime_old + 10:
-                update_uptime = True
-
-        if update_uptime:
+        if _should_update_uptime(self.ds["resource"]["uptime"], uptime_tm):
             self.ds["resource"]["uptime"] = utc_from_timestamp(uptime_tm)
 
-        if self.ds["resource"]["total-memory"] > 0:
-            self.ds["resource"]["memory-usage"] = round(((self.ds["resource"]["total-memory"] - self.ds["resource"]["free-memory"]) / self.ds["resource"]["total-memory"]) * 100)
-        else:
-            self.ds["resource"]["memory-usage"] = "unknown"
-
-        if self.ds["resource"]["total-hdd-space"] > 0:
-            self.ds["resource"]["hdd-usage"] = round(((self.ds["resource"]["total-hdd-space"] - self.ds["resource"]["free-hdd-space"]) / self.ds["resource"]["total-hdd-space"]) * 100)
-        else:
-            self.ds["resource"]["hdd-usage"] = "unknown"
+        self.ds["resource"]["memory-usage"] = _percent_usage(self.ds["resource"]["total-memory"], self.ds["resource"]["free-memory"])
+        self.ds["resource"]["hdd-usage"] = _percent_usage(self.ds["resource"]["total-hdd-space"], self.ds["resource"]["free-hdd-space"])
 
         if "uptime_epoch" in self.ds["resource"] and self.rebootcheck > self.ds["resource"]["uptime_epoch"]:
             self.get_firmware_update()
@@ -2071,43 +2121,16 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         )
 
         for uid, vals in self.ds["queue"].items():
-            self.ds["queue"][uid]["comment"] = str(self.ds["queue"][uid]["comment"])
-            # Generate uniq-id from name for entity unique_id
-            if "uniq-id" not in self.ds["queue"][uid]:
-                self.ds["queue"][uid]["uniq-id"] = self.ds["queue"][uid]["name"]
+            _split_queue_fields(self.ds["queue"][uid], vals)
 
-            upload_max_limit_bps, download_max_limit_bps = [int(x) for x in vals["max-limit"].split("/")]
-            self.ds["queue"][uid]["upload-max-limit"] = f"{upload_max_limit_bps} bps"
-            self.ds["queue"][uid]["download-max-limit"] = f"{download_max_limit_bps} bps"
+        self._dedupe_queue_uniq_ids()
 
-            upload_rate_bps, download_rate_bps = [int(x) for x in vals["rate"].split("/")]
-            self.ds["queue"][uid]["upload-rate"] = f"{upload_rate_bps} bps"
-            self.ds["queue"][uid]["download-rate"] = f"{download_rate_bps} bps"
-
-            upload_limit_at_bps, download_limit_at_bps = [int(x) for x in vals["limit-at"].split("/")]
-            self.ds["queue"][uid]["upload-limit-at"] = f"{upload_limit_at_bps} bps"
-            self.ds["queue"][uid]["download-limit-at"] = f"{download_limit_at_bps} bps"
-
-            upload_burst_limit_bps, download_burst_limit_bps = [int(x) for x in vals["burst-limit"].split("/")]
-            self.ds["queue"][uid]["upload-burst-limit"] = f"{upload_burst_limit_bps} bps"
-            self.ds["queue"][uid]["download-burst-limit"] = f"{download_burst_limit_bps} bps"
-
-            upload_burst_threshold_bps, download_burst_threshold_bps = [int(x) for x in vals["burst-threshold"].split("/")]
-            self.ds["queue"][uid]["upload-burst-threshold"] = f"{upload_burst_threshold_bps} bps"
-            self.ds["queue"][uid]["download-burst-threshold"] = f"{download_burst_threshold_bps} bps"
-
-            upload_burst_time, download_burst_time = vals["burst-time"].split("/")
-            self.ds["queue"][uid]["upload-burst-time"] = upload_burst_time
-            self.ds["queue"][uid]["download-burst-time"] = download_burst_time
-
-        # Handle duplicate Queue entries - suffix uniq-id with RouterOS ID to keep all rules
-        queue_seen = {}
+    def _dedupe_queue_uniq_ids(self) -> None:
+        """Suffix uniq-id with RouterOS id when multiple queues share a name."""
+        queue_seen: dict[str, list[str]] = {}
         for uid in self.ds["queue"]:
             tmp_name = self.ds["queue"][uid]["uniq-id"]
-            if tmp_name not in queue_seen:
-                queue_seen[tmp_name] = [uid]
-            else:
-                queue_seen[tmp_name].append(uid)
+            queue_seen.setdefault(tmp_name, []).append(uid)
 
         for tmp_name, uids in queue_seen.items():
             if len(uids) > 1:
