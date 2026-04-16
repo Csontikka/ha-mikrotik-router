@@ -193,8 +193,8 @@ def generate_version_list(start_version: str, end_version: str) -> list:
     return versions
 
 
-def decrement_version(version: Version, start_version: Version) -> Version:
-    """Decrement version by the smallest possible step without going below start_version."""
+def decrement_version(version: Version, _start_version: Version) -> Version:
+    """Decrement version by the smallest possible step."""
     if version.micro > 0:
         next_patch = version.micro - 1
         return Version(f"{version.major}.{version.minor}.{next_patch}")
