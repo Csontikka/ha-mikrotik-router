@@ -191,7 +191,8 @@ async def _snmp_sysname(loop: asyncio.AbstractEventLoop, ip: str) -> str | None:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setblocking(False)
         sock.sendto(_SNMP_SYSNAME_GET, (ip, _SNMP_PORT))
-        data = await asyncio.wait_for(loop.sock_recv(sock, 1024), timeout=_SNMP_TIMEOUT)
+        async with asyncio.timeout(_SNMP_TIMEOUT):
+            data = await loop.sock_recv(sock, 1024)
         return _parse_snmp_sysname(data)
     except OSError:
         return None
@@ -211,7 +212,8 @@ async def _mndp_unicast(loop: asyncio.AbstractEventLoop, ip: str, timeout: float
         return None
 
     try:
-        data = await asyncio.wait_for(loop.sock_recv(sock, 4096), timeout=timeout)
+        async with asyncio.timeout(timeout):
+            data = await loop.sock_recv(sock, 4096)
         return _parse_mndp(data)
     except OSError:
         return None
@@ -256,7 +258,8 @@ async def _collect_broadcast_replies(loop, sock, found, deadline) -> None:
         if remaining <= 0:
             return
         try:
-            data = await asyncio.wait_for(loop.sock_recv(sock, 4096), timeout=remaining)
+            async with asyncio.timeout(remaining):
+                data = await loop.sock_recv(sock, 4096)
         except TimeoutError:
             return
         except OSError:
