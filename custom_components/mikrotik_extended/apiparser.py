@@ -9,6 +9,33 @@ from .const import TO_REDACT
 
 _LOGGER = getLogger(__name__)
 
+_MISSING = object()
+
+
+def _resolve_entry_value(entry, param):
+    """Return the value at path ``param`` (supports ``a/b/c``), or _MISSING."""
+    if "/" in param:
+        for tmp_param in param.split("/"):
+            if isinstance(entry, dict) and tmp_param in entry:
+                entry = entry[tmp_param]
+            else:
+                return _MISSING
+        return entry
+    if param in entry:
+        return entry[param]
+    return _MISSING
+
+
+def _coerce_typed(ret):
+    """Coerce ret to its matching str/int/float form."""
+    if isinstance(ret, str):
+        return str(ret)
+    if isinstance(ret, int):
+        return int(ret)
+    if isinstance(ret, float):
+        return round(float(ret), 2)
+    return ret
+
 
 # ---------------------------
 #   utc_from_timestamp
@@ -23,26 +50,12 @@ def utc_from_timestamp(timestamp: float) -> datetime:
 # ---------------------------
 def from_entry(entry, param, default="") -> str:
     """Validate and return str value an API dict."""
-    if "/" in param:
-        for tmp_param in param.split("/"):
-            if isinstance(entry, dict) and tmp_param in entry:
-                entry = entry[tmp_param]
-            else:
-                return default
-
-        ret = entry
-    elif param in entry:
-        ret = entry[param]
-    else:
+    ret = _resolve_entry_value(entry, param)
+    if ret is _MISSING:
         return default
 
     if default != "":
-        if isinstance(ret, str):
-            ret = str(ret)
-        elif isinstance(ret, int):
-            ret = int(ret)
-        elif isinstance(ret, float):
-            ret = round(float(ret), 2)
+        ret = _coerce_typed(ret)
 
     return ret[:255] if isinstance(ret, str) and len(ret) > 255 else ret
 
@@ -52,23 +65,15 @@ def from_entry(entry, param, default="") -> str:
 # ---------------------------
 def from_entry_bool(entry, param, default=False, reverse=False) -> bool:
     """Validate and return a bool value from an API dict."""
-    if "/" in param:
-        for tmp_param in param.split("/"):
-            if isinstance(entry, dict) and tmp_param in entry:
-                entry = entry[tmp_param]
-            else:
-                return not default if reverse else default
-
-        ret = entry
-    elif param in entry:
-        ret = entry[param]
-    else:
+    ret = _resolve_entry_value(entry, param)
+    if ret is _MISSING:
         return not default if reverse else default
 
     if isinstance(ret, str):
-        if ret.lower() in ("on", "yes", "up"):
+        lowered = ret.lower()
+        if lowered in ("on", "yes", "up"):
             ret = True
-        elif ret.lower() in ("off", "no", "down"):
+        elif lowered in ("off", "no", "down"):
             ret = False
 
     if not isinstance(ret, bool):
@@ -158,29 +163,36 @@ def parse_api(
 # ---------------------------
 #   get_uid
 # ---------------------------
-def get_uid(entry, key, key_secondary, key_search, keymap) -> str | None:
-    """Get UID for data list."""
-    uid = None
-    if not key_search:
-        key_primary_found = key in entry
-        if key_primary_found and not entry[key]:
-            return None
-
-        if key_primary_found:
-            uid = entry[key]
-        elif key_secondary:
-            if key_secondary not in entry:
-                return None
-
-            if not entry[key_secondary]:
-                return None
-
-            uid = entry[key_secondary]
-    elif keymap and key_search in entry and entry[key_search] in keymap:
-        uid = keymap[entry[key_search]]
-    else:
+def _uid_from_primary_or_secondary(entry, key, key_secondary) -> str | None:
+    """Resolve uid from primary key, falling back to the secondary key."""
+    key_primary_found = key in entry
+    if key_primary_found and not entry[key]:
         return None
 
+    if key_primary_found:
+        return entry[key]
+    if key_secondary:
+        if key_secondary not in entry:
+            return None
+        if not entry[key_secondary]:
+            return None
+        return entry[key_secondary]
+    return None
+
+
+def _uid_from_keymap(entry, key_search, keymap) -> str | None:
+    """Resolve uid via the pre-computed keymap."""
+    if keymap and key_search in entry and entry[key_search] in keymap:
+        return keymap[entry[key_search]]
+    return None
+
+
+def get_uid(entry, key, key_secondary, key_search, keymap) -> str | None:
+    """Get UID for data list."""
+    if not key_search:
+        uid = _uid_from_primary_or_secondary(entry, key, key_secondary)
+    else:
+        uid = _uid_from_keymap(entry, key_search, keymap)
     return uid or None
 
 
