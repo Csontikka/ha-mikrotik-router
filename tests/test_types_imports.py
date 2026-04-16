@@ -5,12 +5,21 @@ them to be imported so every module-level statement runs.
 """
 
 from custom_components.mikrotik_extended import (
+    binary_sensor_types,
     button_types,
     device_tracker_types,
     sensor_types,
     switch_types,
     update_types,
 )
+
+
+def test_binary_sensor_types_definitions():
+    assert binary_sensor_types.SENSOR_TYPES
+    seen_keys = set()
+    for desc in binary_sensor_types.SENSOR_TYPES:
+        assert desc.key not in seen_keys, f"Duplicate binary sensor key: {desc.key}"
+        seen_keys.add(desc.key)
 
 
 def test_button_types_definitions():
