@@ -858,33 +858,13 @@ class TestExtraStateAttributes:
 
 
 class TestNotImplementedMethods:
-    async def test_start_raises(self, hass):
+    @pytest.mark.parametrize("method_name", ["start", "stop", "restart", "reload"])
+    async def test_method_raises(self, hass, method_name):
         desc = _make_entity_description()
         coord = _make_coordinator(hass, data={"resource": {"cpu-load": 0}})
         entity = _make_entity(coord, desc)
         with pytest.raises(NotImplementedError):
-            await entity.start()
-
-    async def test_stop_raises(self, hass):
-        desc = _make_entity_description()
-        coord = _make_coordinator(hass, data={"resource": {"cpu-load": 0}})
-        entity = _make_entity(coord, desc)
-        with pytest.raises(NotImplementedError):
-            await entity.stop()
-
-    async def test_restart_raises(self, hass):
-        desc = _make_entity_description()
-        coord = _make_coordinator(hass, data={"resource": {"cpu-load": 0}})
-        entity = _make_entity(coord, desc)
-        with pytest.raises(NotImplementedError):
-            await entity.restart()
-
-    async def test_reload_raises(self, hass):
-        desc = _make_entity_description()
-        coord = _make_coordinator(hass, data={"resource": {"cpu-load": 0}})
-        entity = _make_entity(coord, desc)
-        with pytest.raises(NotImplementedError):
-            await entity.reload()
+            await getattr(entity, method_name)()
 
 
 # ---------------------------------------------------------------------------
