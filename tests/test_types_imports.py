@@ -52,4 +52,9 @@ def test_switch_types_definitions():
 
 
 def test_update_types_definitions():
-    assert update_types.SENSOR_TYPES or hasattr(update_types, "SENSOR_TYPES")
+    assert update_types.SENSOR_TYPES
+    seen_keys = set()
+    for desc in update_types.SENSOR_TYPES:
+        assert desc.key not in seen_keys, f"Duplicate update key: {desc.key}"
+        seen_keys.add(desc.key)
+        assert desc.data_path
